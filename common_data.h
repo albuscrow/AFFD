@@ -292,7 +292,7 @@ class CommonData
 	//CtrlPoint targetCtrlPoint[MAXCTRLPOINT][MAXCTRLPOINT][MAXCTRLPOINT];
 	CtrlPoint animationList[MAXANIMATIONSTEP][MAXCTRLPOINT][MAXCTRLPOINT][MAXCTRLPOINT];
 	int animationTimeList[MAXANIMATIONSTEP];
-	int animationStep;
+	unsigned long animationStep;
 	std::vector<DirectPoint> directPointVector;
 	/* 每一节点盒当中裁剪后的多边形 */
 	std::vector<TrimmedPolygon> trimmedPolygonList[MAXKNOTINTERVAL][MAXKNOTINTERVAL][MAXKNOTINTERVAL];
@@ -442,10 +442,10 @@ public:
 
 	void preCalc(bool reset_ctrl_point = true);
 	void execute();
-	int objMtlTexListSize() const {return objData->mtlTexList.size();}
+	unsigned long objMtlTexListSize() const {return objData->mtlTexList.size();}
 	//int *faceMtl(const int i) {return faceMtlList[i];}
 	int *faceMtl(int i) {return faceMtlList[i];}
-	int faceMtlListSize() const {return faceMtlList.size();}
+	unsigned long faceMtlListSize() const {return faceMtlList.size();}
 	int faceMtlCount(int i) const {return faceMtlCountList[i];}
 	objdata::MtlTex getMtl(int i) const;
 	/* 返回d方向（可能为U, V, W）的节点区间数 */
@@ -459,7 +459,7 @@ public:
 	void newSamplePointTesslate();
 	void callTesslateD();
 
-	int directPointVectorSize() const {return directPointVector.size();}
+	unsigned long directPointVectorSize() const {return directPointVector.size();}
 	const DirectPoint &directPoint(int idx) const
 	{return directPointVector[idx];}
 	void directPointVectorPush(DirectPoint &p);

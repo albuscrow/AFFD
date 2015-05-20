@@ -1,8 +1,8 @@
-include_directories(${PROJECT_SOURCE_DIR})
-
 cmake_minimum_required(VERSION 2.8)
-find_package(CUDA QUIET REQUIRED)
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+include_directories(${PROJECT_SOURCE_DIR})
+find_package(CUDA QUIET REQUIRED)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -23,5 +23,3 @@ cuda_add_executable(affd ${SRC_FILES})
 CUDA_ADD_CUBLAS_TO_TARGET(affd)
 
 target_link_libraries(affd Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} lapackpp)
-
-

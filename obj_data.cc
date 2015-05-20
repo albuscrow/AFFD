@@ -296,7 +296,7 @@ namespace objdata
 				else if (primitive == "usemtl")		// 这一行是使用材质信息
 					parseUseMtl(iss, mtlRangeList);
 			}
-			int size = mtlRangeList.size();
+			unsigned long size = mtlRangeList.size();
 			if (size != 0)
 				mtlRangeList[size - 1].m_nEnd = faceList.size() - 1;
 		}
@@ -334,9 +334,9 @@ namespace objdata
 			for (std::vector<MtlRange>::size_type i = 0; i < mtlRangeList.size(); ++i)
 			{
 				string name = mtlRangeList[i].m_sMtlName;
-				int begin = mtlRangeList[i].m_nBegin;
-				int end = mtlRangeList[i].m_nEnd;
-				int mtlIdx = -1;
+				unsigned long begin = mtlRangeList[i].m_nBegin;
+				unsigned long end = mtlRangeList[i].m_nEnd;
+				long mtlIdx = -1l;
 				for (std::vector<MtlTex>::size_type j = 0; j < mtlTexList.size(); ++j)
 				{
 					if (mtlTexList[j].m_sMtlTexName == name)
@@ -345,7 +345,7 @@ namespace objdata
 						break;
 					}
 				}
-				for (int j = begin; j <= end; ++j)
+				for (unsigned long j = begin; j <= end; ++j)
 				{
 					faceList[j].m_nMtlIdx = mtlIdx;
 				}

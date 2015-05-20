@@ -93,7 +93,7 @@ namespace objdata
 		std::vector<int> textureCoordIndex;		// 纹理坐标的索引
 		std::vector<int> normalCoordIndex;		// 法向坐标的索引
 		FaceCase m_eFaceCase;					// 该面片使用纹理、法向的情况
-		int m_nMtlIdx;							// 使用材质的编号
+		long m_nMtlIdx;							// 使用材质的编号
 		Face();
 		Face(const Face& face);
 	};
@@ -104,7 +104,7 @@ namespace objdata
 	struct MtlRange
 	{
 		std::string m_sMtlName;		// mtl的名字
-		int m_nBegin, m_nEnd;		// mtl开始、结束的面片编号
+		unsigned long m_nBegin, m_nEnd;		// mtl开始、结束的面片编号
 		MtlRange(const std::string &mtlName, const int begin);
 		MtlRange(const MtlRange &mtlRange);
 	};
@@ -144,9 +144,9 @@ namespace objdata
 		std::vector<TextureCoord> textureCoordList;		// 存放纹理坐标
 		std::vector<NormalCoord> normalCoordList;		// 存放法向坐标
 		std::vector<Face> faceList;						// 存放面片信息
-		std::vector<MtlTex> mtlTexList;
-
 		void readObj(const char *filePath);		// 读取obj文件数据并存放
+
+		std::vector<MtlTex> mtlTexList;
 	};
 }
 
