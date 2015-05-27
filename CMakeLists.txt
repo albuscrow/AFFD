@@ -17,7 +17,7 @@ find_package(Qt5OpenGL)
 
 find_package(OpenGL)
 find_package(GLUT)
-file(GLOB SRC_FILES *.cpp *.h *.cu *.cc)
+file(GLOB SRC_FILES *.cpp *.h *.cu *.cc triangle.c)
 
 cuda_add_executable(affd ${SRC_FILES})
 CUDA_ADD_CUBLAS_TO_TARGET(affd)

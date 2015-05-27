@@ -998,33 +998,43 @@ void CommonData::clipPolygon() {
                     bool useTexture = false;
                     if (faceList[f].m_eFaceCase == V_T_N)
                         useTexture = true;
-                    int mtlIdx = faceList[f].m_nMtlIdx;
-                    VertexCoord v_origin[3];
-                    int idx = faceList[f].vertexCoordIndex[0];
+                    long mtlIdx = faceList[f].m_nMtlIdx;
+
+                    vector<int> &vertexCoordIndex = faceList[f].vertexCoordIndex;
+                    //获得三个顶点
+                    VertexCoord v_origin[3]; //表示物体原来的三个顶点
+                    int idx = vertexCoordIndex[0];
                     v_origin[0] = vertexCoordList[idx];
-                    idx = faceList[f].vertexCoordIndex[1];
+
+                    idx = vertexCoordIndex[1];
                     v_origin[1] = vertexCoordList[idx];
-                    idx = faceList[f].vertexCoordIndex[2];
+
+                    idx = vertexCoordIndex[2];
                     v_origin[2] = vertexCoordList[idx];
+
                     TrimmedPolygon tempPolygon(useTexture, mtlIdx, v_origin, f);
                     tempPolygon.push_back_adjust(false);
                     tempPolygon.push_back_adjust(false);
                     tempPolygon.push_back_adjust(false);
-                    for (unsigned int s = 0; s < faceList[f].vertexCoordIndex.size(); ++s) {
-                        int idx = faceList[f].vertexCoordIndex[s];
+                    for (unsigned int s = 0; s < vertexCoordIndex.size(); ++s) {
+                        int idx = vertexCoordIndex[s];
                         tempPolygon.push_back(vertexCoordList[idx]);
 
-                        int prev_id = faceList[f].vertexCoordIndex[faceList[f].vertexCoordIndex.size() - 1];
+                        //找出前一个定点index，如果当前定点index是0,则前一个就是最后一个
+                        int prev_id = vertexCoordIndex[vertexCoordIndex.size() - 1];
                         if (s != 0)
-                            prev_id = faceList[f].vertexCoordIndex[s - 1];
+                            prev_id = vertexCoordIndex[s - 1];
+
                         tempPolygon.push_back_n_count(findNormalCount(idx, prev_id));
 
-                        idx = faceList[f].normalCoordIndex[s];
-                        const NormalCoord &temp_n(objData->normalCoordList[idx]);
+                        //这边的nornalidx又是f面s顶点的法向index了
+                        int normalidx = faceList[f].normalCoordIndex[s];
+
+                        const NormalCoord &temp_n(objData->normalCoordList[normalidx]);
                         tempPolygon.push_back_n(NormalCoord(temp_n.i(), temp_n.j(), temp_n.k()));
                         tempPolygon.push_back_n_adj(NormalCoord(temp_n.i(), temp_n.j(), temp_n.k()));
 #ifdef IS_BORDER_INFO
-                        tempPolygon.push_back_border(findIsBorder(idx, prev_id));
+                        tempPolygon.push_back_border(findIsBorder(normalidx, prev_id));
 #endif
                     }
                     for (unsigned int s = 0; s < faceList[f].textureCoordIndex.size(); ++s) {
@@ -1404,40 +1414,42 @@ void CommonData::triangulatePolygon() {
     for (int i = 0; i < m_nKnotIntervalCount[U]; ++i) {
         for (int j = 0; j < m_nKnotIntervalCount[V]; ++j) {
             for (int k = 0; k < m_nKnotIntervalCount[W]; ++k) {
-                for (unsigned int p = 0; p < trimmedPolygonList[i][j][k].size(); ++p) {
-                    const VertexCoord &v0 = trimmedPolygonList[i][j][k][p][0];
-                    const VertexCoord &n0 = trimmedPolygonList[i][j][k][p].getNormal(0);
-                    const VertexCoord &n_adj0 = trimmedPolygonList[i][j][k][p].getNormalAdj(0);
+                vector<TrimmedPolygon> &TrimmedPolygonList = trimmedPolygonList[i][j][k];
+                for (unsigned int p = 0; p < TrimmedPolygonList.size(); ++p) {
+                    TrimmedPolygon &trimmedPolygon = TrimmedPolygonList[p];
+                    const VertexCoord &v0 = trimmedPolygon[0];
+                    const VertexCoord n0 = trimmedPolygon.getNormal(0);
+                    const VertexCoord n_adj0 = trimmedPolygon.getNormalAdj(0);
                     //cout << "n0 = " << n0.x() << ", " << n0.y() << ", " << n0.z() << endl;
-                    int origin_face_idx = trimmedPolygonList[i][j][k][p].origin_face_idx_;
-                    bool useTex = trimmedPolygonList[i][j][k][p].useTexture();
+                    int origin_face_idx = trimmedPolygon.origin_face_idx_;
+                    bool useTex = trimmedPolygon.useTexture();
                     TextureCoord vt0;
                     if (useTex)
-                        vt0 = trimmedPolygonList[i][j][k][p].getTexture(0);
-                    int mtlIdx = trimmedPolygonList[i][j][k][p].mtlIdx();
+                        vt0 = trimmedPolygon.getTexture(0);
+                    int mtlIdx = trimmedPolygon.mtlIdx();
                     if (mtlIdx == -1)
                         mtlIdx = mtlFaceList.size() - 1;
-                    const VertexCoord *v_origin = trimmedPolygonList[i][j][k][p].v_origin;
+                    const VertexCoord *v_origin = trimmedPolygon.v_origin;
 #ifdef LINE
 					const VertexCoord &bary_origin0 = trimmedPolygonList[i][j][k][p].getBary(0);
 #endif
-                    int size = trimmedPolygonList[i][j][k][p].size();
+                    int size = trimmedPolygon.size();
                     for (int q = 1; q < size - 1; ++q) {
-                        int nc0, nc1, nc2 = trimmedPolygonList[i][j][k][p].normalCount(q + 1);
+                        int nc0, nc1, nc2 = trimmedPolygon.normalCount(q + 1);
                         if (size == 3)        // 三角形扇仅有一个三角形，需要单独处理
                         {
-                            nc0 = trimmedPolygonList[i][j][k][p].normalCount(0);
-                            nc1 = trimmedPolygonList[i][j][k][p].normalCount(1);
+                            nc0 = trimmedPolygon.normalCount(0);
+                            nc1 = trimmedPolygon.normalCount(1);
                         }
                         else if (q == 1)    // 三角形扇的第一个三角形
                         {
                             nc0 = 1;
-                            nc1 = trimmedPolygonList[i][j][k][p].normalCount(1);
+                            nc1 = trimmedPolygon.normalCount(1);
                             //cout << "q = 1" << endl;
                         }
                         else if (q == size - 2)        // 三角形扇的最后一个三角形
                         {
-                            nc0 = trimmedPolygonList[i][j][k][p].normalCount(0);
+                            nc0 = trimmedPolygon.normalCount(0);
                             nc1 = 1;
                             //cout << "q = size - 2" << endl;
                         }
@@ -1448,29 +1460,29 @@ void CommonData::triangulatePolygon() {
                             //cout << "else" << endl;
                         }
                         if (useTex) {
-                            Triangle t(v0, trimmedPolygonList[i][j][k][p][q], trimmedPolygonList[i][j][k][p][q + 1],
-                                       n0, trimmedPolygonList[i][j][k][p].getNormal(q),
-                                       trimmedPolygonList[i][j][k][p].getNormal(q + 1),
-                                       n_adj0, trimmedPolygonList[i][j][k][p].getNormalAdj(q),
-                                       trimmedPolygonList[i][j][k][p].getNormalAdj(q + 1),
+                            Triangle t(v0, trimmedPolygon[q], trimmedPolygon[q + 1],
+                                       n0, trimmedPolygon.getNormal(q),
+                                       trimmedPolygon.getNormal(q + 1),
+                                       n_adj0, trimmedPolygon.getNormalAdj(q),
+                                       trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
 									   bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q), trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
                                        v_origin, origin_face_idx,
                                        nc0, nc1, nc2,
-                                       vt0, trimmedPolygonList[i][j][k][p].getTexture(q),
-                                       trimmedPolygonList[i][j][k][p].getTexture(q + 1));
+                                       vt0, trimmedPolygon.getTexture(q),
+                                       trimmedPolygon.getTexture(q + 1));
                             triangleList.push_back(t);
                             //cout << "n1 = " << trimmedPolygonList[i][j][k][p].getNormal(q).x()
                             //<< ", " << trimmedPolygonList[i][j][k][p].getNormal(q).y()
                             //<< ", " << trimmedPolygonList[i][j][k][p].getNormal(q).z() << endl;
                         }
                         else {
-                            Triangle t(v0, trimmedPolygonList[i][j][k][p][q], trimmedPolygonList[i][j][k][p][q + 1],
-                                       n0, trimmedPolygonList[i][j][k][p].getNormal(q),
-                                       trimmedPolygonList[i][j][k][p].getNormal(q + 1),
-                                       n_adj0, trimmedPolygonList[i][j][k][p].getNormalAdj(q),
-                                       trimmedPolygonList[i][j][k][p].getNormalAdj(q + 1),
+                            Triangle t(v0, trimmedPolygon[q], trimmedPolygon[q + 1],
+                                       n0, trimmedPolygon.getNormal(q),
+                                       trimmedPolygon.getNormal(q + 1),
+                                       n_adj0, trimmedPolygon.getNormalAdj(q),
+                                       trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
 									   bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q), trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
@@ -2257,6 +2269,7 @@ void CommonData::setSamplePointCount(int count) {
 }
 
 /* 设置变形算法（CYM，PN_CUTTING 或 PN_NO_CUTTING） */
+
 void CommonData::setAlgorithmType() {
     if (algorithm_type_ == CYM)
         algorithm_type_ = PN_CUTTING;

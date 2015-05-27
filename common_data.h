@@ -209,7 +209,7 @@ private:
 	// is_border_list[i]表示vertexList[i-1]到vertexList[i]那条边是否是边界
 	std::vector<bool> is_border_list;
 #endif
-	// adjust_list[i]表示vertexList[i]是否进行第一阶段调整
+	// adjust_list[i]表示vertexList[i]是否进行第一阶段调整???
 	std::vector<bool> adjust_list;
 #ifdef LINE
 	std::vector<objdata::VertexCoord> bary_origin_list;
