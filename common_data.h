@@ -477,6 +477,11 @@ public:
 	void setAdjustSplitPoints(bool adjust) {adjust_split_points_ = adjust;}
 
 	//void moveShip(int target, int id0, int id1, int xyz);
+	void split(objdata::VertexCoord pCoord[], std::vector<objdata::SplitResultPoint> &points,
+                                              std::vector<objdata::SplitResultTriangle> &triangles);
+
+	void acSplit();
 };
+
 
 #endif

@@ -5,6 +5,7 @@
 #include <QTime>
 #include <lapackpp/blas3pp.h>
 #include <lapackpp/laslv.h>
+#include "triangle.h"
 
 #include <sstream>
 
@@ -691,13 +692,17 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tGPU : 按照PN-Triangle方法计算原始面片的控制顶点" << endl;
 
-        clipPolygon();
-        elapsedTimeLoad = calcTimeLoad.restart();
-        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形" << endl;
+//        clipPolygon();
+//        elapsedTimeLoad = calcTimeLoad.restart();
+//        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形" << endl;
+//
+//        triangulatePolygon();
+//        elapsedTimeLoad = calcTimeLoad.restart();
+//        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
 
-        triangulatePolygon();
+        acSplit();
         elapsedTimeLoad = calcTimeLoad.restart();
-        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
     }
 
     loadTriangleListD(triangleList, triangle_adjacent_table_, m_nOrder[0] + m_nOrder[1] + m_nOrder[2] - 3);
@@ -1001,6 +1006,7 @@ void CommonData::clipPolygon() {
                     long mtlIdx = faceList[f].m_nMtlIdx;
 
                     vector<int> &vertexCoordIndex = faceList[f].vertexCoordIndex;
+
                     //获得三个顶点
                     VertexCoord v_origin[3]; //表示物体原来的三个顶点
                     int idx = vertexCoordIndex[0];
@@ -1011,6 +1017,7 @@ void CommonData::clipPolygon() {
 
                     idx = vertexCoordIndex[2];
                     v_origin[2] = vertexCoordList[idx];
+
 
                     TrimmedPolygon tempPolygon(useTexture, mtlIdx, v_origin, f);
                     tempPolygon.push_back_adjust(false);
@@ -1037,6 +1044,11 @@ void CommonData::clipPolygon() {
                         tempPolygon.push_back_border(findIsBorder(normalidx, prev_id));
 #endif
                     }
+
+                    if (faceList[f].textureCoordIndex.size() != 3) {
+                        cout << "noooo!!!!!";
+                    }
+
                     for (unsigned int s = 0; s < faceList[f].textureCoordIndex.size(); ++s) {
                         int idx = faceList[f].textureCoordIndex[s];
                         tempPolygon.push_back_texture(objData->textureCoordList[idx]);
@@ -2440,4 +2452,188 @@ void CommonData::saveEdit(std::ofstream &fout) {
     for (vector<DirectPoint>::size_type i = 0; i != directPointVector.size(); ++i) {
         fout << "\t\t\t\t\t" << directPointVector[i] << endl;
     }
+}
+
+#define XMIN 1
+#define YMIN 2
+#define ZMIN 3
+
+
+void report(struct triangulateio *io) {
+    int i, j;
+
+    for (i = 0; i < io->numberofpoints; i++) {
+        printf("Point %4d:", i);
+        for (j = 0; j < 2; j++) {
+            printf("  %.6g", io->pointlist[i * 2 + j]);
+        }
+    }
+}
+
+
+
+
+void CommonData::split(VertexCoord pCoord[], vector<SplitResultPoint> &points,
+                                              vector<SplitResultTriangle> &triangles) {
+    //因为是所用的细分库是二维的，所以传入的三角形要舍弃一个维度，为了使细分效果跟好，
+    //舍弃一个维度后要保证三角形面积尽量大
+    //所用的算法是计算三角形的法向，然后根据法向的最大分量确定舍弃的维度。
+
+    VertexCoord u = pCoord[0] - pCoord[1];
+    VertexCoord v = pCoord[0] - pCoord[2];
+
+    VertexCoord normal;
+    normal.x(u.y() * v.z() - u.z() * v.y());
+    normal.y(u.z() * v.x() - u.x() * v.z());
+    normal.z(u.x() * v.y() - u.y() * v.x());
+
+    normal.x(fabs(normal.x()));
+    normal.y(fabs(normal.y()));
+    normal.z(fabs(normal.z()));
+
+
+    int deletedAxis;
+    if (normal.x() > normal.y() && normal.x() > normal.z()) {
+        deletedAxis = XMIN;
+    } else if (normal.y() > normal.z()) {
+        deletedAxis = YMIN;
+    } else {
+        deletedAxis = ZMIN;
+    }
+
+    struct triangulateio in, out;
+
+    /* Define input points. */
+
+    in.numberofpoints = 3;
+    in.numberofpointattributes = 0;
+    in.pointlist = (double *) malloc(in.numberofpoints * 2 * sizeof(double));
+    for (int j = 0; j < 3; ++j) {
+        switch (deletedAxis) {
+            case XMIN:
+                in.pointlist[j * 2] = pCoord[j].y();
+                in.pointlist[j * 2 + 1] = pCoord[j].z();
+                break;
+
+            case YMIN:
+
+                in.pointlist[j * 2] = pCoord[j].x();
+                in.pointlist[j * 2 + 1] = pCoord[j].z();
+                break;
+
+            case ZMIN:
+
+                in.pointlist[j * 2] = pCoord[j].x();
+                in.pointlist[j * 2 + 1] = pCoord[j].y();
+                break;
+            default:
+                break;
+        }
+    }
+    in.pointmarkerlist = (int *) NULL;
+    in.numberofsegments = 0;
+    in.numberofholes = 0;
+    in.numberofregions = 0;
+
+    /* Make necessary initializations so that Triangle can return a */
+    /*   triangulation in `mid' and a voronoi diagram in `vorout'.  */
+
+    out.pointlist = (REAL *) NULL;            /* Not needed if -N switch used. */
+    /* Not needed if -N switch used or number of point attributes is zero: */
+    out.pointattributelist = (REAL *) NULL;
+    out.pointmarkerlist = (int *) NULL; /* Not needed if -N or -B switch used. */
+    out.trianglelist = (int *) NULL;          /* Not needed if -E switch used. */
+    /* Not needed if -E switch used or number of triangle attributes is zero: */
+    out.triangleattributelist = (REAL *) NULL;
+    out.neighborlist = (int *) NULL;         /* Needed only if -n switch used. */
+    /* Needed only if segments are output (-p or -c) and -P not used: */
+    out.segmentlist = (int *) NULL;
+    /* Needed only if segments are output (-p or -c) and -P and -B not used: */
+    out.segmentmarkerlist = (int *) NULL;
+    out.edgelist = (int *) NULL;             /* Needed only if -e switch used. */
+    out.edgemarkerlist = (int *) NULL;   /* Needed if -e used and -B not used. */
+
+
+    /* Triangulate the points.  Switches are chosen to read and write a  */
+    /*   PSLG (p), preserve the convex hull (c), number everything from  */
+    /*   zero (z), assign a regional attribute to each element (A), and  */
+    /*   produce an edge list (e), a Voronoi diagram (v), and a triangle */
+    /*   neighbor list (n).                                              */
+
+    char *c = "Qzpcqa.25";
+    triangulate(c, &in, &out, NULL);
+
+    //构造矩阵用于求逆
+    LaGenMatDouble tempMat(3, 3);
+    LaVectorLongInt piv(3);
+    for (int l = 0; l < 2; ++l) {
+        for (int i = 0; i < 3; ++i) {
+            tempMat(l, i) = in.pointlist[i * 2 + l];
+        }
+    }
+    tempMat(2, 0) = 1;
+    tempMat(2, 1) = 1;
+    tempMat(2, 2) = 1;
+
+    LaGenMatDouble originalVertex(3, 3);
+    for (int i = 0; i < 3; ++i) {
+        originalVertex(0, i) = pCoord[i].x();
+        originalVertex(1, i) = pCoord[i].y();
+        originalVertex(2, i) = pCoord[i].z();
+    }
+    LUFactorizeIP(tempMat, piv);
+    LaLUInverseIP(tempMat, piv);
+
+    LaGenMatDouble result(3, 1);
+
+    for (int k = 0; k < out.numberofpoints; ++k) {
+        result(0, 0) = out.pointlist[k * 2];
+        result(1, 0) = out.pointlist[k * 2 + 1];
+        result(2, 0) = 1;
+
+        LaGenMatDouble abc(3, 1);
+        Blas_Mat_Mat_Mult(tempMat, result, abc, false, false);
+        SplitResultPoint splitResultPoint;
+        splitResultPoint.bary[0] = abc(0, 0);
+        splitResultPoint.bary[1] = abc(1, 0);
+        splitResultPoint.bary[2] = abc(2, 0);
+
+
+        LaGenMatDouble newPosition(3, 1);
+        Blas_Mat_Mat_Mult(originalVertex, abc, newPosition, false, false);
+        splitResultPoint.vertex.x(newPosition(0, 0));
+        splitResultPoint.vertex.y(newPosition(1, 0));
+        splitResultPoint.vertex.z(newPosition(2, 0));
+        points.push_back(splitResultPoint);
+    }
+    for (int m = 0; m < out.numberoftriangles; ++m) {
+
+    }
+    cout << out.numberoftriangles << endl;
+}
+
+void CommonData::acSplit() {
+
+
+    for (int i = 0; i < faceList.size(); ++i) {
+        vector<int> &vertexCoordIndex = faceList[i].vertexCoordIndex;
+
+        //获得三个顶点
+        VertexCoord v_origin[3]; //表示物体原来的三个顶点
+        int idx = vertexCoordIndex[0];
+        v_origin[0] = vertexCoordList[idx];
+
+        idx = vertexCoordIndex[1];
+        v_origin[1] = vertexCoordList[idx];
+
+        idx = vertexCoordIndex[2];
+        v_origin[2] = vertexCoordList[idx];
+
+        //分割三角形
+        vector<SplitResultTriangle> splitResultTriangle;
+        vector<SplitResultPoint> splitResultPoint;
+        split(v_origin, splitResultPoint, splitResultTriangle);
+
+    }
+
 }

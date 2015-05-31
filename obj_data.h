@@ -74,6 +74,17 @@ namespace objdata
 		void z(double value) { value2(value); }
 	};
 
+
+	typedef struct {
+		VertexCoord vertex;
+		double bary[3];
+	} SplitResultPoint;
+
+	typedef struct {
+		long vertexId[3];
+	} SplitResultTriangle;
+
+
 	/*
 	 * 面片使用纹理、法向的情况
 	 */

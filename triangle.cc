@@ -1437,7 +1437,7 @@ int size;
 }
 
 #ifdef ANSI_DECLARATORS
-void trifree(VOID *memptr)
+void trifree(void *memptr)
 #else /* not ANSI_DECLARATORS */
 void trifree(memptr)
 VOID *memptr;
@@ -6434,7 +6434,7 @@ REAL dheight;
   adxbdy = adx * bdy;
   bdxady = bdx * ady;
 
-  det = adheight * (bdxcdy - cdxbdy) 
+  det = adheight * (bdxcdy - cdxbdy)
       + bdheight * (cdxady - adxcdy)
       + cdheight * (adxbdy - bdxady);
 
@@ -11475,7 +11475,7 @@ FILE *polyfile;
       for (j = 0; j < 2; j++) {
         if ((end[j] < b->firstnumber) ||
             (end[j] >= b->firstnumber + m->invertices)) {
-          printf("Error:  Segment %ld has an invalid vertex index.\n", 
+          printf("Error:  Segment %ld has an invalid vertex index.\n",
                  segmentnumber);
           triexit(1);
         }
@@ -13110,7 +13110,7 @@ int regions;
         } else {
           printf("Spreading regional attributes.\n");
         }
-      } else { 
+      } else {
         printf("Spreading regional area constraints.\n");
       }
     }
@@ -15663,30 +15663,8 @@ struct behavior *b;
 /*                                                                           */
 /*****************************************************************************/
 
-#ifdef TRILIBRARY
-
-#ifdef ANSI_DECLARATORS
 void triangulate(char *triswitches, struct triangulateio *in,
                  struct triangulateio *out, struct triangulateio *vorout)
-#else /* not ANSI_DECLARATORS */
-void triangulate(triswitches, in, out, vorout)
-char *triswitches;
-struct triangulateio *in;
-struct triangulateio *out;
-struct triangulateio *vorout;
-#endif /* not ANSI_DECLARATORS */
-
-#else /* not TRILIBRARY */
-
-#ifdef ANSI_DECLARATORS
-int main(int argc, char **argv)
-#else /* not ANSI_DECLARATORS */
-int main(argc, argv)
-int argc;
-char **argv;
-#endif /* not ANSI_DECLARATORS */
-
-#endif /* not TRILIBRARY */
 
 {
   struct mesh m;

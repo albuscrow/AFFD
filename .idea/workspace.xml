@@ -2,8 +2,12 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
-      <config projectName="Project" targetName="affd" />
       <config projectName="Project" targetName="affd_automoc" />
+      <config projectName="Project" targetName="tri" />
+      <config projectName="Project" targetName="triangle.c" />
+      <config projectName="Project" targetName="triangle.c_automoc" />
+      <config projectName="Project" targetName="affd" />
+      <config projectName="Project" targetName="tri_automoc" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true" GENERATION_PASS_SYSTEM_ENVIRONMENT="true" BUILD_OUTPUT_DIR="build">
@@ -13,8 +17,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51a5be61-2f9c-40f2-b9bc-3932e7c16bf4" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/showme.c" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/triangle.c" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/triangle.h" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/tricall.c" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/triangle.c" afterPath="$PROJECT_DIR$/triangle.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_data.cc" afterPath="$PROJECT_DIR$/common_data.cc" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_data.h" afterPath="$PROJECT_DIR$/common_data.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/obj_data.h" afterPath="$PROJECT_DIR$/obj_data.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="affd.iws" />
@@ -39,22 +50,75 @@
       <file leaf-file-name="common_data.cc" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/common_data.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.40092167">
-              <caret line="996" column="49" selection-start-line="996" selection-start-column="49" selection-end-line="996" selection-end-column="49" />
+            <state vertical-scroll-proportion="0.8158784">
+              <caret line="2611" column="31" selection-start-line="2611" selection-start-column="31" selection-end-line="2611" selection-end-column="31" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
-                <element signature="e#946#1088#0" expanded="true" />
-                <element signature="e#21090#21313#0" expanded="true" />
-                <element signature="e#24937#24984#0" expanded="true" />
-                <element signature="e#25051#25202#0" expanded="true" />
-                <element signature="e#25304#25454#0" expanded="true" />
-                <element signature="e#25564#25705#0" expanded="true" />
-                <element signature="e#25729#25948#0" expanded="true" />
-                <element signature="e#26620#26839#0" expanded="true" />
-                <element signature="e#39874#39907#0" expanded="true" />
-                <element signature="e#54564#54640#0" expanded="true" />
-                <element signature="e#56326#56429#0" expanded="true" />
-                <element signature="e#91615#92331#0" expanded="true" />
+                <element signature="e#968#1110#0" expanded="true" />
+                <element signature="e#2012#2019#0" expanded="true" />
+                <element signature="e#21112#21335#0" expanded="true" />
+                <element signature="e#25117#25164#0" expanded="true" />
+                <element signature="e#25231#25382#0" expanded="true" />
+                <element signature="e#25484#25634#0" expanded="true" />
+                <element signature="e#25744#25885#0" expanded="true" />
+                <element signature="e#25909#26128#0" expanded="true" />
+                <element signature="e#26800#27019#0" expanded="true" />
+                <element signature="e#40195#40228#0" expanded="true" />
+                <element signature="e#54885#54961#0" expanded="true" />
+                <element signature="e#56647#56750#0" expanded="true" />
+                <element signature="e#91936#92652#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gmd.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/lapackpp/gmd.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="701" column="31" selection-start-line="701" selection-start-column="31" selection-end-line="701" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="laslv.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/lapackpp/laslv.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="134" column="5" selection-start-line="134" selection-start-column="5" selection-end-line="134" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cuda_calc.cu" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="1" column="17" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="triangle.cc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/triangle.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="common_data.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common_data.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="480" column="50" selection-start-line="480" selection-start-column="50" selection-end-line="480" selection-end-column="50" />
+              <folding>
+                <element signature="e#51#69#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -64,27 +128,17 @@
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="2" column="1" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
+              <caret line="12" column="52" selection-start-line="12" selection-start-column="52" selection-end-line="12" selection-end-column="52" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="common_data.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common_data.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-16.36">
-              <caret line="477" column="0" selection-start-line="477" selection-start-column="0" selection-end-line="477" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="obj_data.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/obj_data.h">
+      <file leaf-file-name="triangle.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/triangle.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <caret line="282" column="5" selection-start-line="282" selection-start-column="5" selection-end-line="282" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -104,14 +158,14 @@
         <option value="$PROJECT_DIR$/view.cc" />
         <option value="$USER_HOME$/.clion10/system/cmake/generated/8e746a45/8e746a45/Debug/affd_automoc.cpp" />
         <option value="$PROJECT_DIR$/obj_data.cc" />
-        <option value="$PROJECT_DIR$/obj_data.h" />
         <option value="$PROJECT_DIR$/widget.cc" />
         <option value="$PROJECT_DIR$/cuda_calc.cu" />
+        <option value="$PROJECT_DIR$/triangle.h" />
         <option value="$PROJECT_DIR$/triangle.c" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/triangle.h" />
-        <option value="$PROJECT_DIR$/common_data.cc" />
+        <option value="$PROJECT_DIR$/obj_data.h" />
         <option value="$PROJECT_DIR$/common_data.h" />
+        <option value="$PROJECT_DIR$/common_data.cc" />
       </list>
     </option>
   </component>
@@ -279,10 +333,30 @@
       <envs />
       <method />
     </configuration>
-    <list size="3">
+    <configuration default="false" name="tri" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="tri" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tri_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="tri_automoc" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="triangle.c" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="triangle.c" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="triangle.c_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="triangle.c_automoc" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <list size="7">
       <item index="0" class="java.lang.String" itemvalue="Application.Build All" />
       <item index="1" class="java.lang.String" itemvalue="Application.affd" />
       <item index="2" class="java.lang.String" itemvalue="Application.affd_automoc" />
+      <item index="3" class="java.lang.String" itemvalue="Application.tri" />
+      <item index="4" class="java.lang.String" itemvalue="Application.tri_automoc" />
+      <item index="5" class="java.lang.String" itemvalue="Application.triangle.c" />
+      <item index="6" class="java.lang.String" itemvalue="Application.triangle.c_automoc" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -313,23 +387,23 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16585957" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.49757868" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37540454" sideWeight="0.47578692" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.48789346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39158577" sideWeight="0.5242131" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26321468" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26321468" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32686085" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20819849" sideWeight="0.47578692" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30266345" sideWeight="0.50643086" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3925354" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20064725" sideWeight="0.47578692" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32686085" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3925354" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -369,18 +443,19 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/triangle.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="282" column="5" selection-start-line="282" selection-start-column="5" selection-end-line="282" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.clion10/system/cmake/generated/8e746a45/8e746a45/Debug/affd_automoc.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -430,7 +505,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
-          <folding />
+          <folding>
+            <element signature="e#51#69#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -494,7 +571,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
-          <folding />
+          <folding>
+            <element signature="e#51#69#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -576,20 +655,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.clion10/system/cmake/generated/8e746a45/8e746a45/Release/affd_automoc.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11186441">
-          <caret line="3" column="24" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.clion10/system/cmake/generated/8e746a45/8e746a45/Debug/affd_automoc.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="3" column="24" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.cc">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -639,13 +704,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="480" column="5" selection-start-line="480" selection-start-column="5" selection-end-line="480" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/obj_data.cc">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -653,52 +711,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/obj_data.inl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="69" column="17" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Session.vim">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.6205924">
           <caret line="1386" column="0" selection-start-line="1386" selection-start-column="0" selection-end-line="1386" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/triangle.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.1877095">
-          <caret line="191" column="13" selection-start-line="191" selection-start-column="13" selection-end-line="191" selection-end-column="13" />
-          <folding>
-            <element signature="e#21659#21801#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tricall.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68268156">
-          <caret line="142" column="15" selection-start-line="142" selection-start-column="15" selection-end-line="142" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/triangle.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.61452514">
-          <caret line="13017" column="0" selection-start-line="13017" selection-start-column="0" selection-end-line="13017" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/showme.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.196648">
-          <caret line="3374" column="0" selection-start-line="3374" selection-start-column="0" selection-end-line="3374" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -710,48 +726,113 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/obj_data.h">
+    <entry file="file://$PROJECT_DIR$/triangle.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="282" column="5" selection-start-line="282" selection-start-column="5" selection-end-line="282" selection-end-column="5" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/bits/mathcalls.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33277026">
+          <caret line="180" column="49" selection-start-line="180" selection-start-column="49" selection-end-line="180" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5.1.0/bits/vector.tcc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="65" column="4" selection-start-line="65" selection-start-column="4" selection-end-line="65" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="2" column="1" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
+          <caret line="12" column="52" selection-start-line="12" selection-start-column="52" selection-end-line="12" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1" column="17" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/lapackpp/laslv.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="134" column="5" selection-start-line="134" selection-start-column="5" selection-end-line="134" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/lapackpp/gmd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="701" column="31" selection-start-line="701" selection-start-column="31" selection-end-line="701" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obj_data.inl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.9262673">
+          <caret line="58" column="0" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obj_data.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.48263255">
+          <caret line="117" column="41" selection-start-line="117" selection-start-column="41" selection-end-line="117" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/triangle.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/common_data.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-16.36">
-          <caret line="477" column="0" selection-start-line="477" selection-start-column="0" selection-end-line="477" selection-end-column="0" />
-          <folding />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="480" column="50" selection-start-line="480" selection-start-column="50" selection-end-line="480" selection-end-column="50" />
+          <folding>
+            <element signature="e#51#69#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/common_data.cc">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.40092167">
-          <caret line="996" column="49" selection-start-line="996" selection-start-column="49" selection-end-line="996" selection-end-column="49" />
+        <state vertical-scroll-proportion="0.8158784">
+          <caret line="2611" column="31" selection-start-line="2611" selection-start-column="31" selection-end-line="2611" selection-end-column="31" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
-            <element signature="e#946#1088#0" expanded="true" />
-            <element signature="e#21090#21313#0" expanded="true" />
-            <element signature="e#24937#24984#0" expanded="true" />
-            <element signature="e#25051#25202#0" expanded="true" />
-            <element signature="e#25304#25454#0" expanded="true" />
-            <element signature="e#25564#25705#0" expanded="true" />
-            <element signature="e#25729#25948#0" expanded="true" />
-            <element signature="e#26620#26839#0" expanded="true" />
-            <element signature="e#39874#39907#0" expanded="true" />
-            <element signature="e#54564#54640#0" expanded="true" />
-            <element signature="e#56326#56429#0" expanded="true" />
-            <element signature="e#91615#92331#0" expanded="true" />
+            <element signature="e#968#1110#0" expanded="true" />
+            <element signature="e#2012#2019#0" expanded="true" />
+            <element signature="e#21112#21335#0" expanded="true" />
+            <element signature="e#25117#25164#0" expanded="true" />
+            <element signature="e#25231#25382#0" expanded="true" />
+            <element signature="e#25484#25634#0" expanded="true" />
+            <element signature="e#25744#25885#0" expanded="true" />
+            <element signature="e#25909#26128#0" expanded="true" />
+            <element signature="e#26800#27019#0" expanded="true" />
+            <element signature="e#40195#40228#0" expanded="true" />
+            <element signature="e#54885#54961#0" expanded="true" />
+            <element signature="e#56647#56750#0" expanded="true" />
+            <element signature="e#91936#92652#0" expanded="true" />
           </folding>
         </state>
       </provider>
