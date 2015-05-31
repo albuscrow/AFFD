@@ -249,9 +249,9 @@ View::View(QWidget *parent, CommonData *commonData) : QGLWidget(desiredFormat())
 #endif
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-    if (format().swapInterval() == -1){
+    if (format().swapInterval() == -1) {
         timer.setInterval(17);
-    }else{
+    } else {
         timer.setInterval(1);
     }
     timer.start();
@@ -697,6 +697,8 @@ void View::initializeGL() {
     glEnable(GL_LIGHTING);                                    // 打开光照
     glEnable(GL_LIGHT0);                                    // 打开光源0
     //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+    glDisable(GL_CULL_FACE);
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 

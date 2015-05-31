@@ -1,11 +1,10 @@
 #include "common_data.h"
-#include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <QTime>
 #include <lapackpp/blas3pp.h>
 #include <lapackpp/laslv.h>
 #include "triangle.h"
+#include "obj_data.h"
 
 #include <sstream>
 
@@ -1018,7 +1017,6 @@ void CommonData::clipPolygon() {
                     idx = vertexCoordIndex[2];
                     v_origin[2] = vertexCoordList[idx];
 
-
                     TrimmedPolygon tempPolygon(useTexture, mtlIdx, v_origin, f);
                     tempPolygon.push_back_adjust(false);
                     tempPolygon.push_back_adjust(false);
@@ -1043,10 +1041,6 @@ void CommonData::clipPolygon() {
 #ifdef IS_BORDER_INFO
                         tempPolygon.push_back_border(findIsBorder(normalidx, prev_id));
 #endif
-                    }
-
-                    if (faceList[f].textureCoordIndex.size() != 3) {
-                        cout << "noooo!!!!!";
                     }
 
                     for (unsigned int s = 0; s < faceList[f].textureCoordIndex.size(); ++s) {
@@ -1170,7 +1164,7 @@ int CommonData::clipPolygonAgainstPlane(TrimmedPolygon &polygon, double a, doubl
     if (positive == 0)        // 全部顶点都不需要保留
         return 0;
 
-    //cout << "a = " << a << ", b = " << b << ", c = " << c << ", d = " << d << endl;
+    //cout << "a = " << a << ", b = " << b << ", c = " << c << ", ZERO = " << ZERO << endl;
     //cout << "nega = " << negative << ", positive = " << positive << endl;
 
     bool useTexture = polygon.useTexture();
@@ -1514,6 +1508,7 @@ void CommonData::triangulatePolygon() {
                             //cout << t.v[0] << ", " << t.v[1] << ", " << t.v[2] << endl;
                             //cout << nc0 << ", " << nc1 << ", " << nc2 << endl;
                         }
+                        cout << " " << mtlIdx;
                         face_children_table_[origin_face_idx].push_front(triangleList.size() - 1);
                         mtlFaceList[mtlIdx].push_back(triangleIdx++);
                     }
@@ -2163,7 +2158,7 @@ void CommonData::directLinearSolve(const LaGenMatDouble &D) {
     double arrayd[MAXCTRLPOINT * MAXCTRLPOINT * MAXCTRLPOINT * 3] = {0.0f};
     LaGenMatDouble d(arrayd, rowCountR, 3);
     Blas_Mat_Mat_Mult(R, M, d);
-    //cout << "d:\n" << d << endl;
+    //cout << "ZERO:\n" << ZERO << endl;
 
     int idx = 0;
     for (int i = 0; i < m_nCtrlPointCount[U]; ++i)
@@ -2471,10 +2466,8 @@ void report(struct triangulateio *io) {
 }
 
 
-
-
-void CommonData::split(VertexCoord pCoord[], vector<SplitResultPoint> &points,
-                                              vector<SplitResultTriangle> &triangles) {
+void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
+                       vector<SplitResultTriangle> &triangles) {
     //因为是所用的细分库是二维的，所以传入的三角形要舍弃一个维度，为了使细分效果跟好，
     //舍弃一个维度后要保证三角形面积尽量大
     //所用的算法是计算三角形的法向，然后根据法向的最大分量确定舍弃的维度。
@@ -2560,7 +2553,8 @@ void CommonData::split(VertexCoord pCoord[], vector<SplitResultPoint> &points,
     /*   produce an edge list (e), a Voronoi diagram (v), and a triangle */
     /*   neighbor list (n).                                              */
 
-    char *c = "Qzpcqa.25";
+    char *c = "Qzpcqa0.00005";
+
     triangulate(c, &in, &out, NULL);
 
     //构造矩阵用于求逆
@@ -2594,9 +2588,42 @@ void CommonData::split(VertexCoord pCoord[], vector<SplitResultPoint> &points,
         LaGenMatDouble abc(3, 1);
         Blas_Mat_Mat_Mult(tempMat, result, abc, false, false);
         SplitResultPoint splitResultPoint;
-        splitResultPoint.bary[0] = abc(0, 0);
-        splitResultPoint.bary[1] = abc(1, 0);
-        splitResultPoint.bary[2] = abc(2, 0);
+        splitResultPoint.bary.x(abc(0, 0));
+        splitResultPoint.bary.y(abc(1, 0));
+        splitResultPoint.bary.z(abc(2, 0));
+        VertexCoord bary = splitResultPoint.bary;
+        if (fabs(1 - bary.x()) < ZERO
+            || fabs(1 - bary.y()) < ZERO
+            || fabs(1 - bary.z()) < ZERO) {
+            splitResultPoint.isOriginal = true;
+            splitResultPoint.isBorder = false;
+            splitResultPoint.isInter = false;
+            if (fabs(1 - bary.x()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[0];
+            } else if (fabs(1 - bary.y()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[1];
+            } else {
+                splitResultPoint.normalCount = normalCount[2];
+            }
+        } else if (fabs(bary.z()) < ZERO
+                   || fabs(bary.y()) < ZERO
+                   || fabs(bary.z()) < ZERO) {
+            splitResultPoint.isOriginal = false;
+            splitResultPoint.isBorder = true;
+            splitResultPoint.isInter = false;
+            if (fabs(bary.x()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[1] > normalCount[2] ? normalCount[1] : normalCount[2];
+            } else if (fabs(bary.y()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[0] > normalCount[2] ? normalCount[0] : normalCount[2];
+            } else {
+                splitResultPoint.normalCount = normalCount[0] > normalCount[1] ? normalCount[0] : normalCount[1];
+            }
+        } else {
+            splitResultPoint.isOriginal = false;
+            splitResultPoint.isBorder = false;
+            splitResultPoint.isInter = true;
+            splitResultPoint.normalCount = 1;
+        }
 
 
         LaGenMatDouble newPosition(3, 1);
@@ -2606,13 +2633,19 @@ void CommonData::split(VertexCoord pCoord[], vector<SplitResultPoint> &points,
         splitResultPoint.vertex.z(newPosition(2, 0));
         points.push_back(splitResultPoint);
     }
-    for (int m = 0; m < out.numberoftriangles; ++m) {
 
+    for (int m = 0; m < out.numberoftriangles; ++m) {
+        SplitResultTriangle triangle;
+        triangle.vertexId[0] = out.trianglelist[m * 3];
+        triangle.vertexId[1] = out.trianglelist[m * 3 + 1];
+        triangle.vertexId[2] = out.trianglelist[m * 3 + 2];
+        triangles.push_back(triangle);
     }
-    cout << out.numberoftriangles << endl;
 }
 
 void CommonData::acSplit() {
+    vector<vector<int> > mtlFaceList(objData->mtlTexList.size() + 1);
+    int triangleIdx = 0;
 
 
     for (int i = 0; i < faceList.size(); ++i) {
@@ -2620,20 +2653,175 @@ void CommonData::acSplit() {
 
         //获得三个顶点
         VertexCoord v_origin[3]; //表示物体原来的三个顶点
-        int idx = vertexCoordIndex[0];
-        v_origin[0] = vertexCoordList[idx];
+        int normalCount[3]; //表示物体原来的三个顶点
+        int idx1 = vertexCoordIndex[0];
+        int idx2 = vertexCoordIndex[1];
+        int idx3 = vertexCoordIndex[2];
 
-        idx = vertexCoordIndex[1];
-        v_origin[1] = vertexCoordList[idx];
+        v_origin[0] = vertexCoordList[idx1];
+        normalCount[0] = findNormalCount(idx1, idx3);
 
-        idx = vertexCoordIndex[2];
-        v_origin[2] = vertexCoordList[idx];
+        v_origin[1] = vertexCoordList[idx2];
+        normalCount[1] = findNormalCount(idx2, idx1);
+
+        v_origin[2] = vertexCoordList[idx3];
+        normalCount[2] = findNormalCount(idx3, idx2);
 
         //分割三角形
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
-        split(v_origin, splitResultPoint, splitResultTriangle);
+        split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
 
+        //取出原始三角片的三个顶点法向
+        VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];
+        VertexCoord normal2 = objData->normalCoordList[faceList[i].normalCoordIndex[1]];
+        VertexCoord normal3 = objData->normalCoordList[faceList[i].normalCoordIndex[2]];
+
+
+        TextureCoord textureCoord1 = objData->textureCoordList[faceList[i].textureCoordIndex[0]];
+        TextureCoord textureCoord2 = objData->textureCoordList[faceList[i].textureCoordIndex[1]];
+        TextureCoord textureCoord3 = objData->textureCoordList[faceList[i].textureCoordIndex[2]];
+
+
+        long nMtlIdx = faceList[i].m_nMtlIdx;
+        if (nMtlIdx == -1) {
+            nMtlIdx = mtlFaceList.size() - 1;
+        }
+
+        for (int j = 0; j < splitResultTriangle.size(); ++j) {
+
+            //调整切割点和法向量
+            for (int k = 0; k < 3; ++k) {
+                SplitResultPoint &point = splitResultPoint[splitResultTriangle[j].vertexId[k]];
+                point.normal = normal1 * point.bary.x()
+                               + normal2 * point.bary.y()
+                               + normal3 * point.bary.z();
+
+                point.normal.normalize();
+
+
+                point.textureCoord = textureCoord1 * point.bary.x()
+                                     + textureCoord2 * point.bary.y()
+                                     + textureCoord3 * point.bary.z();
+
+                if (adjust_split_points_ && !point.isOriginal) {
+                    point.vertex = cubicBezierTriangleList[i].calcValue(point.bary);
+                    point.normalAdjusted = quadraticBezierTriangleList[i].calcValue(point.bary);
+                    point.normalAdjusted.normalize();
+                } else {
+                    point.normalAdjusted = point.normal;
+                }
+
+            }
+
+            SplitResultPoint point1 = splitResultPoint[splitResultTriangle[j].vertexId[0]];
+            SplitResultPoint point2 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
+            SplitResultPoint point3 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
+
+            VertexCoord u = point1.vertex - point2.vertex;
+            VertexCoord v = point2.vertex - point3.vertex;
+
+            VertexCoord normal;
+            normal.x(u.y() * v.z() - u.z() * v.y());
+            normal.y(u.z() * v.x() - u.x() * v.z());
+            normal.z(u.x() * v.y() - u.y() * v.x());
+
+            if (normal * point1.normal < 0) {
+                point2 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
+                point3 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
+            }
+
+            Triangle t(point1.vertex, point2.vertex, point3.vertex,
+                       point1.normal, point2.normal, point3.normal,
+                       point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
+                       v_origin, i,
+//                       point1.normalCount, point2.normalCount, point3.normalCount,
+                       1,1,1,
+                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
+            triangleList.push_back(t);
+
+            face_children_table_[i].push_front(triangleList.size() - 1);
+            mtlFaceList[nMtlIdx].push_back(triangleIdx++);
+        }
     }
 
+    /* 将此模型中所有的三角形顶点统一编号，所有面片根据材质的不同，存入faceMtlList中 */
+    int samplePointPerTriangle = m_nSamplePointCount * (m_nSamplePointCount + 1) / 2;
+    m_nTessPointCount = samplePointPerTriangle * triangleList.size();
+    int segment = m_nSamplePointCount - 1;
+    int subTrianglePerTriangle = segment * segment;
+
+    int totalFaceNum = 0;
+    for (vector<vector<int> >::size_type ii = 0; ii < mtlFaceList.size(); ++ii)
+        totalFaceNum += mtlFaceList[ii].size();
+    int faceCounter = 0;
+    for (vector<vector<int> >::size_type ii = 0; ii < mtlFaceList.size(); ++ii) {
+        int *tempFaceList = new int[mtlFaceList[ii].size() * subTrianglePerTriangle * 3];
+        int pos = 0;
+        for (vector<int>::size_type jj = 0; jj < mtlFaceList[ii].size(); ++jj) {
+            int idx = mtlFaceList[ii][jj];
+            int pointBase = samplePointPerTriangle * idx;
+            for (int i = 0; i < segment; ++i) {
+                for (int j = 0; j <= i; ++j) {
+                    tempFaceList[pos++] = pointBase + triangleCoord(i, j);
+                    tempFaceList[pos++] = pointBase + triangleCoord(i + 1, j);
+                    tempFaceList[pos++] = pointBase + triangleCoord(i + 1, j + 1);
+                    if (i < segment - 1) {
+                        tempFaceList[pos++] = pointBase + triangleCoord(i + 1, j);
+                        tempFaceList[pos++] = pointBase + triangleCoord(i + 2, j + 1);
+                        tempFaceList[pos++] = pointBase + triangleCoord(i + 1, j + 1);
+                    }
+                }
+            }
+        }
+        faceCounter += mtlFaceList[ii].size();
+        faceMtlList.push_back(tempFaceList);
+        faceMtlCountList.push_back(mtlFaceList[ii].size() * subTrianglePerTriangle);
+    }
+
+
+    // 对三角化之后的模型重新寻找相邻关系
+    // triangle_adjacent_table_中的元素三个一组，[3i+0], [3i+1], [3i+2]
+    // 分别代表与i号面片的0号、1号、2号边相邻的三角形信息。0号边是v2v0，1号边是v0v1，2号边是v1v2
+    // 每个元素的高30位存储了对方三角形的编号，低两位存储了对方三角形的相邻边编号(可能是0, 1, 2)
+    // 初始情况将所有元素都设置成-1234
+    triangle_adjacent_table_ = new int[triangleList.size() * 3];
+    std::fill(triangle_adjacent_table_, triangle_adjacent_table_ + triangleList.size() * 3, -1234);
+    for (vector<Triangle>::size_type i = 0; i < triangleList.size(); ++i) {
+        //cout << "triangle = " << i << endl;
+        int ori_idx = triangleList[i].origin_face_idx_;
+        // 遍历i号三角形的亲兄弟三角形
+        for (list<int>::iterator it = face_children_table_[ori_idx].begin();
+             it != face_children_table_[ori_idx].end(); ++it) {
+            int result;
+            //cout << "\tchild = " << *it << endl;
+            if ((result = triangularAdjacent(i, *it)) >= 0) {
+                //cout << "\t相邻" << endl;
+                int idx0 = result >> 4;
+                int idx1 = result & 0xF;
+                triangle_adjacent_table_[i * 3 + idx0] = *it << 2 | idx1;
+                //cout << "face_idx = " << *it << " " << idx0 << " " << idx1
+                //<< " " << i * 3 + idx0 << "=" << triangle_adjacent_table_[i * 3 + idx0] << endl;
+            }
+        }
+        // 遍历i号三角形的叔伯三角形（即和i号三角形的父亲相邻的三角形）
+        for (list<int>::iterator it = face_adjacent_table_[ori_idx].begin();
+             it != face_adjacent_table_[ori_idx].end(); ++it) {
+            //cout << "\t叔伯 = " << *it << endl;
+            // 遍历该叔叔所有的儿子三角形（称为i号三角形的堂兄弟三角形）
+            for (list<int>::iterator it2 = face_children_table_[*it].begin();
+                 it2 != face_children_table_[*it].end(); ++it2) {
+                int result;
+                //cout << "\t\t叔伯的儿子 = " << *it2 << endl;
+                if ((result = triangularAdjacent(i, *it2)) >= 0) {
+                    //cout << "\t\t相邻" << endl;
+                    int idx0 = result >> 4;
+                    int idx1 = result & 0xF;
+                    triangle_adjacent_table_[i * 3 + idx0] = *it2 << 2 | idx1;
+                    //cout << "face_idx = " << *it2 << " " << idx0 << " " << idx1
+                    //<< " " << i * 3 + idx0 << "=" << triangle_adjacent_table_[i * 3 + idx0] << endl;
+                }
+            }
+        }
+    }
 }
