@@ -248,41 +248,167 @@
 /*                                                                           */
 /*****************************************************************************/
 #define REAL double
+#include "cstdlib"
+
+#ifndef acacacac
+#define acacacac
 struct triangulateio {
-  REAL *pointlist;                                               /* In / out */
-  REAL *pointattributelist;                                      /* In / out */
-  int *pointmarkerlist;                                          /* In / out */
-  int numberofpoints;                                            /* In / out */
-  int numberofpointattributes;                                   /* In / out */
 
-  int *trianglelist;                                             /* In / out */
-  REAL *triangleattributelist;                                   /* In / out */
-  REAL *trianglearealist;                                         /* In only */
-  int *neighborlist;                                             /* Out only */
-  int numberoftriangles;                                         /* In / out */
-  int numberofcorners;                                           /* In / out */
-  int numberoftriangleattributes;                                /* In / out */
+    REAL *pointlist;                                               /* In / out */
+    REAL *pointattributelist;
+    /* In / out */
+    int *pointmarkerlist;
+    /* In / out */
+    int numberofpoints;
+    /* In / out */
+    int numberofpointattributes;
+    /* In / out */
 
-  int *segmentlist;                                              /* In / out */
-  int *segmentmarkerlist;                                        /* In / out */
-  int numberofsegments;                                          /* In / out */
+    int *trianglelist;                                             /* In / out */
+    REAL *triangleattributelist;                                   /* In / out */
+    REAL *trianglearealist;
+    /* In only */
+    int *neighborlist;
+    /* Out only */
+    int numberoftriangles;
+    /* In / out */
+    int numberofcorners;
+    /* In / out */
+    int numberoftriangleattributes;
+    /* In / out */
 
-  REAL *holelist;                        /* In / pointer to array copied out */
-  int numberofholes;                                      /* In / copied out */
+    int *segmentlist;
+    /* In / out */
+    int *segmentmarkerlist;
+    /* In / out */
+    int numberofsegments;                                          /* In / out */
 
-  REAL *regionlist;                      /* In / pointer to array copied out */
-  int numberofregions;                                    /* In / copied out */
+    REAL *holelist;
+    /* In / pointer to array copied out */
+    int numberofholes;                                      /* In / copied out */
 
-  int *edgelist;                                                 /* Out only */
-  int *edgemarkerlist;            /* Not used with Voronoi diagram; out only */
-  REAL *normlist;                /* Used only with Voronoi diagram; out only */
-  int numberofedges;                                             /* Out only */
+    REAL *regionlist;
+    /* In / pointer to array copied out */
+    int numberofregions;
+    /* In / copied out */
+
+    int *edgelist;
+    /* Out only */
+    int *edgemarkerlist;            /* Not used with Voronoi diagram; out only */
+    REAL *normlist;
+    /* Used only with Voronoi diagram; out only */
+    int numberofedges;                                             /* Out only */
+
+public:
+    void acinit(){
+        this->pointlist = 0;
+        this->pointmarkerlist = 0;
+        this->pointattributelist = 0;
+        this->trianglelist = 0;
+        this->trianglearealist = 0;
+        this->triangleattributelist = 0;
+        this->neighborlist = 0;
+        this->segmentlist = 0;
+        this->segmentmarkerlist = 0;
+        this->holelist = 0;
+        this->regionlist = 0;
+        this->edgemarkerlist = 0;
+        this->edgelist = 0;
+        this->normlist = 0;
+        this->numberofcorners = 0;
+        this->numberofedges = 0;
+        this->numberofpointattributes = 0;
+        this->numberofpoints = 0;
+        this->numberofholes = 0;
+        this->numberofregions = 0;
+        this->numberofsegments = 0;
+        this->numberoftriangleattributes = 0;
+        this->numberoftriangles = 0;
+    }
+
+    void acfree(){
+
+        if (this->pointlist != 0){
+            free(this->pointlist);
+        }
+        this->pointlist = 0;
+
+        if (this->pointmarkerlist != 0){
+            free(this->pointmarkerlist);
+        }
+        this->pointmarkerlist = 0;
+
+        if (this->pointattributelist != 0){
+            free(this->pointattributelist);
+        }
+        this->pointattributelist = 0;
+
+        if (this->trianglelist != 0){
+            free(this->trianglelist);
+        }
+        this->trianglelist = 0;
+
+        if (this->trianglearealist != 0){
+            free(this->trianglearealist);
+        }
+        this->trianglearealist = 0;
+
+        if (this->triangleattributelist != 0){
+            free(this->triangleattributelist);
+        }
+        this->triangleattributelist = 0;
+
+        if (this->neighborlist != 0){
+            free(this->neighborlist);
+        }
+        this->neighborlist = 0;
+
+        if (this->segmentlist != 0){
+            free(this->segmentlist);
+        }
+        this->segmentlist = 0;
+
+        if (this->segmentmarkerlist != 0){
+            free(this->segmentmarkerlist);
+        }
+        this->segmentmarkerlist = 0;
+
+        if (this->holelist != 0){
+            free(this->holelist);
+        }
+        this->holelist = 0;
+
+        if (this->regionlist != 0){
+            free(this->regionlist);
+        }
+        this->regionlist = 0;
+
+        if (this->edgemarkerlist != 0){
+            free(this->edgemarkerlist);
+        }
+        this->edgemarkerlist = 0;
+
+        if (this->edgelist != 0){
+            free(this->edgelist);
+        }
+        this->edgelist = 0;
+
+        if (this->normlist != 0){
+            free(this->normlist);
+        }
+        this->normlist = 0;
+    }
 };
 
+#endif
+
 #ifdef ANSI_DECLARATORS
+
 void triangulate(char *, struct triangulateio *, struct triangulateio *,
                  struct triangulateio *);
+
 void trifree(void *memptr);
+
 #else /* not ANSI_DECLARATORS */
 void triangulate();
 void trifree();

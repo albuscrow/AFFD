@@ -110,10 +110,10 @@ private:
 	double polynomial(double *coord, int degree, double x);
 	void keyPressEvent(QKeyEvent *event);
 private slots:
+	void loadObj();
 	void morph();
 	void startTimer();
 	void stopTimer();
-	void loadObj();
 	void loadEdit();
 	void loadTarget();
 	void saveTarget();

@@ -419,6 +419,8 @@ Widget::Widget() {
 
     connect(adjust_silhouette_rbutton, SIGNAL(clicked(bool)), this, SLOT(setAdjustSilhouette(bool)));
     connect(no_adjust_silhouette_rbutton, SIGNAL(clicked(bool)), this, SLOT(setNoAdjustSilhouette(bool)));
+
+//    loadObj();
 }
 
 Widget::~Widget() {
@@ -546,9 +548,12 @@ void Widget::loadObj() {
 	m_pView->loadObj(texComboBox->currentText());
 	m_pView->update();
 #else
-    QString qCurrentFileName = QFileDialog::getOpenFileName(this, tr("打开obj文件"),
-                                                            QString(tr("/home/ac/code/c++/dashi")),
-                                                            tr("obj文件 (*.obj)"));
+//    QString qCurrentFileName = QFileDialog::getOpenFileName(this, tr("打开obj文件"),
+//                                                            QString(tr("/home/ac/code/c++/dashi/")),
+//                                                            tr("obj文件 (*.obj)"));
+
+
+    QString qCurrentFileName = QString(tr("/home/ac/code/c++/dashi/OBJ/wheel.obj"));
     if (!qCurrentFileName.isEmpty()) {
         //说明QByteArray ba = fileName.toLocal8Bit();
         //说明const char *c_str = ba.data();

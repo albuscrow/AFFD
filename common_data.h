@@ -7,6 +7,7 @@
 #include <lapackpp/gmd.h>
 #include "obj_data.h"
 #include "matrix_stack.h"
+#include "triangle.h"
 
 #define NORMALIZE_TO_1	// 模型读进来之后单位化到[-1,1]x[-1,1]x[-1,1]区间
 #define MORPH			// 表示进行变形动画，因此不进行一些时间的打印
@@ -481,6 +482,10 @@ public:
                                               std::vector<objdata::SplitResultTriangle> &triangles);
 
 	void acSplit();
+
+	void acFree(triangulateio triangulateio);
+
+	void initIO(triangulateio io);
 };
 
 

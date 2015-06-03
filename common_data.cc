@@ -2465,9 +2465,26 @@ void report(struct triangulateio *io) {
     }
 }
 
+#define SPLIT_DEGREE 0.05
 
 void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
                        vector<SplitResultTriangle> &triangles) {
+    //根据边的长度，算出各个边应该分成几段
+    int spitNum[3];
+    spitNum[0] = (int) (round((pCoord[0] - pCoord[1]).norm()) / SPLIT_DEGREE);
+    spitNum[1] = (int) (round((pCoord[1] - pCoord[2]).norm()) / SPLIT_DEGREE);
+    spitNum[2] = (int) (round((pCoord[2] - pCoord[0]).norm()) / SPLIT_DEGREE);
+
+    for (int i1 = 0; i1 < 3; ++i1) {
+        if (spitNum[i1] < 1) {
+            spitNum[i1] = 1;
+        }
+//        cout << spitNum[i1] << " ";
+    }
+//    cout << endl;
+
+
+
     //因为是所用的细分库是二维的，所以传入的三角形要舍弃一个维度，为了使细分效果跟好，
     //舍弃一个维度后要保证三角形面积尽量大
     //所用的算法是计算三角形的法向，然后根据法向的最大分量确定舍弃的维度。
@@ -2495,36 +2512,100 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     }
 
     struct triangulateio in, out;
+    in.acinit();
+    out.acinit();
 
     /* Define input points. */
 
-    in.numberofpoints = 3;
+    in.numberofpoints = spitNum[0] + spitNum[1] + spitNum[2];
     in.numberofpointattributes = 0;
     in.pointlist = (double *) malloc(in.numberofpoints * 2 * sizeof(double));
-    for (int j = 0; j < 3; ++j) {
-        switch (deletedAxis) {
-            case XMIN:
-                in.pointlist[j * 2] = pCoord[j].y();
-                in.pointlist[j * 2 + 1] = pCoord[j].z();
-                break;
 
-            case YMIN:
+    TextureCoord tempPoint[3];
+    switch (deletedAxis) {
+        case XMIN:
+            for (int j = 0; j < 3; ++j) {
+                tempPoint[j].u(pCoord[j].y());
+                tempPoint[j].v(pCoord[j].z());
+            }
+            break;
 
-                in.pointlist[j * 2] = pCoord[j].x();
-                in.pointlist[j * 2 + 1] = pCoord[j].z();
-                break;
+        case YMIN:
+            for (int j = 0; j < 3; ++j) {
+                tempPoint[j].u(pCoord[j].x());
+                tempPoint[j].v(pCoord[j].z());
+            }
+            break;
 
-            case ZMIN:
+        case ZMIN:
 
-                in.pointlist[j * 2] = pCoord[j].x();
-                in.pointlist[j * 2 + 1] = pCoord[j].y();
-                break;
-            default:
-                break;
+            for (int j = 0; j < 3; ++j) {
+                tempPoint[j].u(pCoord[j].x());
+                tempPoint[j].v(pCoord[j].y());
+            }
+            break;
+        default:
+            break;
+    }
+
+    int index = 0;
+    for (int n = 0; n < 3; ++n) {
+        TextureCoord p0 = tempPoint[n];
+        TextureCoord p1 = tempPoint[(n + 1) % 3];
+        if (spitNum[n] == 1) {
+//            cout <<index / 2 + 1 << " " << p0 << endl;
+            if (fabs(p0.v()) < ZERO) {
+                p0.v(0);
+            }
+
+            if (fabs(p0.u()) < ZERO) {
+                p0.u(0);
+            }
+            in.pointlist[index++] = p0.u();
+            in.pointlist[index++] = p0.v();
+        } else {
+            TextureCoord delta = p1 - p0;
+            delta.u(delta.u() / spitNum[n]);
+            delta.v(delta.v() / spitNum[n]);
+            for (int i = 0; i < spitNum[n]; ++i) {
+                TextureCoord middleP = p0 + i * delta;
+//                cout <<index / 2 + 1 << " " << middleP << endl;
+//                cout <<index / 2 + 1 << " " << delta << endl;
+                if (fabs(middleP.v()) < ZERO) {
+                    middleP.v(0);
+                }
+
+                if (fabs(middleP.u()) < ZERO) {
+                    middleP.u(0);
+                }
+                in.pointlist[index++] = middleP.u();
+                in.pointlist[index++] = middleP.v();
+            }
         }
     }
+//    for (int k1 = 0; k1 < in.numberofpoints; ++k1) {
+//        cout << k1 + 1  << " " << k1 + 1 << " " << k1 + 2 << endl;
+//    }
+//    cout << endl;
+//    if (in.numberofpoints * 2 != index) {
+//        cout << "no!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1" << endl;
+//    }
     in.pointmarkerlist = (int *) NULL;
-    in.numberofsegments = 0;
+    in.numberofsegments = in.numberofpoints;
+    in.segmentlist = (int *) malloc(in.numberofsegments * 2 * sizeof(int));
+
+    for (int l1 = 0; l1 < in.numberofsegments - 1; ++l1) {
+        in.segmentlist[l1 * 2] = l1 + 1;
+        in.segmentlist[l1 * 2 + 1] = l1 + 2;
+    }
+
+    in.segmentlist[in.numberofsegments * 2 - 2] = in.numberofsegments;
+    in.segmentlist[in.numberofsegments * 2 - 1] = 1;
+
+    for (int k1 = 0; k1 < in.numberofsegments; ++k1) {
+        cout << k1 + 1 << " "<< in.segmentlist[k1 * 2] << " " << in.segmentlist[k1 * 2 + 1] << endl;
+    }
+
     in.numberofholes = 0;
     in.numberofregions = 0;
 
@@ -2553,17 +2634,66 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     /*   produce an edge list (e), a Voronoi diagram (v), and a triangle */
     /*   neighbor list (n).                                              */
 
-    char *c = "Qzpcqa0.00005";
+    char *c = "Qpqa0.0005";
 
+
+    cout << "mark begin" << endl;
+    triangulate(c, &in, &out, NULL);
+    cout << "mark end" << endl;
+
+    //count inter point number
+    int counter = 0;
+    for (int l = 0; l < out.numberofpoints; ++l) {
+        if (out.pointmarkerlist[l] == 0) {
+            ++counter;
+        }
+    }
+
+    int newPointNumber = counter + in.numberofpoints;
+    double *newPointList = (double *) malloc(newPointNumber * 2 * sizeof(double));
+    memcpy(newPointList, in.pointlist, in.numberofpoints * 2 * sizeof(double));
+    int currentIndex = in.numberofpoints * 2;
+    for (int l = 0; l < out.numberofpoints; ++l) {
+        if (out.pointmarkerlist[l] == 0) {
+            newPointList[currentIndex++] = out.pointlist[l * 2];
+            newPointList[currentIndex++] = out.pointlist[l * 2 + 1];
+        }
+    }
+//    cout << newPointNumber << endl;
+//    if (newPointNumber * 2 == currentIndex){ cout << "ok ";
+//    }
+    free(in.pointlist);
+    in.pointlist = newPointList;
+    in.numberofpoints = newPointNumber;
+
+
+    out.acfree();
+    out.acinit();
+
+    out.pointlist = (REAL *) NULL;            /* Not needed if -N switch used. */
+    /* Not needed if -N switch used or number of point attributes is zero: */
+    out.pointattributelist = (REAL *) NULL;
+    out.pointmarkerlist = (int *) NULL; /* Not needed if -N or -B switch used. */
+    out.trianglelist = (int *) NULL;          /* Not needed if -E switch used. */
+    /* Not needed if -E switch used or number of triangle attributes is zero: */
+    out.triangleattributelist = (REAL *) NULL;
+    out.neighborlist = (int *) NULL;         /* Needed only if -n switch used. */
+    /* Needed only if segments are output (-p or -c) and -P not used: */
+    out.segmentlist = (int *) NULL;
+    /* Needed only if segments are output (-p or -c) and -P and -B not used: */
+    out.segmentmarkerlist = (int *) NULL;
+    out.edgelist = (int *) NULL;             /* Needed only if -e switch used. */
+    out.edgemarkerlist = (int *) NULL;   /* Needed if -e used and -B not used. */
+
+    c = (char *) "Qzpc";
     triangulate(c, &in, &out, NULL);
 
     //构造矩阵用于求逆
     LaGenMatDouble tempMat(3, 3);
     LaVectorLongInt piv(3);
-    for (int l = 0; l < 2; ++l) {
-        for (int i = 0; i < 3; ++i) {
-            tempMat(l, i) = in.pointlist[i * 2 + l];
-        }
+    for (int i = 0; i < 3; ++i) {
+        tempMat(0, i) = tempPoint[i].u();
+        tempMat(1, i) = tempPoint[i].v();
     }
     tempMat(2, 0) = 1;
     tempMat(2, 1) = 1;
@@ -2580,7 +2710,10 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
 
     LaGenMatDouble result(3, 1);
 
+//    cout << endl << "in points num" << in.numberofpoints << " ";
+//    cout << "out points num" << out.numberofpoints << endl;
     for (int k = 0; k < out.numberofpoints; ++k) {
+//        cout << out.pointmarkerlist[k] << " ";
         result(0, 0) = out.pointlist[k * 2];
         result(1, 0) = out.pointlist[k * 2 + 1];
         result(2, 0) = 1;
@@ -2641,6 +2774,9 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
         triangle.vertexId[2] = out.trianglelist[m * 3 + 2];
         triangles.push_back(triangle);
     }
+
+    in.acfree();
+    out.acfree();
 }
 
 void CommonData::acSplit() {
@@ -2670,7 +2806,9 @@ void CommonData::acSplit() {
         //分割三角形
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
+        cout << "begin split" << endl;
         split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
+        cout << "end split" << endl;
 
         //取出原始三角片的三个顶点法向
         VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];
@@ -2699,7 +2837,6 @@ void CommonData::acSplit() {
 
                 point.normal.normalize();
 
-
                 point.textureCoord = textureCoord1 * point.bary.x()
                                      + textureCoord2 * point.bary.y()
                                      + textureCoord3 * point.bary.z();
@@ -2712,6 +2849,7 @@ void CommonData::acSplit() {
                     point.normalAdjusted = point.normal;
                 }
 
+                point.normal = point.normalAdjusted;
             }
 
             SplitResultPoint point1 = splitResultPoint[splitResultTriangle[j].vertexId[0]];
@@ -2736,7 +2874,7 @@ void CommonData::acSplit() {
                        point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
                        v_origin, i,
 //                       point1.normalCount, point2.normalCount, point3.normalCount,
-                       1,1,1,
+                       1, 1, 1,
                        point1.textureCoord, point2.textureCoord, point3.textureCoord);
             triangleList.push_back(t);
 
@@ -2824,4 +2962,13 @@ void CommonData::acSplit() {
             }
         }
     }
+}
+
+void CommonData::acFree(triangulateio io) {
+
+}
+
+
+void CommonData::initIO(triangulateio io) {
+
 }
