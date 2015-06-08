@@ -698,7 +698,7 @@ void View::initializeGL() {
     glEnable(GL_LIGHT0);                                    // 打开光源0
     //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-    glDisable(GL_CULL_FACE);
+//    glDisable(GL_CULL_FACE);
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 

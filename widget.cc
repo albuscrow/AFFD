@@ -548,12 +548,12 @@ void Widget::loadObj() {
 	m_pView->loadObj(texComboBox->currentText());
 	m_pView->update();
 #else
-//    QString qCurrentFileName = QFileDialog::getOpenFileName(this, tr("打开obj文件"),
-//                                                            QString(tr("/home/ac/code/c++/dashi/")),
-//                                                            tr("obj文件 (*.obj)"));
+    QString qCurrentFileName = QFileDialog::getOpenFileName(this, tr("打开obj文件"),
+                                                            QString(tr("/home/ac/code/c++/dashi/")),
+                                                            tr("obj文件 (*.obj)"));
 
 
-    QString qCurrentFileName = QString(tr("/home/ac/code/c++/dashi/OBJ/wheel.obj"));
+//    QString qCurrentFileName = QString(tr("/home/ac/code/c++/dashi/OBJ/wheel.obj"));
     if (!qCurrentFileName.isEmpty()) {
         //说明QByteArray ba = fileName.toLocal8Bit();
         //说明const char *c_str = ba.data();
@@ -1122,6 +1122,8 @@ void Widget::changeAlgorithm() {
     }
     else if (m_pCommonData->getAlgorithmType() == PN_CUTTING)
         algorithm_label->setText(tr("PN_CUTTING"));
+    else if (m_pCommonData->getAlgorithmType() == LZQ)
+        algorithm_label->setText(tr("lzq"));
     else
         algorithm_label->setText(tr("PN_NO_CUTTING"));
     cout << windowTitle().toUtf8().constData() << endl;

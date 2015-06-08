@@ -2104,7 +2104,7 @@ __global__ void calcAdjustNormal(TriangleD *triangleListD, int f,
 }
 
 void calcSampleValue(AlgorithmType algo_type) {
-    if (algo_type == CYM) {
+    if (algo_type == CYM || algo_type == LZQ) {
         // 计算采样点的值和法向
         //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
         calcSampleValueThread << < blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 13 >> >
@@ -2606,7 +2606,7 @@ __global__ void	move(TriangleD *triangleListD, float *triangleCtrlPointD, float 
 float center_factor = 1.5f;
 
 void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType algo_type) {
-    if (algo_type == CYM) {
+    if (algo_type == CYM || algo_type == LZQ) {
         float alpha = 1.0f, beta = 0.0f;
         /* 计算面片和法向的控制顶点*/
         cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
@@ -2630,7 +2630,7 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
                                                                          order[U], order[V], order[W],
                                                                          ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
 
-    if (algo_type == CYM) {
+    if (algo_type == CYM || algo_type == LZQ) {
         // 调整侧影轮廓线
         if (adjust_silhouette) {
             const int move_block_size = 256;
@@ -2912,7 +2912,7 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     float alpha = 1.0f, beta = 0.0f;
     // 计算三角化点的坐标和法向
     cublasStatus_t stat;
-    if (algo_type == CYM) {
+    if (algo_type == CYM || algo_type == LZQ) {
         stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
                            samplePointPerTriangle, triangleNum * 6, triangleCtrlPointNum_lower,
                            &alpha,

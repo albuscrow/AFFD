@@ -16,7 +16,7 @@
  * 如果同时define，只能得到其中之一的效果
  */
 //#define TRUTH
-//#define LINE
+#define LINE
 
 //#define RE_LENGTH		// 对边控制顶点的调整要不要保持长度
 
@@ -78,7 +78,8 @@ enum AlgorithmType
 {
 	CYM,
 	PN_CUTTING,
-	PN_NO_CUTTING
+	PN_NO_CUTTING,
+	LZQ
 };
 
 /*---------------------------------------------------------*/
@@ -482,10 +483,6 @@ public:
                                               std::vector<objdata::SplitResultTriangle> &triangles);
 
 	void acSplit();
-
-	void acFree(triangulateio triangulateio);
-
-	void initIO(triangulateio io);
 };
 
 

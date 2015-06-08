@@ -211,7 +211,7 @@ CommonData::CommonData() {
     adjust_silhouette_ = true;
     adjust_split_points_ = true;
     use_pn_ = true;
-    algorithm_type_ = CYM;
+    algorithm_type_ = LZQ;
     //algorithm_type_ = PN_CUTTING;
     //algorithm_type_ = PN_NO_CUTTING;
 
@@ -220,7 +220,7 @@ CommonData::CommonData() {
 
 //#define ALGO_TEST
 #ifndef ALGO_TEST
-    m_nSamplePointCount = 13;        // Bézier 曲面片三角化时各方向的采样点数量为11
+    m_nSamplePointCount = 2;        // Bézier 曲面片三角化时各方向的采样点数量为11
     //m_nSamplePointCount = 30;		// Bézier 曲面片三角化时各方向的采样点数量为11
 #else
 	m_nSamplePointCount = 2;		// Bézier 曲面片三角化时各方向的采样点数量为2
@@ -685,7 +685,7 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化_PN_NO_CUTTING" << endl;
     }
-    else {
+    else if (algorithm_type_ == LZQ) {
         PN();
         callCudaThreadSynchronize();
         elapsedTimeLoad = calcTimeLoad.restart();
@@ -700,6 +700,23 @@ void CommonData::preCalc(bool reset_ctrl_point) {
 //        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
 
         acSplit();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
+    } else {
+        PN();
+        callCudaThreadSynchronize();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tGPU : 按照PN-Triangle方法计算原始面片的控制顶点" << endl;
+
+        clipPolygon();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形" << endl;
+
+        triangulatePolygon();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
+
+//        acSplit();
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
     }
@@ -2278,12 +2295,19 @@ void CommonData::setSamplePointCount(int count) {
 /* 设置变形算法（CYM，PN_CUTTING 或 PN_NO_CUTTING） */
 
 void CommonData::setAlgorithmType() {
-    if (algorithm_type_ == CYM)
+    if (algorithm_type_ == CYM) {
         algorithm_type_ = PN_CUTTING;
-    else if (algorithm_type_ == PN_CUTTING)
+        cout << "pn_cutting" << endl;
+    } else if (algorithm_type_ == PN_CUTTING) {
         algorithm_type_ = PN_NO_CUTTING;
-    else
+        cout << "pn_no_cutting" << endl;
+    } else if (algorithm_type_ == PN_NO_CUTTING) {
+        algorithm_type_ = LZQ;
+        cout << "lzq" << endl;
+    } else {
         algorithm_type_ = CYM;
+        cout << "cym" << endl;
+    }
 }
 
 /* 设置当前使用的变形算法（FFD 或 AFFD） */
@@ -2465,7 +2489,7 @@ void report(struct triangulateio *io) {
     }
 }
 
-#define SPLIT_DEGREE 0.05
+#define SPLIT_DEGREE 0.04
 
 void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
                        vector<SplitResultTriangle> &triangles) {
@@ -2595,16 +2619,16 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     in.segmentlist = (int *) malloc(in.numberofsegments * 2 * sizeof(int));
 
     for (int l1 = 0; l1 < in.numberofsegments - 1; ++l1) {
-        in.segmentlist[l1 * 2] = l1 + 1;
-        in.segmentlist[l1 * 2 + 1] = l1 + 2;
+        in.segmentlist[l1 * 2] = l1;
+        in.segmentlist[l1 * 2 + 1] = l1 + 1;
     }
 
-    in.segmentlist[in.numberofsegments * 2 - 2] = in.numberofsegments;
-    in.segmentlist[in.numberofsegments * 2 - 1] = 1;
+    in.segmentlist[in.numberofsegments * 2 - 2] = in.numberofsegments - 1;
+    in.segmentlist[in.numberofsegments * 2 - 1] = 0;
 
-    for (int k1 = 0; k1 < in.numberofsegments; ++k1) {
-        cout << k1 + 1 << " "<< in.segmentlist[k1 * 2] << " " << in.segmentlist[k1 * 2 + 1] << endl;
-    }
+//    for (int k1 = 0; k1 < in.numberofsegments; ++k1) {
+//        cout << k1 + 1 << " " << in.segmentlist[k1 * 2] << " " << in.segmentlist[k1 * 2 + 1] << endl;
+//    }
 
     in.numberofholes = 0;
     in.numberofregions = 0;
@@ -2634,12 +2658,10 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     /*   produce an edge list (e), a Voronoi diagram (v), and a triangle */
     /*   neighbor list (n).                                              */
 
-    char *c = "Qpqa0.0005";
+    char *c = "zQpq20a0.0005";
 
 
-    cout << "mark begin" << endl;
     triangulate(c, &in, &out, NULL);
-    cout << "mark end" << endl;
 
     //count inter point number
     int counter = 0;
@@ -2685,7 +2707,7 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     out.edgelist = (int *) NULL;             /* Needed only if -e switch used. */
     out.edgemarkerlist = (int *) NULL;   /* Needed if -e used and -B not used. */
 
-    c = (char *) "Qzpc";
+    c = (char *) "zQpc";
     triangulate(c, &in, &out, NULL);
 
     //构造矩阵用于求逆
@@ -2806,19 +2828,32 @@ void CommonData::acSplit() {
         //分割三角形
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
-        cout << "begin split" << endl;
         split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
-        cout << "end split" << endl;
 
         //取出原始三角片的三个顶点法向
         VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];
         VertexCoord normal2 = objData->normalCoordList[faceList[i].normalCoordIndex[1]];
         VertexCoord normal3 = objData->normalCoordList[faceList[i].normalCoordIndex[2]];
+        normal1.normalize();
+        normal2.normalize();
+        normal3.normalize();
 
+        cout << splitResultTriangle.size() << endl;
 
-        TextureCoord textureCoord1 = objData->textureCoordList[faceList[i].textureCoordIndex[0]];
-        TextureCoord textureCoord2 = objData->textureCoordList[faceList[i].textureCoordIndex[1]];
-        TextureCoord textureCoord3 = objData->textureCoordList[faceList[i].textureCoordIndex[2]];
+        if (splitResultTriangle.size() > 20) {
+            cout << normal1 << endl;
+            cout << normal2 << endl;
+            cout << normal3 << endl;
+        }
+
+//        TextureCoord textureCoord1;
+//        TextureCoord textureCoord2;
+//        TextureCoord textureCoord3;
+//        if (faceList[i].m_eFaceCase == V_T_N) {
+//            textureCoord1 = objData->textureCoordList[faceList[i].textureCoordIndex[0]];
+//            textureCoord2 = objData->textureCoordList[faceList[i].textureCoordIndex[1]];
+//            textureCoord3 = objData->textureCoordList[faceList[i].textureCoordIndex[2]];
+//        }
 
 
         long nMtlIdx = faceList[i].m_nMtlIdx;
@@ -2835,21 +2870,24 @@ void CommonData::acSplit() {
                                + normal2 * point.bary.y()
                                + normal3 * point.bary.z();
 
+//                cout << point.bary << endl;
+
                 point.normal.normalize();
 
-                point.textureCoord = textureCoord1 * point.bary.x()
-                                     + textureCoord2 * point.bary.y()
-                                     + textureCoord3 * point.bary.z();
+//                point.textureCoord = textureCoord1 * point.bary.x()
+//                                     + textureCoord2 * point.bary.y()
+//                                     + textureCoord3 * point.bary.z();
 
                 if (adjust_split_points_ && !point.isOriginal) {
                     point.vertex = cubicBezierTriangleList[i].calcValue(point.bary);
                     point.normalAdjusted = quadraticBezierTriangleList[i].calcValue(point.bary);
                     point.normalAdjusted.normalize();
+                    point.normal = point.normalAdjusted;
                 } else {
                     point.normalAdjusted = point.normal;
                 }
 
-                point.normal = point.normalAdjusted;
+//                point.normal = point.normalAdjusted;
             }
 
             SplitResultPoint point1 = splitResultPoint[splitResultTriangle[j].vertexId[0]];
@@ -2872,10 +2910,11 @@ void CommonData::acSplit() {
             Triangle t(point1.vertex, point2.vertex, point3.vertex,
                        point1.normal, point2.normal, point3.normal,
                        point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
+                       point1.bary, point2.bary, point3.bary,
                        v_origin, i,
-//                       point1.normalCount, point2.normalCount, point3.normalCount,
-                       1, 1, 1,
-                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
+                       point1.normalCount, point2.normalCount, point3.normalCount);
+//                       1, 1, 1);
+//                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
             triangleList.push_back(t);
 
             face_children_table_[i].push_front(triangleList.size() - 1);
@@ -2962,13 +3001,4 @@ void CommonData::acSplit() {
             }
         }
     }
-}
-
-void CommonData::acFree(triangulateio io) {
-
-}
-
-
-void CommonData::initIO(triangulateio io) {
-
 }
