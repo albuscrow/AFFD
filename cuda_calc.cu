@@ -45,8 +45,7 @@ __host__ __device__ T *matrixCase(T *matrix_b_spline, int order, int ctrlPointNu
             else
                 return matrix_b_spline + 32;    // MB33
         }
-    }
-    else {
+    } else {
         if (ctrlPointNum == 4)
             return matrix_b_spline + 41;        // MB40
         else if (ctrlPointNum == 5) {

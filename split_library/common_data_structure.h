@@ -106,9 +106,8 @@ public:
         return edge(p2, p1);
     }
 
-
     friend std::ostream& operator<<(std::ostream &os, const edge &e) {
-        os << "edge point1:" << e.p1 << " point2:" << e.p2;
+        os << "edge\npoint1:" << e.p1 << "point2:" << e.p2;
         return os;
     }
 
