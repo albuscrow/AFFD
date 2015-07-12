@@ -9,11 +9,11 @@ using std::cout;
 using std::endl;
 using std::vector;
 int main() {
-    point p1(3,0,0);
-    point p2(0,1,0);
-    point p3(0,0,0);
+    pointSharePtr p1 = point::getPoint(3, 0, 0);
+    pointSharePtr p2 = point::getPoint(0, 1, 0);
+    pointSharePtr p3 = point::getPoint(0, 0, 0);
     triangle t(p1, p2, p3);
 
-    split1(t, 0.2);
+    split1(t, 0.8);
     system("./showme result.poly");
 }
