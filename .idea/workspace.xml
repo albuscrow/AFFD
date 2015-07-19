@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/common_data.cc" line="1448" mnemonic="4" />
+    <bookmark url="file://$PROJECT_DIR$/common_data.cc" line="1454" mnemonic="4" />
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
-      <config projectName="Project" targetName="splitTest_automoc" />
-      <config projectName="Project" targetName="triangle.c" />
+      <config projectName="Project" targetName="splitTriangle" />
+      <config projectName="Project" targetName="tri_automoc" />
       <config projectName="Project" targetName="affd_automoc" />
-      <config projectName="Project" targetName="tri" />
-      <config projectName="Project" targetName="splitTest" />
       <config projectName="Project" targetName="triangle.c_automoc" />
       <config projectName="Project" targetName="affd" />
-      <config projectName="Project" targetName="tri_automoc" />
+      <config projectName="Project" targetName="splitTest_automoc" />
+      <config projectName="Project" targetName="testSplit" />
+      <config projectName="Project" targetName="cudaLib" />
+      <config projectName="Project" targetName="splitTest" />
+      <config projectName="Project" targetName="tri" />
+      <config projectName="Project" targetName="cudaLib_automoc" />
+      <config projectName="Project" targetName="triangle.c" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true" GENERATION_PASS_SYSTEM_ENVIRONMENT="true" BUILD_OUTPUT_DIR="build">
@@ -22,14 +26,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51a5be61-2f9c-40f2-b9bc-3932e7c16bf4" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/split_library/test/source_file_test.cpp" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/split_library/source_file_test.cpp" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/CMakeLists.txt" afterPath="$PROJECT_DIR$/split_library/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/affd.iml" afterPath="$PROJECT_DIR$/.idea/affd.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_data.cc" afterPath="$PROJECT_DIR$/common_data.cc" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/common_data_structure.cpp" afterPath="$PROJECT_DIR$/split_library/common_data_structure.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/common_data_structure.h" afterPath="$PROJECT_DIR$/split_library/common_data_structure.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/source_file_test.cpp" afterPath="$PROJECT_DIR$/split_library/source_file_test.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/obj_data.cc" afterPath="$PROJECT_DIR$/obj_data.cc" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/split.cpp" afterPath="$PROJECT_DIR$/split_library/split.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/split.h" afterPath="$PROJECT_DIR$/split_library/split.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/triangle.cc" afterPath="$PROJECT_DIR$/triangle.cc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/triangle.h" afterPath="$PROJECT_DIR$/triangle.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="affd.iws" />
@@ -51,36 +59,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/split_library/CMakeLists.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="4" column="21" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="source_file_test.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/split_library/source_file_test.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-              <folding>
-                <element signature="e#35#54#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="split.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/split_library/split.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="20" column="81" selection-start-line="20" selection-start-column="81" selection-end-line="20" selection-end-column="81" />
-              <folding>
-                <element signature="e#84#101#0" expanded="true" />
-              </folding>
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -89,18 +73,52 @@
         <entry file="file://$PROJECT_DIR$/split_library/common_data_structure.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="169" column="0" selection-start-line="169" selection-start-column="0" selection-end-line="169" selection-end-column="0" />
+              <caret line="18" column="11" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+              <folding>
+                <element signature="e#117#133#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="common_data.cc" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/common_data.cc">
+      <file leaf-file-name="obj_data.cc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/obj_data.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5970149">
-              <caret line="2742" column="4" selection-start-line="2742" selection-start-column="4" selection-end-line="2742" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="276" column="23" selection-start-line="276" selection-start-column="23" selection-end-line="276" selection-end-column="23" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="streambuf_iterator.h" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/5.1.0/bits/streambuf_iterator.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="209" column="28" selection-start-line="209" selection-start-column="28" selection-end-line="209" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cuda_calc.cu" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="2891" column="5" selection-start-line="2891" selection-start-column="5" selection-end-line="2891" selection-end-column="5" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -109,20 +127,42 @@
         <entry file="file://$PROJECT_DIR$/split_library/common_data_structure.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="10" column="21" selection-start-line="10" selection-start-column="21" selection-end-line="10" selection-end-column="21" />
+              <caret line="63" column="41" selection-start-line="63" selection-start-column="41" selection-end-line="63" selection-end-column="41" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="split.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/split_library/split.cpp">
+      <file leaf-file-name="common_data.cc" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/common_data.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.20545746">
+              <caret line="196" column="21" selection-start-line="196" selection-start-column="21" selection-end-line="196" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#24#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="utility" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/5.1.0/utility">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="80" column="69" selection-start-line="80" selection-start-column="69" selection-end-line="80" selection-end-column="69" />
+              <caret line="33" column="57" selection-start-line="33" selection-start-column="57" selection-end-line="33" selection-end-column="57" />
               <folding>
-                <element signature="e#36#54#0" expanded="true" />
+                <marker date="1435197466000" expanded="true" signature="2664:8437" placeholder="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/split_library/CMakeLists.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -139,7 +179,6 @@
         <option value="$PROJECT_DIR$/view.h" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$USER_HOME$/.clion10/system/cmake/generated/8e746a45/8e746a45/Debug/affd_automoc.cpp" />
-        <option value="$PROJECT_DIR$/obj_data.cc" />
         <option value="$PROJECT_DIR$/triangle.c" />
         <option value="$PROJECT_DIR$/obj_data.h" />
         <option value="$PROJECT_DIR$/main.cc" />
@@ -151,16 +190,17 @@
         <option value="$PROJECT_DIR$/view.cc" />
         <option value="$PROJECT_DIR$/affd_line.fs" />
         <option value="$PROJECT_DIR$/cuda_calc.cu" />
-        <option value="$PROJECT_DIR$/common_data.cc" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/split_library/source_file.cpp" />
-        <option value="$PROJECT_DIR$/split_library/CMakeLists.txt" />
         <option value="/usr/include/c++/5.1.0/bits/stl_vector.h" />
-        <option value="$PROJECT_DIR$/split_library/source_file_test.cpp" />
-        <option value="$PROJECT_DIR$/split_library/common_data_structure.cpp" />
         <option value="$PROJECT_DIR$/split_library/split.h" />
         <option value="$PROJECT_DIR$/split_library/split.cpp" />
+        <option value="$PROJECT_DIR$/split_library/common_data_structure.cpp" />
+        <option value="$PROJECT_DIR$/split_library/source_file_test.cpp" />
+        <option value="$PROJECT_DIR$/split_library/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/obj_data.cc" />
         <option value="$PROJECT_DIR$/split_library/common_data_structure.h" />
+        <option value="$PROJECT_DIR$/common_data.cc" />
       </list>
     </option>
   </component>
@@ -240,6 +280,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -247,6 +301,10 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="affd" />
               <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="affd" />
@@ -277,8 +335,11 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/split_library/test" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.splitTest">
+  <component name="RunManager" selected="Application.affd">
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="affd" CONFIG_NAME="Debug">
       <envs />
       <method />
@@ -323,44 +384,24 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="affd_automoc" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="affd_automoc" CONFIG_NAME="Debug">
+    <configuration default="false" name="testSplit" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="testSplit" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="testSplit">
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="tri" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="tri" CONFIG_NAME="Debug">
+    <configuration default="false" name="cudaLib" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="cudaLib" CONFIG_NAME="Debug">
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="tri_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="tri_automoc" CONFIG_NAME="Debug">
+    <configuration default="false" name="cudaLib_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="cudaLib_automoc" CONFIG_NAME="Debug">
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="triangle.c" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="triangle.c" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="triangle.c_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="triangle.c_automoc" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="splitTest" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="splitTest" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="splitTest">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="splitTest_automoc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="Project" TARGET_NAME="splitTest_automoc" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
-    <list size="9">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.Build All" />
       <item index="1" class="java.lang.String" itemvalue="Application.affd" />
-      <item index="2" class="java.lang.String" itemvalue="Application.affd_automoc" />
-      <item index="3" class="java.lang.String" itemvalue="Application.tri" />
-      <item index="4" class="java.lang.String" itemvalue="Application.tri_automoc" />
-      <item index="5" class="java.lang.String" itemvalue="Application.triangle.c" />
-      <item index="6" class="java.lang.String" itemvalue="Application.triangle.c_automoc" />
-      <item index="7" class="java.lang.String" itemvalue="Application.splitTest" />
-      <item index="8" class="java.lang.String" itemvalue="Application.splitTest_automoc" />
+      <item index="2" class="java.lang.String" itemvalue="Application.testSplit" />
+      <item index="3" class="java.lang.String" itemvalue="Application.cudaLib" />
+      <item index="4" class="java.lang.String" itemvalue="Application.cudaLib_automoc" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -386,17 +427,17 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1600" y="0" width="1916" height="1076" extended-state="0" />
+    <frame x="1600" y="0" width="1916" height="1076" extended-state="1" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16860466" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31423983" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.49757868" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2676923" sideWeight="0.4733656" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36923078" sideWeight="0.4733656" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.48789346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37460318" sideWeight="0.5266344" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26153848" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="1700" y="118" width="1476" height="828" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21128204" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32820514" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20717949" sideWeight="0.47578692" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30266345" sideWeight="0.50643086" order="2" side_tool="true" content_ui="tabs" />
@@ -405,32 +446,32 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="1700" y="118" width="1476" height="828" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26153848" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3925354" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.49757868" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.49757868" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.45431146" sideWeight="0.4733656" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36923078" sideWeight="0.4733656" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.48789346" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.48789346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37460318" sideWeight="0.5266344" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="1700" y="118" width="1476" height="828" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32303733" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2074074" sideWeight="0.47578692" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15203562" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32820514" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20717949" sideWeight="0.47578692" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.7654185" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26243386" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26153848" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30266345" sideWeight="0.50643086" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42728442" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42564103" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -446,39 +487,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="35" />
+      <option name="time" value="46" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/affd_truth.vs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common_data.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/qt/QtOpenGL/qgl.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -563,13 +576,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/lapackpp/laslv.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="134" column="5" selection-start-line="134" selection-start-column="5" selection-end-line="134" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.cc">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -619,13 +625,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/obj_data.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="32" column="27" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/view.cc">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -644,13 +643,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="2891" column="5" selection-start-line="2891" selection-start-column="5" selection-end-line="2891" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -689,14 +681,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="14" column="20" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/5.1.0/ext/new_allocator.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.72156864">
@@ -708,19 +692,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="65" column="4" selection-start-line="65" selection-start-column="4" selection-end-line="65" selection-end-column="4" />
-          <folding>
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/include/c++/5.1.0/bits/stl_vector.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="424" column="0" selection-start-line="424" selection-start-column="0" selection-end-line="424" selection-end-column="0" />
-          <folding>
-            <element signature="e#11049#12785#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -728,25 +699,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="763" column="4" selection-start-line="763" selection-start-column="4" selection-end-line="763" selection-end-column="4" />
-          <folding>
-            <marker date="1435197465000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1435197465000" expanded="false" signature="-1:-1" placeholder="&lt;_Up,_Ep,=_Require&lt;is_convertible&lt;unique_ptr&lt;_Up,_Ep&gt;::pointer,pointer&gt;,__not_&lt;is_array&lt;_Up&gt;&gt;,conditional&lt;is_reference&lt;_Dp&gt;::value,is_same&lt;_Ep,_Dp&gt;,is_convertible&lt;_Ep,_Dp&gt;&gt;" />
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="&lt;~&gt;" />
-            <marker date="1435197465000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="&lt;~&gt;" />
-            <marker date="1435197465000" expanded="false" signature="-1:-1" placeholder="&lt;_Up,_Ep,=_Require&lt;__safe_conversion&lt;_Up,_Ep&gt;,conditional&lt;is_reference&lt;_Dp&gt;::value,is_same&lt;_Ep,_Dp&gt;,is_convertible&lt;_Ep,_Dp&gt;&gt;" />
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="&lt;~&gt;" />
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="&lt;~&gt;" />
-            <marker date="1435197465000" expanded="true" signature="-1:-1" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/split_library/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="21" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -754,53 +706,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="132" column="8" selection-start-line="132" selection-start-column="8" selection-end-line="132" selection-end-column="8" />
-          <folding>
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-            <marker date="1429763951000" expanded="false" signature="-1:-1" placeholder="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -808,7 +713,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="199" column="9" selection-start-line="199" selection-start-column="9" selection-end-line="199" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -816,7 +720,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33284885">
           <caret line="7437" column="49" selection-start-line="7437" selection-start-column="49" selection-end-line="7437" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -824,25 +727,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.43371212">
           <caret line="374" column="67" selection-start-line="374" selection-start-column="67" selection-end-line="374" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/split_library/source_file_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding>
-            <element signature="e#35#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/split_library/common_data_structure.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="10" column="21" selection-start-line="10" selection-start-column="21" selection-end-line="10" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -850,43 +734,144 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3328446">
           <caret line="133" column="0" selection-start-line="133" selection-start-column="0" selection-end-line="133" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/lapackpp/laslv.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="458" column="5" selection-start-line="458" selection-start-column="5" selection-end-line="458" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5.1.0/bits/shared_ptr.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/split_library/split.h">
+    <entry file="file:///usr/include/c++/5.1.0/bits/stl_vector.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="81" selection-start-line="20" selection-start-column="81" selection-end-line="20" selection-end-column="81" />
-          <folding>
-            <element signature="e#84#101#0" expanded="true" />
-          </folding>
+          <caret line="424" column="0" selection-start-line="424" selection-start-column="0" selection-end-line="424" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5.1.0/ext/atomicity.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7083333">
+          <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/split_library/split.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="80" column="69" selection-start-line="80" selection-start-column="69" selection-end-line="80" selection-end-column="69" />
+          <caret line="299" column="10" selection-start-line="299" selection-start-column="10" selection-end-line="299" selection-end-column="10" />
           <folding>
-            <element signature="e#36#54#0" expanded="true" />
+            <element signature="e#36#54#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/split_library/test/source_file_test.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+          <folding>
+            <element signature="e#55#89#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5.1.0/utility">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="33" column="57" selection-start-line="33" selection-start-column="57" selection-end-line="33" selection-end-column="57" />
+          <folding>
+            <marker date="1435197466000" expanded="true" signature="2664:8437" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/split_library/split.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2891" column="5" selection-start-line="2891" selection-start-column="5" selection-end-line="2891" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/split_library/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5.1.0/bits/streambuf_iterator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="209" column="28" selection-start-line="209" selection-start-column="28" selection-end-line="209" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obj_data.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="276" column="23" selection-start-line="276" selection-start-column="23" selection-end-line="276" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/split_library/common_data_structure.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="41" selection-start-line="63" selection-start-column="41" selection-end-line="63" selection-end-column="41" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/split_library/common_data_structure.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="169" column="0" selection-start-line="169" selection-start-column="0" selection-end-line="169" selection-end-column="0" />
-          <folding />
+          <caret line="18" column="11" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+          <folding>
+            <element signature="e#117#133#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/common_data.cc">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5970149">
-          <caret line="2742" column="4" selection-start-line="2742" selection-start-column="4" selection-end-line="2742" selection-end-column="4" />
-          <folding />
+        <state vertical-scroll-proportion="0.20545746">
+          <caret line="196" column="21" selection-start-line="196" selection-start-column="21" selection-end-line="196" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

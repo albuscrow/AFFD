@@ -21,11 +21,15 @@ find_package(Qt5OpenGL)
 
 find_package(OpenGL)
 find_package(GLUT)
-file(GLOB SRC_FILES *.cpp *.h *.cu *.cc)
+file(GLOB CUDA_SRC_FILES *.cu)
 
+cuda_add_library(cudaLib ${CUDA_SRC_FILES})
+cuda_add_cublas_to_target(cudaLib)
+
+add_definitions(-std=c++14)
+file(GLOB SRC_FILES *.cpp *.h *.cc)
 cuda_add_executable(affd ${SRC_FILES})
-cuda_add_cublas_to_target(affd)
 
-target_link_libraries(affd Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} lapackpp)
+target_link_libraries(affd Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} lapackpp splitTriangle cudaLib)
 
 add_subdirectory(split_library)

@@ -9,16 +9,16 @@
 
 
 void addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3,
-                 std::vector<TriangleSharePtr> &result);
+                 std::vector<TriangleSharePtr> &result, const triangle &t);
 
-std::vector<TriangleSharePtr > split1(const triangle &t, const double &l);
+std::vector<TriangleSharePtr> split1(const triangle &t, const double &l);
 
-std::vector<TriangleSharePtr > split1(const point &p1, const point &p2, const point &p3, const double &l);
+std::vector<TriangleSharePtr> split1(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, const double &l);
 
 void split1Iter(std::vector<pointSharePtr> p1, std::vector<pointSharePtr> p2, const double &l,
-                std::vector<TriangleSharePtr > &result);
+                std::vector<TriangleSharePtr > &result, const triangle &t);
 
-void splitOneLevel(edge edge1, edge edge2, double l, std::vector<TriangleSharePtr > &result);
+void splitOneLevel(edge edge1, edge edge2, double l, std::vector<TriangleSharePtr > &result, const triangle &t);
 
 std::vector<pointSharePtr> splitEdge(const edge &e, const double &l);
 

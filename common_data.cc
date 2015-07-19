@@ -3,8 +3,10 @@
 #include <QTime>
 #include <lapackpp/blas3pp.h>
 #include <lapackpp/laslv.h>
+#include <memory>
 #include "triangle.h"
 #include "obj_data.h"
+#include "split_library/split.h"
 
 #include <sstream>
 
@@ -158,7 +160,7 @@ Triangle::Triangle(const VertexCoord &v0, const VertexCoord &v1, const VertexCoo
                    const NormalCoord &n0, const NormalCoord &n1, const NormalCoord &n2,
                    const NormalCoord &n_adj0, const NormalCoord &n_adj1, const NormalCoord &n_adj2,
 #ifdef LINE
-				   const VertexCoord &bary_ori0, const VertexCoord &bary_ori1, const VertexCoord &bary_ori2,
+                   const VertexCoord &bary_ori0, const VertexCoord &bary_ori1, const VertexCoord &bary_ori2,
 #endif
                    const VertexCoord *vo, int origin_face_idx,
                    int nc0, int nc1, int nc2,
@@ -176,7 +178,9 @@ Triangle::Triangle(const VertexCoord &v0, const VertexCoord &v1, const VertexCoo
     v_origin[1] = vo[1];
     v_origin[2] = vo[2];
 #ifdef LINE
-	bary_origin[0] = bary_ori0; bary_origin[1] = bary_ori1; bary_origin[2] = bary_ori2;
+    bary_origin[0] = bary_ori0;
+    bary_origin[1] = bary_ori1;
+    bary_origin[2] = bary_ori2;
 #endif
     n_count[0] = nc0;
     n_count[1] = nc1;
@@ -189,7 +193,9 @@ Triangle::Triangle(const VertexCoord &v0, const VertexCoord &v1, const VertexCoo
 
 /*----------------------------------------------------------------------------------------*/
 
-const double CommonData::ZERO = 10e-6;
+#ifndef ZERO
+#define ZERO 0.0000001
+#endif
 const double CommonData::EXPAND = 0.001;
 //const double CommonData::EXPAND = 0.0;
 const double CommonData::PI = 3.1415926536;
@@ -1115,7 +1121,7 @@ void CommonData::clipPolygon() {
 #endif
                         }
 #ifdef LINE
-						tempPolygon.push_back_bary(bary);
+                        tempPolygon.push_back_bary(bary);
 #endif
                         //cout << idx << ", n_count = " << tempPolygon.normalCount(idx) << endl;
                     }
@@ -1329,7 +1335,7 @@ void CommonData::triangulatePolygon_PN_NO_CUTTING() {
             const TextureCoord &t2 = objData->textureCoordList[id2];
             Triangle t(v[0], v[1], v[2], n0, n1, n2, n0, n1, n2,
 #ifdef LINE
-						VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
+                       VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
 #endif
                        v, f,
                        nc0, nc1, nc2,
@@ -1339,7 +1345,7 @@ void CommonData::triangulatePolygon_PN_NO_CUTTING() {
         else {
             Triangle t(v[0], v[1], v[2], n0, n1, n2, n0, n1, n2,
 #ifdef LINE
-						VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
+                       VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
 #endif
                        v, f,
                        nc0, nc1, nc2);
@@ -1454,7 +1460,7 @@ void CommonData::triangulatePolygon() {
                         mtlIdx = mtlFaceList.size() - 1;
                     const VertexCoord *v_origin = trimmedPolygon.v_origin;
 #ifdef LINE
-					const VertexCoord &bary_origin0 = trimmedPolygonList[i][j][k][p].getBary(0);
+                    const VertexCoord &bary_origin0 = trimmedPolygonList[i][j][k][p].getBary(0);
 #endif
                     int size = trimmedPolygon.size();
                     for (int q = 1; q < size - 1; ++q) {
@@ -1489,7 +1495,8 @@ void CommonData::triangulatePolygon() {
                                        n_adj0, trimmedPolygon.getNormalAdj(q),
                                        trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
-									   bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q), trimmedPolygonList[i][j][k][p].getBary(q + 1),
+                                       bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
+                                       trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
                                        v_origin, origin_face_idx,
                                        nc0, nc1, nc2,
@@ -1507,7 +1514,8 @@ void CommonData::triangulatePolygon() {
                                        n_adj0, trimmedPolygon.getNormalAdj(q),
                                        trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
-									   bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q), trimmedPolygonList[i][j][k][p].getBary(q + 1),
+                                       bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
+                                       trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
                                        v_origin, origin_face_idx,
                                        nc0, nc1, nc2
@@ -2829,6 +2837,10 @@ void CommonData::acSplit() {
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
         split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
+
+        triangle t(std::make_shared<point>(v_origin[0].x(), v_origin[0].y(), v_origin[0].z()),
+                   std::make_shared<point>(v_origin[1].x(), v_origin[1].y(), v_origin[1].z()),
+                   std::make_shared<point>(v_origin[2].x(), v_origin[2].y(), v_origin[2].z()));
 
         //取出原始三角片的三个顶点法向
         VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];

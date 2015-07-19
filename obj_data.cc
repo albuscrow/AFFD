@@ -275,7 +275,7 @@ namespace objdata
 		string mtlName;
 		vector<MtlRange> mtlRangeList;
 		ifstream inFile(filePathName);
-		if (inFile != 0)
+		if (inFile.is_open())
 		{
 			string line;
 			while(getline(inFile, line))
@@ -310,7 +310,7 @@ namespace objdata
 		filePath = filePath.substr(0, lastSlashPos + 1);
 
 		inFile.open((filePath + mtlName).c_str());
-		if (inFile != 0)
+		if (inFile.is_open())
 		{
 			string line;
 			while(getline(inFile, line))

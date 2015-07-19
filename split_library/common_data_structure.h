@@ -11,8 +11,14 @@
 #include <vector>
 #include <memory>
 #include <assert.h>
+#include <lapackpp/gmd.h>
+#include <lapackpp/lavli.h>
+#include <lapackpp/laslv.h>
+#include <lapackpp/blas3pp.h>
 
+#ifndef ZERO
 #define ZERO 0.0000001
+#endif
 
 class point {
 public:
@@ -34,8 +40,8 @@ public:
     }
 
     //method for vector
-    point operator*(const point &p) const {
-        return point(x * p.x, y * p.y, z * p.z);
+    double operator*(const point &p) const {
+        return x * p.x + y * p.y + z * p.z;
     }
 
     point operator*(const double &d) const {
@@ -47,8 +53,8 @@ public:
         return point(x / d, y / d, z / d);
     }
 
-    std::shared_ptr<point> operator-(const point &p) const {
-        return std::shared_ptr<point>(new point(x - p.x, y - p.y, z - p.z));
+    point operator-(const point &p) const {
+        return point(x - p.x, y - p.y, z - p.z);
     }
 
 //    point operator+(const point &p) const {
@@ -56,8 +62,8 @@ public:
 //    }
 
 
-    std::shared_ptr<point> operator+(const point &p) const {
-        return std::shared_ptr<point>(new point(x + p.x, y + p.y, z + p.z));
+    point operator+(const point &p) const {
+        return point(x + p.x, y + p.y, z + p.z);
     }
 
     bool operator==(const point &p) const {
@@ -70,7 +76,7 @@ public:
         return point(-x, -y, -z);
     }
 
-    friend std::ostream& operator<<(std::ostream &os, const point &p) {
+    friend std::ostream &operator<<(std::ostream &os, const point &p) {
         os << "point x:" << p.x << " y:" << p.y << " z:" << p.z << std::endl;
         return os;
     }
@@ -89,23 +95,75 @@ public:
         return l;
     }
 
-    bool equal (double x, double y, double z) {
+    bool equal(double x, double y, double z) {
         return fabs(x - this->x) < ZERO
-                && fabs(y - this->y) < ZERO
-                && fabs(z - this->z) < ZERO;
+               && fabs(y - this->y) < ZERO
+               && fabs(z - this->z) < ZERO;
     }
 
     static const std::vector<std::shared_ptr<point>> &getPointPool() {
         return pointPool;
     }
 
+    point() { }
+
+    point(double x, double y, double z)
+            : x(x), y(y), z(z), l(sqrt(x * x + y * y + z * z)) { }
+
+    void setX(double x) {
+        point::x = x;
+    }
+
+    void setY(double y) {
+        point::y = y;
+    }
+
+    void setZ(double z) {
+        point::z = z;
+    }
+
+    /**
+     * get rotate triangle use following formula:
+     * m*r = r*cos(theta) + v x r*sin(theme) + (v * r) * v(1-cos(theme));*/
+
+    point rotate(point v, double sin, double cos) {
+//        point p = *this * cos + v.crossProduct(*this) * sin
+//                + v * (v * (*this)) * (1 - cos);
+//        x = p.x;
+//        y = p.y;
+//        z = p.z;
+        double oneminscos = 1 - cos;
+        double xx = v.x * v.x;
+        double yy = v.y * v.y;
+        double zz = v.z * v.z;
+        double xy = v.x * v.y;
+        double yz = v.y * v.z;
+        double zx = v.z * v.x;
+        double newX = (cos + oneminscos * xx) * x +
+                      (oneminscos * xy - sin * v.z) * y +
+                      (oneminscos * zx + sin * v.y) * z;
+
+        double newY = (oneminscos * xy + sin * v.z) * x +
+                      (cos + oneminscos * yy) * y +
+                      (oneminscos * yz - sin * v.x) * z;
+
+        double newZ = (oneminscos * zx - sin * v.y) * x +
+                      (oneminscos * yz + sin * v.x) * y +
+                      (cos + oneminscos * zz) * z;
+
+        x = newX;
+        y = newY;
+        z = newZ;
+
+        return *this;
+    }
+
+
 private:
     double x = 0, y = 0, z = 0;
     double l = 0.0;
     static std::vector<std::shared_ptr<point>> pointPool;
-    point() { }
-    point(double x, double y, double z)
-            : x(x), y(y), z(z), l(sqrt(x * x + y * y + z * z)) { }
+
 };
 
 using vector3d = point;
@@ -116,17 +174,17 @@ using pointSharePtr = std::shared_ptr<point>;
 class edge {
 public:
 
-    edge(){};
+    edge() { };
 
     edge(pointSharePtr p1, pointSharePtr p2) : p1(p1), p2(p2),
-                                             v12(*p2 - *p1), v21(*p1 - *p2),
-                                             length(v12->getLength()) { }
+                                               v12(*p2 - *p1), v21(*p1 - *p2),
+                                               length(v12.getLength()) { }
 
     edge operator-() {
         return edge(p2, p1);
     }
 
-    friend std::ostream& operator<<(std::ostream &os, const edge &e) {
+    friend std::ostream &operator<<(std::ostream &os, const edge &e) {
         os << "edge\npoint1:" << e.p1 << "point2:" << e.p2;
         return os;
     }
@@ -139,11 +197,11 @@ public:
         return p2;
     }
 
-    vector3dSharePtr getV12() const {
+    vector3d getV12() const {
         return v12;
     }
 
-    vector3dSharePtr getV21() const {
+    vector3d getV21() const {
         return v21;
     }
 
@@ -154,7 +212,7 @@ public:
 
 private:
     pointSharePtr p1, p2;
-    vector3dSharePtr v12, v21;
+    vector3d v12, v21;
     double length = 0.0;
 };
 
@@ -166,11 +224,46 @@ public:
     triangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3)
             : p1(p1), p2(p2), p3(p3),
               e12(p1, p2), e23(p2, p3), e31(p3, p1) {
+
+        //构造矩阵用于求逆
+//        this->auxMatrixForContain = LaGenMatDouble(3, 3);
+//        LaVectorLongInt piv(3);
+//
+//        auxMatrixForContain(0, 0) = p1->getX();
+//        auxMatrixForContain(1, 0) = p1->getY();
+//        auxMatrixForContain(2, 0) = 1;
+//
+//        auxMatrixForContain(0, 1) = p2->getX();
+//        auxMatrixForContain(1, 1) = p2->getY();
+//        auxMatrixForContain(2, 1) = 1;
+//
+//        auxMatrixForContain(0, 2) = p3->getX();
+//        auxMatrixForContain(1, 2) = p3->getY();
+//        auxMatrixForContain(2, 2) = 1;
+//
+//        LUFactorizeIP(auxMatrixForContain, piv);
+//        LaLUInverseIP(auxMatrixForContain, piv);
+
     }
 
-    bool containPoint(point *) {
+    bool containPoint(point *p) const {
+        LaGenMatDouble result(3, 1);
+        result(0, 0) = p->getX();
+        result(1, 0) = p->getY();
+        result(2, 0) = 1;
 
+        LaGenMatDouble abc(3, 1);
+        Blas_Mat_Mat_Mult(auxMatrixForContain, result, abc, false, false);
+//        std::cout << auxMatrixForContain << std::endl;
+//        std::cout << abc << std::endl;
+        return abc(0, 0) - 1 < ZERO && abc(0, 0) - 0 > ZERO
+               && abc(1, 0) - 1 < ZERO && abc(1, 0) - 0 > ZERO
+               && abc(2, 0) - 1 < ZERO && abc(2, 0) - 0 > ZERO;
     }
+
+    void rotate();
+
+    vector3d getNormal();
 
     const edge &getSmallestEdge() const {
         if (e12.getLength() < e23.getLength()
@@ -207,10 +300,13 @@ public:
         return e31;
     }
 
+    point getExcentre() const;
+
 
 private:
     pointSharePtr p1, p2, p3;
     edge e12, e23, e31;
+    LaGenMatDouble auxMatrixForContain;
 
 };
 
