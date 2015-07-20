@@ -55,25 +55,28 @@ point triangle::getExcentre() const {
 
 void triangle::rotate() {
     vector3d normal = getNormal().normalize();
-    if (normal.equal(0, 0, 1)) {
-        return;
+    if (!normal.equal(0, 0, 1) && !normal.equal(0, 0, -1)) {
+        vector3d zAxis(0, 0, 1);
+
+
+        vector3d v = normal.crossProduct(zAxis).normalize();
+
+        double cos = zAxis * normal;
+        double sin = sqrt(1 - cos * cos);
+
+#ifdef TEST
+        std::cout << "rotate n" << normal << std::endl;
+        std::cout << "rotate v" << v << std::endl;
+        std::cout << acos(cos) / 3.1415 * 180 << std::endl;
+#endif
+
+        p1->rotate(v, sin, cos);
+        p2->rotate(v, sin, cos);
+        p3->rotate(v, sin, cos);
+        e12 = edge(p1, p2);
+        e23 = edge(p2, p3);
+        e31 = edge(p3, p1);
     }
-
-    vector3d zAxis(0, 0, 1);
-
-    vector3d v = normal.crossProduct(zAxis).normalize();
-    std::cout << "rotate v" << v << std::endl;
-    double cos = zAxis * normal;
-    double sin = sqrt(1 - cos * cos);
-    std::cout << acos(cos) / 3.1415 * 180 << std::endl;
-
-    p1->rotate(v, sin, cos);
-    p2->rotate(v, sin, cos);
-    p3->rotate(v, sin, cos);
-    e12 = edge(p1, p2);
-    e23 = edge(p2, p3);
-    e31 = edge(p3, p1);
-
 
     this->auxMatrixForContain = LaGenMatDouble(3, 3);
     LaVectorLongInt piv(3);
@@ -92,6 +95,14 @@ void triangle::rotate() {
 
     LUFactorizeIP(auxMatrixForContain, piv);
     LaLUInverseIP(auxMatrixForContain, piv);
+
+//    std::cout << "rotate:" << std::endl;
+//    for (int i = 0; i < 3; ++i) {
+//        for (int j = 0; j < 3; ++j) {
+//            std::cout << auxMatrixForContain(i, j) << " ";
+//        }
+//        std::cout << std::endl;
+//    }
 
     return;
 }

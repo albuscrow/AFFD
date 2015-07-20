@@ -105,6 +105,11 @@ public:
         return pointPool;
     }
 
+    static void clearPointPool() {
+        pointPool.clear();
+        return;
+    }
+
     point() { }
 
     point(double x, double y, double z)
@@ -252,6 +257,9 @@ public:
         result(1, 0) = p->getY();
         result(2, 0) = 1;
 
+//        std::cout << "containPoint:\n" << result << std::endl;
+//        std::cout << auxMatrixForContain << std::endl;
+
         LaGenMatDouble abc(3, 1);
         Blas_Mat_Mat_Mult(auxMatrixForContain, result, abc, false, false);
 //        std::cout << auxMatrixForContain << std::endl;
@@ -301,6 +309,10 @@ public:
     }
 
     point getExcentre() const;
+
+    const LaGenMatDouble &getAuxMatrixForContain() const {
+        return auxMatrixForContain;
+    }
 
 
 private:

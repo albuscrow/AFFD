@@ -483,6 +483,9 @@ public:
                                               std::vector<objdata::SplitResultTriangle> &triangles);
 
 	void acSplit();
+
+	void splitUseNewMethod(objdata::VertexCoord pCoord[], int pInt[], std::vector<objdata::SplitResultPoint> &vector,
+                           std::vector<objdata::SplitResultTriangle> &triangle);
 };
 
 

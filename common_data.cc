@@ -4,9 +4,11 @@
 #include <lapackpp/blas3pp.h>
 #include <lapackpp/laslv.h>
 #include <memory>
+#include <map>
 #include "triangle.h"
 #include "obj_data.h"
 #include "split_library/split.h"
+
 
 #include <sstream>
 
@@ -2809,6 +2811,105 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
     out.acfree();
 }
 
+int getID(std::map<point *, int> ids, vector<pointSharePtr> &points, pointSharePtr key) {
+    if (ids.find(key.get()) == ids.end()) {
+        unsigned long i = ids.size();
+        ids[key.get()] = (int) i;
+        points.push_back(key);
+    }
+
+    return ids[key.get()];
+}
+
+void CommonData::splitUseNewMethod(VertexCoord pCoord[], int normalCount[], std::vector<objdata::SplitResultPoint> &outPoints,
+                                   std::vector<objdata::SplitResultTriangle> &outTriangles) {
+
+    triangle t(std::make_shared<point>(pCoord[0].x(), pCoord[0].y(), pCoord[0].z()),
+               std::make_shared<point>(pCoord[1].x(), pCoord[1].y(), pCoord[1].z()),
+               std::make_shared<point>(pCoord[2].x(), pCoord[2].y(), pCoord[2].z()));
+    t.rotate();
+    vector<TriangleSharePtr> triangles = split1(t, SPLIT_DEGREE);
+
+    std::vector<pointSharePtr> points = point::getPointPool();
+    std::map<point *, int> ids;
+    for (int i = 0; i < points.size(); ++i) {
+        ids[points[i].get()] = i;
+    }
+
+    LaGenMatDouble result(3, 1);
+    for (TriangleSharePtr trianglePtr : triangles) {
+        SplitResultTriangle srt;
+        srt.vertexId[0] = getID(ids, points, trianglePtr->getP1());
+        srt.vertexId[1] = getID(ids, points, trianglePtr->getP2());
+        srt.vertexId[2] = getID(ids, points, trianglePtr->getP3());
+        outTriangles.push_back(srt);
+    }
+
+    for (int k = 0; k < points.size(); ++k) {
+//        cout << out.pointmarkerlist[k] << " ";
+        pointSharePtr p = points[k];
+        result(0, 0) = p->getX();
+        result(1, 0) = p->getY();
+        result(2, 0) = 1;
+
+        LaGenMatDouble abc(3, 1);
+        Blas_Mat_Mat_Mult(t.getAuxMatrixForContain(), result, abc, false, false);
+        SplitResultPoint splitResultPoint;
+        splitResultPoint.bary.x(abc(0, 0));
+        splitResultPoint.bary.y(abc(1, 0));
+        splitResultPoint.bary.z(abc(2, 0));
+        VertexCoord bary = splitResultPoint.bary;
+        if (fabs(1 - bary.x()) < ZERO
+            || fabs(1 - bary.y()) < ZERO
+            || fabs(1 - bary.z()) < ZERO) {
+            splitResultPoint.isOriginal = true;
+            splitResultPoint.isBorder = false;
+            splitResultPoint.isInter = false;
+            if (fabs(1 - bary.x()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[0];
+            } else if (fabs(1 - bary.y()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[1];
+            } else {
+                splitResultPoint.normalCount = normalCount[2];
+            }
+        } else if (fabs(bary.z()) < ZERO
+                   || fabs(bary.y()) < ZERO
+                   || fabs(bary.z()) < ZERO) {
+            splitResultPoint.isOriginal = false;
+            splitResultPoint.isBorder = true;
+            splitResultPoint.isInter = false;
+            if (fabs(bary.x()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[1] > normalCount[2] ? normalCount[1] : normalCount[2];
+            } else if (fabs(bary.y()) < ZERO) {
+                splitResultPoint.normalCount = normalCount[0] > normalCount[2] ? normalCount[0] : normalCount[2];
+            } else {
+                splitResultPoint.normalCount = normalCount[0] > normalCount[1] ? normalCount[0] : normalCount[1];
+            }
+        } else {
+            splitResultPoint.isOriginal = false;
+            splitResultPoint.isBorder = false;
+            splitResultPoint.isInter = true;
+            splitResultPoint.normalCount = 1;
+        }
+
+
+        LaGenMatDouble newPosition(3, 1);
+
+        LaGenMatDouble originalVertex(3, 3);
+        for (int i = 0; i < 3; ++i) {
+            originalVertex(0, i) = pCoord[i].x();
+            originalVertex(1, i) = pCoord[i].y();
+            originalVertex(2, i) = pCoord[i].z();
+        }
+        Blas_Mat_Mat_Mult(originalVertex, abc, newPosition, false, false);
+        splitResultPoint.vertex.x(newPosition(0, 0));
+        splitResultPoint.vertex.y(newPosition(1, 0));
+        splitResultPoint.vertex.z(newPosition(2, 0));
+        outPoints.push_back(splitResultPoint);
+    }
+
+}
+
 void CommonData::acSplit() {
     vector<vector<int> > mtlFaceList(objData->mtlTexList.size() + 1);
     int triangleIdx = 0;
@@ -2836,11 +2937,10 @@ void CommonData::acSplit() {
         //分割三角形
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
-        split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
+//        split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
+        std::cout << "acsplit face index:" << i << endl;
+        splitUseNewMethod(v_origin, normalCount, splitResultPoint, splitResultTriangle);
 
-        triangle t(std::make_shared<point>(v_origin[0].x(), v_origin[0].y(), v_origin[0].z()),
-                   std::make_shared<point>(v_origin[1].x(), v_origin[1].y(), v_origin[1].z()),
-                   std::make_shared<point>(v_origin[2].x(), v_origin[2].y(), v_origin[2].z()));
 
         //取出原始三角片的三个顶点法向
         VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];
@@ -2850,13 +2950,14 @@ void CommonData::acSplit() {
         normal2.normalize();
         normal3.normalize();
 
-        cout << splitResultTriangle.size() << endl;
+        cout << "acSplit result triangle size :"
+        << splitResultTriangle.size() << endl;
 
-        if (splitResultTriangle.size() > 20) {
-            cout << normal1 << endl;
-            cout << normal2 << endl;
-            cout << normal3 << endl;
-        }
+//        if (splitResultTriangle.size() > 20) {
+//            cout << normal1 << endl;
+//            cout << normal2 << endl;
+//            cout << normal3 << endl;
+//        }
 
 //        TextureCoord textureCoord1;
 //        TextureCoord textureCoord2;
@@ -3014,3 +3115,4 @@ void CommonData::acSplit() {
         }
     }
 }
+

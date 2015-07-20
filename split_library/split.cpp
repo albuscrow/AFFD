@@ -6,10 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
-#include <lapackpp/gmd.h>
-#include <lapackpp/lavli.h>
-#include <lapackpp/laslv.h>
-
+#include <sstream>
 
 void outputAsFile(std::vector<TriangleSharePtr> &triangles);
 
@@ -24,6 +21,8 @@ std::map<point *, std::vector<TriangleSharePtr>> pointTriangleMap =
         std::map<point *, std::vector<TriangleSharePtr>>();
 
 std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
+    pointTriangleMap.clear();
+    point::clearPointPool();
 
     //取得三角形中两个较长的边
     vector<edge> edgeVector{t.getE12(), t.getE23(), t.getE31()};
@@ -60,18 +59,40 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 
     //先把最顶上的三角形分割出来
     addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[1], result, t);
+    if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 2) {
+        outputAsFile(result);
+        return result;
+    } else if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 3) {
+        addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], result, t);
+        outputAsFile(result);
+        return result;
+    } else if (firstEdgePoints.size() == 3 && secondEdgePoints.size() == 2) {
+        addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], result, t);
+        outputAsFile(result);
+        return result;
+    } else if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 4) {
+        addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], result, t);
+        addTriangle(firstEdgePoints[1], secondEdgePoints[2], secondEdgePoints[3], result, t);
+        outputAsFile(result);
+        return result;
+    } else if (firstEdgePoints.size() == 4 && secondEdgePoints.size() == 2) {
+        addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], result, t);
+        addTriangle(firstEdgePoints[3], firstEdgePoints[2], secondEdgePoints[1], result, t);
+        outputAsFile(result);
+        return result;
+    }
     firstEdgePoints.erase(firstEdgePoints.begin());
     secondEdgePoints.erase(secondEdgePoints.begin());
 
     split1Iter(firstEdgePoints, secondEdgePoints, l, result, t);
 
-    result.push_back(std::shared_ptr<triangle>(new triangle(t)));
+//    result.push_back(std::shared_ptr<triangle>(new triangle(t)));
     cvt(t);
     cvt(t);
     cvt(t);
+
+
     outputAsFile(result);
-
-
 #ifdef TEST
 //    cout << point::getPointPool().size() << endl;
 //    cout << pointTriangleMap.size() << endl;
@@ -84,7 +105,9 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 }
 
 void cvt(const triangle &t) {
+    #ifdef TEST
     cout << pointTriangleMap.size() << endl;
+    #endif
     std::map<point *, point> temp;
     for (auto iter = pointTriangleMap.begin(); iter != pointTriangleMap.end(); ++iter) {
         point *keyPoint = iter->first;
@@ -112,7 +135,12 @@ void cvt(const triangle &t) {
 void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> secondEdgePoints, const double &l,
                 vector<TriangleSharePtr> &triangleVector, const triangle &t) {
     if (firstEdgePoints.size() == 2 || secondEdgePoints.size() == 2) {
-        if (firstEdgePoints.size() + secondEdgePoints.size() == 5) {
+        if (firstEdgePoints.size() + secondEdgePoints.size() == 4) {
+            splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
+                          edge(firstEdgePoints[1], secondEdgePoints[1]),
+                          l, triangleVector, t);
+
+        } else if (firstEdgePoints.size() + secondEdgePoints.size() == 5) {
             splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
                           edge(firstEdgePoints[1], secondEdgePoints[1]),
                           l, triangleVector, t);
@@ -128,8 +156,12 @@ void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> sec
                         addTriangle(firstEdgePoints[1], temp[1], edgeVector[1], triangleVector, t);
                         addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
                     }
+                } else if (edgeVector.size() == 2) {
+                    addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], triangleVector, t);
                 } else {
+                    cout << "unhandle case !!!!!!!!" << endl;
                     cout << edgeVector.size() << endl;
+                    exit(1);
                 }
             } else {
                 vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[2]), l);
@@ -144,8 +176,12 @@ void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> sec
                         addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
                     }
 
+                }  else if (edgeVector.size() == 2) {
+                    addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], triangleVector, t);
                 } else {
+                    cout << "unhandle case !!!!!!!!" << endl;
                     cout << edgeVector.size() << endl;
+                    exit(1);
                 }
             }
         } else {
@@ -266,8 +302,12 @@ void splitOneLevel(edge edge1, edge edge2, double l, vector<TriangleSharePtr> &r
     }
 }
 
+int index = 0;
 void outputAsFile(std::vector<TriangleSharePtr> &triangles) {
-    std::ofstream of("result.poly");
+    std::string s1 = "result";
+    std::string s2 = ".poly";
+    std::ofstream of(s1 + std::to_string(index) + s2);
+    ++index;
     of << triangles.size() * 3 << " 2 0 0" << endl;
     for (int i = 0; i < triangles.size(); ++i) {
         of << i * 3 + 1 << " " << triangles[i]->getP1()->getX() << " " << triangles[i]->getP1()->getY() << endl;
