@@ -1,8 +1,9 @@
 set(CMAKE_AUTOMOC OFF)
 
-add_definitions(-std=c++14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 #add_definitions(-DTEST)
+add_definitions(-DCVT_TIMES=0)
 
 file(GLOB SPLIT_LIBRARY_SRC_FILES *.cpp *.h)
 

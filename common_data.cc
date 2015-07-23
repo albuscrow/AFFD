@@ -1535,7 +1535,6 @@ void CommonData::triangulatePolygon() {
                             //cout << t.v[0] << ", " << t.v[1] << ", " << t.v[2] << endl;
                             //cout << nc0 << ", " << nc1 << ", " << nc2 << endl;
                         }
-                        cout << " " << mtlIdx;
                         face_children_table_[origin_face_idx].push_front(triangleList.size() - 1);
                         mtlFaceList[mtlIdx].push_back(triangleIdx++);
                     }
@@ -2938,7 +2937,9 @@ void CommonData::acSplit() {
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
 //        split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
+        #ifdef TEST
         std::cout << "acsplit face index:" << i << endl;
+        #endif
         splitUseNewMethod(v_origin, normalCount, splitResultPoint, splitResultTriangle);
 
 
@@ -2950,8 +2951,10 @@ void CommonData::acSplit() {
         normal2.normalize();
         normal3.normalize();
 
+        #ifdef TEST
         cout << "acSplit result triangle size :"
         << splitResultTriangle.size() << endl;
+        #endif
 
 //        if (splitResultTriangle.size() > 20) {
 //            cout << normal1 << endl;
@@ -3006,19 +3009,19 @@ void CommonData::acSplit() {
             SplitResultPoint point1 = splitResultPoint[splitResultTriangle[j].vertexId[0]];
             SplitResultPoint point2 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
             SplitResultPoint point3 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
-
-            VertexCoord u = point1.vertex - point2.vertex;
-            VertexCoord v = point2.vertex - point3.vertex;
-
-            VertexCoord normal;
-            normal.x(u.y() * v.z() - u.z() * v.y());
-            normal.y(u.z() * v.x() - u.x() * v.z());
-            normal.z(u.x() * v.y() - u.y() * v.x());
-
-            if (normal * point1.normal < 0) {
-                point2 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
-                point3 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
-            }
+//
+//            VertexCoord u = point1.vertex - point2.vertex;
+//            VertexCoord v = point2.vertex - point3.vertex;
+//
+//            VertexCoord normal;
+//            normal.x(u.y() * v.z() - u.z() * v.y());
+//            normal.y(u.z() * v.x() - u.x() * v.z());
+//            normal.z(u.x() * v.y() - u.y() * v.x());
+//
+//            if (normal * point1.normal < 0) {
+//                point2 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
+//                point3 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
+//            }
 
             Triangle t(point1.vertex, point2.vertex, point3.vertex,
                        point1.normal, point2.normal, point3.normal,

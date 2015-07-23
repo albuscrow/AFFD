@@ -26,8 +26,8 @@ extern GLuint texCoordVBO;                // 结果纹理坐标的缓冲区对�
 extern GLuint texCoord3DVBO;            // 结果纹理三维坐标的缓冲区对象标识符
 extern GLuint vertexVBO;                // 结果顶点坐标的缓冲区对象标识符
 #ifdef LINE
-extern GLuint baryVBO;					// 结果顶点在切割后的三角形中的坐标的缓冲区对象标识符
-extern GLuint oriBaryVBO;				// 结果顶点在切割前的三角形中的坐标的缓冲区对象标识符
+extern GLuint baryVBO;                    // 结果顶点在切割后的三角形中的坐标的缓冲区对象标识符
+extern GLuint oriBaryVBO;                // 结果顶点在切割前的三角形中的坐标的缓冲区对象标识符
 #endif
 
 #ifdef TRUTH
@@ -204,7 +204,7 @@ View::View(QWidget *parent, CommonData *commonData) : QGLWidget(desiredFormat())
 	colormap_name = 0;
 #endif
 #ifdef LINE
-	m_bLine = false;
+    m_bLine = false;
 #endif
     tex2DNameList = 0;
     tex3DName = 0;
@@ -289,8 +289,8 @@ void View::genBuffers() {
     glGenBuffers(1, &texCoord3DVBO);
     glGenBuffers(1, &vertexVBO);
 #ifdef LINE
-	glGenBuffers(1, &baryVBO);
-	glGenBuffers(1, &oriBaryVBO);
+    glGenBuffers(1, &baryVBO);
+    glGenBuffers(1, &oriBaryVBO);
 #endif
 
 #ifdef TRUTH
@@ -330,10 +330,10 @@ void View::delBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glDeleteBuffers(1, &vertexVBO);
 #ifdef LINE
-	glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
-	glDeleteBuffers(1, &baryVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
-	glDeleteBuffers(1, &oriBaryVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
+    glDeleteBuffers(1, &baryVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
+    glDeleteBuffers(1, &oriBaryVBO);
 #endif
 
 #ifdef TRUTH
@@ -381,17 +381,17 @@ void View::setBufferData() {
     //cout << "nVBO = " << normalVBO << ", texVBO = " << texCoordVBO
     //<< ", vVBO = " << vertexVBO << endl;
 #ifdef LINE
-	glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 3, 0, GL_DYNAMIC_DRAW);
-	//cout << "@重心坐标VBO" << endl << "\t";
-	viewMemD += sizeof(float) * tessPointCount * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@重心坐标VBO");
+    glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 3, 0, GL_DYNAMIC_DRAW);
+    //cout << "@重心坐标VBO" << endl << "\t";
+    viewMemD += sizeof(float) * tessPointCount * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@重心坐标VBO");
 
-	glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 3, 0, GL_DYNAMIC_DRAW);
-	//cout << "@重心坐标VBO" << endl << "\t";
-	viewMemD += sizeof(float) * tessPointCount * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@原始重心坐标VBO");
+    glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 3, 0, GL_DYNAMIC_DRAW);
+    //cout << "@重心坐标VBO" << endl << "\t";
+    viewMemD += sizeof(float) * tessPointCount * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@原始重心坐标VBO");
 #endif
 
 
@@ -675,8 +675,7 @@ void View::initializeGL() {
 
     /* 设置光源0的环境分量、漫射分量、镜面分量和位置 */
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse); glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     //GLfloat lmodel_ambient[] = {1.0, 1.0, 1.0, 1.0};
@@ -686,12 +685,15 @@ void View::initializeGL() {
     //glClearColor(0.0, 0.0, 0.0, 0.0);						// 清除屏幕的颜色（黑色）
     //glClearColor(1.0, 0.0, 0.0, 0.0);						// 清除屏幕的颜色（红色）
     glClearColor(1.0, 1.0, 1.0, 0.0);                        // 清除屏幕的颜色（白色）
-
-    //glClearColor(0.91015625, 0.90234375, 0.8984375, 0.0);		// 最常用，清除屏幕的颜色（灰色，kde）
+ //glClearColor(0.91015625, 0.90234375, 0.8984375, 0.0);		// 最常用，清除屏幕的颜色（灰色，kde）
 
     //glClearColor(0.9490196, 0.945098, 0.941176, 0.0);			// 清除屏幕的颜色（灰色，gnome）
+#ifdef DISABLE_CULL
+    glDisable(GL_CULL_FACE);
+#else
     glEnable(GL_CULL_FACE);
-    //glDisable(GL_CULL_FACE);
+#endif
+
     glEnable(GL_DEPTH_TEST);                                // 打开深度测试
 
     glEnable(GL_LIGHTING);                                    // 打开光照
@@ -704,7 +706,7 @@ void View::initializeGL() {
 
     string vertexShader, fragmentShader;
 #ifdef LINE
-	readShaderSource("affd_line", vertexShader, fragmentShader);
+    readShaderSource("affd_line", vertexShader, fragmentShader);
 #else
 #ifdef TRUTH
 	readShaderSource("affd_truth", vertexShader, fragmentShader);
@@ -900,17 +902,17 @@ void View::paintGL()                                        // 完成opengl绘�
                     glEnableVertexAttribArray(index_mNormal);
 
 #ifdef LINE
-					glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
-					const GLuint index_mBary = glGetAttribLocation(prog, "Bary");
-					glVertexAttribPointer(index_mBary, 3, GL_FLOAT, GL_FALSE, 0, 0);
-					glEnableVertexAttribArray(index_mBary);
+                    glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
+                    const GLuint index_mBary = glGetAttribLocation(prog, "Bary");
+                    glVertexAttribPointer(index_mBary, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                    glEnableVertexAttribArray(index_mBary);
 
-					glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
-					const GLuint index_mOriBary = glGetAttribLocation(prog, "OriBary");
-					glVertexAttribPointer(index_mOriBary, 3, GL_FLOAT, GL_FALSE, 0, 0);
-					glEnableVertexAttribArray(index_mOriBary);
+                    glBindBuffer(GL_ARRAY_BUFFER, oriBaryVBO);
+                    const GLuint index_mOriBary = glGetAttribLocation(prog, "OriBary");
+                    glVertexAttribPointer(index_mOriBary, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                    glEnableVertexAttribArray(index_mOriBary);
 
-					glUniform1i(divide_id_, m_pCommonData->samplePointCount() - 1);
+                    glUniform1i(divide_id_, m_pCommonData->samplePointCount() - 1);
 #endif
 
 #ifdef TRUTH
@@ -951,7 +953,7 @@ void View::paintGL()                                        // 完成opengl绘�
 #endif
 
 #ifdef LINE
-					glUniform1i(use_line_id_, m_bLine);
+                    glUniform1i(use_line_id_, m_bLine);
 #endif
 
                     float cubeMapRotInvMat[9];
@@ -2418,7 +2420,7 @@ void View::calcThetaAndRotateAxis(double *cPos, double *lPos, double &theta, dou
 void View::wheelEvent(QWheelEvent *event) {
     if (event->orientation() == Qt::Vertical) {
         //m_fScale *= (1.0 + 0.0003 * event->delta());
-        m_fScale += 0.0003 * event->delta();
+        m_fScale += 0.03 * event->delta();
         cout << "m_fScale = " << m_fScale << endl;
         setProjection();
         update();
@@ -2537,14 +2539,13 @@ void View::keyPressEvent(QKeyEvent *event) {
 #endif
 
 #ifdef LINE
-	else if (event->key() == Qt::Key_L)
-	{
-		if (m_bLine)
-			m_bLine = false;
-		else
-			m_bLine = true;
-		update();
-	}
+    else if (event->key() == Qt::Key_L) {
+        if (m_bLine)
+            m_bLine = false;
+        else
+            m_bLine = true;
+        update();
+    }
 #endif
 }
 
@@ -2832,8 +2833,8 @@ bool View::installShaders(const GLchar *vertexShader, const GLchar *fragmentShad
 #endif
 
 #ifdef LINE
-	divide_id_ = getUniLoc(prog, "Divide");
-	use_line_id_ = getUniLoc(prog, "UseLine");
+    divide_id_ = getUniLoc(prog, "Divide");
+    use_line_id_ = getUniLoc(prog, "UseLine");
 #endif
 
     ka_id_ = getUniLoc(prog, "Mtl.ka");

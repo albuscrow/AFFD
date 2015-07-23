@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 add_definitions(-DTRILIBRARY)
 add_definitions(-DLINUX)
 add_definitions(-DANSI_DECLARATORS)
+#add_definitions(-DDISABLE_CULL)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories(${PROJECT_SOURCE_DIR})
 find_package(CUDA QUIET REQUIRED)
 
