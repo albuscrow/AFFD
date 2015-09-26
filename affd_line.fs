@@ -96,9 +96,9 @@ void main()
 
 		// 线框图中切割后的三角形，中等大小，黄色
 		if (bary.x < limit || bary.y < limit || bary.z < limit)
-			//FragColor = vec4(1.0, 1.0, 0.0, 1.0);
-			FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-		//if (bary.x < limit *2|| bary.y < limit*2 || bary.z < limit*2)
+			FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+			//FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		if (bary.x < limit *2|| bary.y < limit*2 || bary.z < limit*2)
 			//FragColor = vec4(0.0, 1.0, 0.0, 1.0);
 
 		// 线框图中切割前的三角形，最大，红色

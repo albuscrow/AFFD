@@ -486,6 +486,8 @@ public:
 
 	void splitUseNewMethod(objdata::VertexCoord pCoord[], int pInt[], std::vector<objdata::SplitResultPoint> &vector,
                            std::vector<objdata::SplitResultTriangle> &triangle);
+
+	void preComputerSamplerParamter();
 };
 
 

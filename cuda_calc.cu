@@ -6,6 +6,7 @@
 #include <cuda_gl_interop.h>
 #include <cublas_v2.h>
 #include <cuda_runtime_api.h>
+#include <vector_functions.hpp>
 #include "common_data.h"
 
 using namespace std;
@@ -299,13 +300,13 @@ void printMemD(const char *file, const char *function, int line, int memSize, st
 
 /*#define PRINT_MEM*/
 #ifdef PRINT_MEM
-	/*作废totalMemD += memSize;*/
-	cout << info << "\n"
-		 << "\t文件" << fileName << "，函数" << function << ", 第" << line << "行，申请显存" << longNumber(memSize) << "字节, "
-		 << "目前累计使用显存" << longNumber(permanentMemD + modelMemD + degreeMemD + tessMemD + viewMemD) << "字节\n"
-		 << "\t其中permanent = " << longNumber(permanentMemD) << ", model = " << longNumber(modelMemD)
-		 << ", degreeMemD = " << longNumber(degreeMemD) << ", tessMemD = " << longNumber(tessMemD)
-		 << ", view = " << longNumber(viewMemD) << endl;
+    /*作废totalMemD += memSize;*/
+    cout << info << "\n"
+         << "\t文件" << fileName << "，函数" << function << ", 第" << line << "行，申请显存" << longNumber(memSize) << "字节, "
+         << "目前累计使用显存" << longNumber(permanentMemD + modelMemD + degreeMemD + tessMemD + viewMemD) << "字节\n"
+         << "\t其中permanent = " << longNumber(permanentMemD) << ", model = " << longNumber(modelMemD)
+         << ", degreeMemD = " << longNumber(degreeMemD) << ", tessMemD = " << longNumber(tessMemD)
+         << ", view = " << longNumber(viewMemD) << endl;
 #endif
 }
 
@@ -540,7 +541,7 @@ void loadTriangleMatrixD() {
 struct TriangleD {
     float3 v[3], n[3], n_adj_origin[3], n_adj[3];
 #ifdef LINE
-	float3 bary_origin[3];
+    float3 bary_origin[3];
 #endif
     int nc[3];        // nc0, nc1, nc2分别代表v2v0, v0v1, v1v2边的法向数量
     float2 vt[3];
@@ -601,9 +602,9 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
             tempTriangleList[i].n_adj[j].z = triangleList[i].n_adj[j].k();
 
 #ifdef LINE
-			tempTriangleList[i].bary_origin[j].x = triangleList[i].bary_origin[j].x();
-			tempTriangleList[i].bary_origin[j].y = triangleList[i].bary_origin[j].y();
-			tempTriangleList[i].bary_origin[j].z = triangleList[i].bary_origin[j].z();
+            tempTriangleList[i].bary_origin[j].x = triangleList[i].bary_origin[j].x();
+            tempTriangleList[i].bary_origin[j].y = triangleList[i].bary_origin[j].y();
+            tempTriangleList[i].bary_origin[j].z = triangleList[i].bary_origin[j].z();
 #endif
 
             tempTriangleList[i].nc[j] = triangleList[i].n_count[j];
@@ -620,30 +621,30 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
 
     delete[]tempTriangleList;
 
-    cudaMalloc(&sampleValueD, sizeof(float) * (triangleCtrlPointNum + constrait_point_num) * triangleNum * 6);
+    cudaMalloc((void **) &sampleValueD, sizeof(float) * (triangleCtrlPointNum + constrait_point_num) * triangleNum * 6);
     degreeMemD += sizeof(float) * (triangleCtrlPointNum + constrait_point_num) * triangleNum * 6;
     printMemD(__FILE__, __FUNCTION__, __LINE__,
               sizeof(float) * (triangleCtrlPointNum + constrait_point_num) * triangleNum * 6,
               "@为了求Bezier曲面片的控制顶点，需要在其上进行采样，结果放在这里。即第二个矩阵乘法用到的矩阵T");
 
-    cudaMalloc(&sampleValueD_PN, sizeof(float3) * triangleNum * 3 * 2);
-    cudaMalloc(&triangleCtrlPointD_PN, sizeof(float) * (1 + 2 + 3 + 4) * triangleNum * 3);
-    cudaMalloc(&triangleNormalCtrlPointD_PN, sizeof(float) * (1 + 2 + 3) * triangleNum * 3);
+    cudaMalloc((void **) &sampleValueD_PN, sizeof(float3) * triangleNum * 3 * 2);
+    cudaMalloc((void **) &triangleCtrlPointD_PN, sizeof(float) * (1 + 2 + 3 + 4) * triangleNum * 3);
+    cudaMalloc((void **) &triangleNormalCtrlPointD_PN, sizeof(float) * (1 + 2 + 3) * triangleNum * 3);
 
-    cudaMalloc(&triangleCtrlPointD, sizeof(float) * triangleCtrlPointNum_lower * triangleNum * 6);
+    cudaMalloc((void **) &triangleCtrlPointD, sizeof(float) * triangleCtrlPointNum_lower * triangleNum * 6);
 
-    cudaMalloc(&triangle_adjacent_tableD, sizeof(int) * triangleNum * 3);
+    cudaMalloc((void **) &triangle_adjacent_tableD, sizeof(int) * triangleNum * 3);
     cudaMemcpy(triangle_adjacent_tableD, triangle_adjacent_table, sizeof(int) * triangleNum * 3,
                cudaMemcpyHostToDevice);
 
 #ifdef TRUTH
-	cudaMalloc(&sampleValueD_truth, sizeof(float) * triangleCtrlPointNum * triangleNum * 3);
-	degreeMemD += sizeof(float) * triangleCtrlPointNum * triangleNum * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleNum * 3,
-			  "@为了求精确Bezier曲面片的控制顶点，需要在其上进行采样，结果放在这里。即第二个矩阵乘法用到的矩阵T");
+    cudaMalloc(&sampleValueD_truth, sizeof(float) * triangleCtrlPointNum * triangleNum * 3);
+    degreeMemD += sizeof(float) * triangleCtrlPointNum * triangleNum * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleNum * 3,
+              "@为了求精确Bezier曲面片的控制顶点，需要在其上进行采样，结果放在这里。即第二个矩阵乘法用到的矩阵T");
 
-	activeThreadNumStep0_truth = triangleCtrlPointNum * triangleNum;
-	blockNumStep0_truth = ceil(static_cast<double>(activeThreadNumStep0_truth) / blockSizeStep0);
+    activeThreadNumStep0_truth = triangleCtrlPointNum * triangleNum;
+    blockNumStep0_truth = ceil(static_cast<double>(activeThreadNumStep0_truth) / blockSizeStep0);
 #endif
 
     activeThreadNumStep0 = triangleCtrlPointNum * triangleNum;
@@ -658,20 +659,20 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
     blockNumStep0_PN = ceil(static_cast<double>(3 * triangleNum) / blockSizeStep0_PN);
 
 #ifdef TRUTH
-	extern float matrixTriangle[9][55*55];
-	float *temp = new float[triangleCtrlPointNum * triangleCtrlPointNum];
-	for (int i = 0; i < triangleCtrlPointNum; ++i)
-	{
-		for (int j = 0; j < triangleCtrlPointNum; ++j)
-		{
-			temp[index2c(i, j, triangleCtrlPointNum)] = matrixTriangle[degree - 1][i * triangleCtrlPointNum + j];
-		}
-	}
-	cudaMalloc(&B_1D_truth, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum);
-	degreeMemD += sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, "@第一个矩阵乘法用到的矩阵(B-1)T存放在这里");
-	cudaMemcpy(B_1D_truth, temp, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, cudaMemcpyHostToDevice);
-	delete temp;
+    extern float matrixTriangle[9][55*55];
+    float *temp = new float[triangleCtrlPointNum * triangleCtrlPointNum];
+    for (int i = 0; i < triangleCtrlPointNum; ++i)
+    {
+        for (int j = 0; j < triangleCtrlPointNum; ++j)
+        {
+            temp[index2c(i, j, triangleCtrlPointNum)] = matrixTriangle[degree - 1][i * triangleCtrlPointNum + j];
+        }
+    }
+    cudaMalloc(&B_1D_truth, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum);
+    degreeMemD += sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, "@第一个矩阵乘法用到的矩阵(B-1)T存放在这里");
+    cudaMemcpy(B_1D_truth, temp, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, cudaMemcpyHostToDevice);
+    delete temp;
 #endif
     /***************************************************************************/
 
@@ -686,7 +687,7 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
     cout << "activeThreadNumStep1 = " << activeThreadNumStep1 << ", blockNumStep1 = " << blockNumStep1 << endl;
 
 #ifdef DRAW_TRIANGULAR_CTRL_POINTS
-	triangular_ctrl_points = new float[3 * triangleCtrlPointNum_lower * triangleNum];
+    triangular_ctrl_points = new float[3 * triangleCtrlPointNum_lower * triangleNum];
 #endif
 }
 
@@ -796,94 +797,94 @@ void generateUVW(int samplePointPerEdge) {
 #ifdef TRUTH
 void generateUVW_truth(int samplePointPerEdge)
 {
-	double *a = new double[samplePointPerTriangle * 3];
-	int idx = 0;
-	for (int i = segmentPerEdge; i >= 0; --i)
-	{
-		for (int j = segmentPerEdge - i; j >= 0; --j)
-		{
-			int k = segmentPerEdge - i - j;
-			a[idx++] = (double)i / segmentPerEdge;
-			a[idx++] = (double)j / segmentPerEdge;
-			a[idx++] = (double)k / segmentPerEdge;
-		}
-	}
+    double *a = new double[samplePointPerTriangle * 3];
+    int idx = 0;
+    for (int i = segmentPerEdge; i >= 0; --i)
+    {
+        for (int j = segmentPerEdge - i; j >= 0; --j)
+        {
+            int k = segmentPerEdge - i - j;
+            a[idx++] = (double)i / segmentPerEdge;
+            a[idx++] = (double)j / segmentPerEdge;
+            a[idx++] = (double)k / segmentPerEdge;
+        }
+    }
 
-	float *b = new float[samplePointPerTriangle * triangleCtrlPointNum * 3];
-	for (int row = 0; row < samplePointPerTriangle; ++row)
-	{
-		int idx = 0;
-		for (int i = degree; i >= 0; --i)
-		{
-			for (int j = degree - i; j >= 0; --j)
-			{
-				int k = degree - i - j;
-				double u = a[row * 3 + 0];
-				double v = a[row * 3 + 1];
-				double w = a[row * 3 + 2];
-				b[index2c(row, idx, samplePointPerTriangle * 3)] = B(u, v, w, degree, make_int3(i, j, k));
-				//b[row * triangleCtrlPointNum + idx] = B(u, v, w, degree, make_int3(i, j, k));
-				++idx;
-			}
-		}
-	}
+    float *b = new float[samplePointPerTriangle * triangleCtrlPointNum * 3];
+    for (int row = 0; row < samplePointPerTriangle; ++row)
+    {
+        int idx = 0;
+        for (int i = degree; i >= 0; --i)
+        {
+            for (int j = degree - i; j >= 0; --j)
+            {
+                int k = degree - i - j;
+                double u = a[row * 3 + 0];
+                double v = a[row * 3 + 1];
+                double w = a[row * 3 + 2];
+                b[index2c(row, idx, samplePointPerTriangle * 3)] = B(u, v, w, degree, make_int3(i, j, k));
+                //b[row * triangleCtrlPointNum + idx] = B(u, v, w, degree, make_int3(i, j, k));
+                ++idx;
+            }
+        }
+    }
 
-	/***********************************************************************************************************************************/
+    /***********************************************************************************************************************************/
 
-	for (int row = 0; row < samplePointPerTriangle; ++row)
-	{
-		int idx = 0;
-		for (int i = degree; i >= 0; --i)
-		{
-			for (int j = degree - i; j >= 0; --j)
-			{
-				int k = degree - i - j;
-				double u = a[row * 3 + 0];
-				double v = a[row * 3 + 1];
-				double w = a[row * 3 + 2];
-				b[index2c(row + samplePointPerTriangle, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
-												 (i * power(u, i - 1) * power(v, j) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
-				++idx;
-			}
-		}
-	}
+    for (int row = 0; row < samplePointPerTriangle; ++row)
+    {
+        int idx = 0;
+        for (int i = degree; i >= 0; --i)
+        {
+            for (int j = degree - i; j >= 0; --j)
+            {
+                int k = degree - i - j;
+                double u = a[row * 3 + 0];
+                double v = a[row * 3 + 1];
+                double w = a[row * 3 + 2];
+                b[index2c(row + samplePointPerTriangle, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
+                                                 (i * power(u, i - 1) * power(v, j) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
+                ++idx;
+            }
+        }
+    }
 
-	/***********************************************************************************************************************************/
+    /***********************************************************************************************************************************/
 
-	for (int row = 0; row < samplePointPerTriangle; ++row)
-	//for (int row = samplePointPerTriangle * 2; row < samplePointPerTriangle * 3; ++row)
-	{
-		int idx = 0;
-		for (int i = degree; i >= 0; --i)
-		{
-			for (int j = degree - i; j >= 0; --j)
-			{
-				int k = degree - i - j;
-				double u = a[row * 3 + 0];
-				double v = a[row * 3 + 1];
-				double w = a[row * 3 + 2];
-				b[index2c(row + samplePointPerTriangle * 2, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
-												 (j * power(u, i) * power(v, j - 1) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
-				++idx;
-			}
-		}
-	}
-	cudaMalloc(&BqD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
-	tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第一个矩阵乘法用到的矩阵Bq存放在这里");
-	cudaMemcpy(BqD_truth, b, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, cudaMemcpyHostToDevice);
+    for (int row = 0; row < samplePointPerTriangle; ++row)
+    //for (int row = samplePointPerTriangle * 2; row < samplePointPerTriangle * 3; ++row)
+    {
+        int idx = 0;
+        for (int i = degree; i >= 0; --i)
+        {
+            for (int j = degree - i; j >= 0; --j)
+            {
+                int k = degree - i - j;
+                double u = a[row * 3 + 0];
+                double v = a[row * 3 + 1];
+                double w = a[row * 3 + 2];
+                b[index2c(row + samplePointPerTriangle * 2, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
+                                                 (j * power(u, i) * power(v, j - 1) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
+                ++idx;
+            }
+        }
+    }
+    cudaMalloc(&BqD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
+    tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第一个矩阵乘法用到的矩阵Bq存放在这里");
+    cudaMemcpy(BqD_truth, b, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, cudaMemcpyHostToDevice);
 
-	/***********************************************************************************************************************************/
-	cudaMalloc(&BBD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
-	tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第二个矩阵乘法用到的矩阵BB存放在这里");
+    /***********************************************************************************************************************************/
+    cudaMalloc(&BBD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
+    tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第二个矩阵乘法用到的矩阵BB存放在这里");
 
-	cudaMalloc(&RD_truth, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3);
-	tessMemD += sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3;
-	printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3, "@第二个矩阵乘法的结果RD存放在这里");
+    cudaMalloc(&RD_truth, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3);
+    tessMemD += sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3, "@第二个矩阵乘法的结果RD存放在这里");
 
-	delete []a;
-	delete []b;
+    delete []a;
+    delete []b;
 }
 #endif
 
@@ -959,94 +960,94 @@ __device__ float3 BSplineVolumeValueMatrixD2(float *Mu, float *Mv, float *Mw,
 
 #else
 
-	// 第一个矩阵乘法
-	int base_i = leftUIdx - orderU + 1;
-	int base_j = leftVIdx - orderV + 1;
-	int base_k = leftWIdx - orderW + 1;
-	float3 box[4][4][4], temp;
-	for (int k = 0; k < orderW; ++k)
-		for (int i = 0; i < orderU; ++i)
-			for (int j = 0; j < orderV; ++j)
-			{
-				temp = make_float3(0.0, 0.0, 0.0);
-				for (int l = 0; l < orderU; ++l)
-				{
-					float3 cp = ctrlPointD[base_i + l][base_j + j][base_k + k];
-					temp += Mu[i * orderU + l] * cp;
-				}
-				box[i][j][k] = temp;
-			}
+    // 第一个矩阵乘法
+    int base_i = leftUIdx - orderU + 1;
+    int base_j = leftVIdx - orderV + 1;
+    int base_k = leftWIdx - orderW + 1;
+    float3 box[4][4][4], temp;
+    for (int k = 0; k < orderW; ++k)
+        for (int i = 0; i < orderU; ++i)
+            for (int j = 0; j < orderV; ++j)
+            {
+                temp = make_float3(0.0, 0.0, 0.0);
+                for (int l = 0; l < orderU; ++l)
+                {
+                    float3 cp = ctrlPointD[base_i + l][base_j + j][base_k + k];
+                    temp += Mu[i * orderU + l] * cp;
+                }
+                box[i][j][k] = temp;
+            }
 
-	// 第二个矩阵乘法
-	float3 box1[4][4][4];
-	for (int i = 0; i < orderU; ++i)
-		for (int j = 0; j < orderV; ++j)
-			for (int k = 0; k < orderW; ++k)
-			{
-				temp = make_float3(0.0, 0.0, 0.0);
-				for (int l = 0; l < orderV; ++l)
-				{
-					float3 cp = box[i][l][k];
-					temp += Mv[j * orderV + l] * cp;
-				}
-				box1[i][j][k] = temp;
-			}
+    // 第二个矩阵乘法
+    float3 box1[4][4][4];
+    for (int i = 0; i < orderU; ++i)
+        for (int j = 0; j < orderV; ++j)
+            for (int k = 0; k < orderW; ++k)
+            {
+                temp = make_float3(0.0, 0.0, 0.0);
+                for (int l = 0; l < orderV; ++l)
+                {
+                    float3 cp = box[i][l][k];
+                    temp += Mv[j * orderV + l] * cp;
+                }
+                box1[i][j][k] = temp;
+            }
 
-	// 第三个矩阵乘法
-	for (int j = 0; j < orderV; ++j)
-		for (int k = 0; k < orderW; ++k)
-			for (int i = 0; i < orderU; ++i)
-			{
-				temp = make_float3(0.0, 0.0, 0.0);
-				for (int l = 0; l < orderW; ++l)
-				{
-					float3 cp = box1[i][j][l];
-					temp += Mw[k * orderW + l] * cp;
-				}
-				box[i][j][k] = temp;
-			}
+    // 第三个矩阵乘法
+    for (int j = 0; j < orderV; ++j)
+        for (int k = 0; k < orderW; ++k)
+            for (int i = 0; i < orderU; ++i)
+            {
+                temp = make_float3(0.0, 0.0, 0.0);
+                for (int l = 0; l < orderW; ++l)
+                {
+                    float3 cp = box1[i][j][l];
+                    temp += Mw[k * orderW + l] * cp;
+                }
+                box[i][j][k] = temp;
+            }
 
-	// 由三维控制顶点算出二维临时控制顶点
-	float t[4];
-	t[0] = 1.0f;
-	t[1] = u;
-	t[2] = u * u;
-	t[3] = t[2] * u;
+    // 由三维控制顶点算出二维临时控制顶点
+    float t[4];
+    t[0] = 1.0f;
+    t[1] = u;
+    t[2] = u * u;
+    t[3] = t[2] * u;
 
-	float3 cp2D[4][4];
-	for (int j = 0; j < orderV; ++j)
-		for (int k = 0; k < orderW; ++k)
-		{
-			cp2D[j][k] = make_float3(0.0f, 0.0f, 0.0f);
-			for (int i = 0; i < orderU; ++i)
-			{
-				cp2D[j][k] += t[i] * box[i][j][k];
-			}
-		}
+    float3 cp2D[4][4];
+    for (int j = 0; j < orderV; ++j)
+        for (int k = 0; k < orderW; ++k)
+        {
+            cp2D[j][k] = make_float3(0.0f, 0.0f, 0.0f);
+            for (int i = 0; i < orderU; ++i)
+            {
+                cp2D[j][k] += t[i] * box[i][j][k];
+            }
+        }
 
-	// 由二维临时控制顶点算出一维临时控制顶点
-	t[1] = v;
-	t[2] = v * v;
-	t[3] = t[2] * v;
+    // 由二维临时控制顶点算出一维临时控制顶点
+    t[1] = v;
+    t[2] = v * v;
+    t[3] = t[2] * v;
 
-	float3 cp1D[4];
-	for (int k = 0; k < orderW; ++k)
-	{
-		cp1D[k] = make_float3(0.0f, 0.0f, 0.0f);
-		for (int j = 0; j < orderV; ++j)
-			cp1D[k] += t[j] * cp2D[j][k];
-	}
+    float3 cp1D[4];
+    for (int k = 0; k < orderW; ++k)
+    {
+        cp1D[k] = make_float3(0.0f, 0.0f, 0.0f);
+        for (int j = 0; j < orderV; ++j)
+            cp1D[k] += t[j] * cp2D[j][k];
+    }
 
-	// 由一维临时控制顶点算出结果
-	t[1] = w;
-	t[2] = w * w;
-	t[3] = t[2] * w;
+    // 由一维临时控制顶点算出结果
+    t[1] = w;
+    t[2] = w * w;
+    t[3] = t[2] * w;
 
-	temp = make_float3(0.0f, 0.0f, 0.0f);
-	for (int k = 0; k < orderW; ++k)
-		temp += t[k] * cp1D[k];
+    temp = make_float3(0.0f, 0.0f, 0.0f);
+    for (int k = 0; k < orderW; ++k)
+        temp += t[k] * cp1D[k];
 
-	return temp;
+    return temp;
 #endif
 }
 
@@ -1717,16 +1718,31 @@ __global__ void calcSampleValueThread_PN(TriangleD *triangleListD, float3 *sampl
             u * J_bar_star_T_0 * x_stride + v * J_bar_star_T_1 * y_stride + w * J_bar_star_T_2 * z_stride;
 }
 
+//采样控制顶点
 __global__ void calcSampleValueThread(TriangleD *triangleListD, float *sampleValueD,
-                                      int activeThreadNum, int m, int f, int c, int n,
+                                      int activeThreadNum, int m /*triangleCtrlPointNum*/,
+                                      int f/*triangleNum*/, int c/*constrait_point_num*/, int n/*degree*/,
                                       int orderU, int orderV, int orderW,
                                       int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW) {
+
+    /*(triangleListD, sampleValueD,
+            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+            degree, order[U], order[V], order[W],
+            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);*/
+
+
+
+
+    //在所有线程中的ID
     int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
     if (globalIdx >= activeThreadNum)
         return;
+
+    //表示是第几个三角形的控制顶点
     int triangleIdx = globalIdx / m;
     TriangleD &triangle = triangleListD[triangleIdx];
 
+    //表示是第几个控制顶点，degree是3,一共有十个控制顶点
     int localIdx = globalIdx % m;
 
     float tempFloorFloat = (sqrtf((float) localIdx * 8 + 9) - 3) * 0.5;
@@ -2103,14 +2119,17 @@ __global__ void calcAdjustNormal(TriangleD *triangleListD, int f,
 }
 
 void calcSampleValue(AlgorithmType algo_type) {
-    if (algo_type == CYM || algo_type == LZQ) {
+    if (algo_type == CYM) {
         // 计算采样点的值和法向
         //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
-        calcSampleValueThread << < blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 13 >> >
-                                                                  (triangleListD, sampleValueD,
-                                                                          activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-                                                                          degree, order[U], order[V], order[W],
-                                                                          ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+        calcSampleValueThread << < blockNumStep0,
+                blockSizeStep0,
+                sizeof(float) * blockSizeStep0 * 13 >> >
+
+                (triangleListD, sampleValueD,
+                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                        degree, order[U], order[V], order[W],
+                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
 
         // 计算约束点的值和法向
         //calcConstraitSampleValueThread<<<blockNumStep1, blockSizeStep1, sizeof(float) * blockSizeStep1 * 9>>>
@@ -2119,8 +2138,26 @@ void calcSampleValue(AlgorithmType algo_type) {
                                                                                    activeThreadNumStep1, triangleCtrlPointNum, triangleNum, constrait_point_num,
                                                                                    degree_lower, order[U], order[V], order[W],
                                                                                    ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
-    }
-    else {
+    } else if (algo_type == LZQ){
+
+        // 计算采样点的值和法向
+        calcSampleValueThread << < blockNumStep0,
+                blockSizeStep0,
+                sizeof(float) * blockSizeStep0 * 13 >> >
+
+                (triangleListD, sampleValueD,
+                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                        degree, order[U], order[V], order[W],
+                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+
+        // 计算约束点的值和法向
+        calcConstraitSampleValueThread << < blockNumStep1, blockSizeStep1, sizeof(float) * blockSizeStep1 * 13 >> >
+                                                                           (triangleListD, sampleValueD,
+                                                                                   activeThreadNumStep1, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                                                                                   degree_lower, order[U], order[V], order[W],
+                                                                                   ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+
+    } else {
         calcSampleValueThread_PN << < blockNumStep0_PN, blockSizeStep0_PN, sizeof(float) * blockSizeStep1 * 13 >> >
                                                                            (triangleListD, sampleValueD_PN,
                                                                                    triangleNum, degree, order[U], order[V], order[W],
@@ -2173,83 +2210,83 @@ void calcSampleValue(AlgorithmType algo_type) {
 
 #ifdef TRUTH
 __global__ void calcSampleValueThread_truth(TriangleD *triangleListD, float *sampleValueD_truth,
-									  int activeThreadNum, int m, int f, int n,
-									  int orderU, int orderV, int orderW,
-									  int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW)
+                                      int activeThreadNum, int m, int f, int n,
+                                      int orderU, int orderV, int orderW,
+                                      int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW)
 {
-	int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (globalIdx >= activeThreadNum)
-		return;
+    int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
+    if (globalIdx >= activeThreadNum)
+        return;
 
-	int triangleIdx = globalIdx / m;
+    int triangleIdx = globalIdx / m;
 
-	int localIdx = globalIdx % m;
+    int localIdx = globalIdx % m;
 
-	float tempFloorFloat = (sqrtf((float)localIdx * 8 + 9) - 3) / 2;
-	int floor = rintf(tempFloorFloat);
-	if ((floor * 2 + 3) * (floor * 2 + 3) != localIdx * 8 + 9)
-		floor = ceilf(tempFloorFloat);
-	int room = localIdx - (floor + 1) * floor / 2;
-	float3 barycentric_coord;
-	barycentric_coord.x = (float)(n - floor) / n;
-	barycentric_coord.y = (float)(floor - room) / n;
-	barycentric_coord.z = 1.0f - barycentric_coord.x - barycentric_coord.y;
+    float tempFloorFloat = (sqrtf((float)localIdx * 8 + 9) - 3) / 2;
+    int floor = rintf(tempFloorFloat);
+    if ((floor * 2 + 3) * (floor * 2 + 3) != localIdx * 8 + 9)
+        floor = ceilf(tempFloorFloat);
+    int room = localIdx - (floor + 1) * floor / 2;
+    float3 barycentric_coord;
+    barycentric_coord.x = (float)(n - floor) / n;
+    barycentric_coord.y = (float)(floor - room) / n;
+    barycentric_coord.z = 1.0f - barycentric_coord.x - barycentric_coord.y;
 
-	TriangleD &triangle = triangleListD[triangleIdx];
-	float3 v0 = triangle.v[0];
-	float3 v1 = triangle.v[1];
-	float3 v2 = triangle.v[2];
+    TriangleD &triangle = triangleListD[triangleIdx];
+    float3 v0 = triangle.v[0];
+    float3 v1 = triangle.v[1];
+    float3 v2 = triangle.v[2];
 
-	float u = v0.x * barycentric_coord.x + v1.x * barycentric_coord.y + v2.x * barycentric_coord.z;
-	float v = v0.y * barycentric_coord.x + v1.y * barycentric_coord.y + v2.y * barycentric_coord.z;
-	float w = v0.z * barycentric_coord.x + v1.z * barycentric_coord.y + v2.z * barycentric_coord.z;
+    float u = v0.x * barycentric_coord.x + v1.x * barycentric_coord.y + v2.x * barycentric_coord.z;
+    float v = v0.y * barycentric_coord.x + v1.y * barycentric_coord.y + v2.y * barycentric_coord.z;
+    float w = v0.z * barycentric_coord.x + v1.z * barycentric_coord.y + v2.z * barycentric_coord.z;
 
-	int i = (u - knotListD[0]) / (knotListD[orderU] - knotListD[0]);
-	int j = (v - knotListD[20 + 0]) / (knotListD[20 + orderV] - knotListD[20 + 0]);
-	int k = (w - knotListD[40 + 0]) / (knotListD[40 + orderW] - knotListD[40 + 0]);
-	if (i >= ctrlPointNumU + orderU - 2 * (orderU - 1) - 1)
-		--i;
-	if (j >= ctrlPointNumV + orderV - 2 * (orderV - 1) - 1)
-		--j;
-	if (k >= ctrlPointNumW + orderW - 2 * (orderW - 1) - 1)
-		--k;
+    int i = (u - knotListD[0]) / (knotListD[orderU] - knotListD[0]);
+    int j = (v - knotListD[20 + 0]) / (knotListD[20 + orderV] - knotListD[20 + 0]);
+    int k = (w - knotListD[40 + 0]) / (knotListD[40 + orderW] - knotListD[40 + 0]);
+    if (i >= ctrlPointNumU + orderU - 2 * (orderU - 1) - 1)
+        --i;
+    if (j >= ctrlPointNumV + orderV - 2 * (orderV - 1) - 1)
+        --j;
+    if (k >= ctrlPointNumW + orderW - 2 * (orderW - 1) - 1)
+        --k;
 
-	/* 确定此 block 需要的 u、v、w 三个方向的 B 样条矩阵 */
-	float *Mu = matrixCase(matrix_b_spline_d, orderU, ctrlPointNumU, i + orderU - 1);
-	float *Mv = matrixCase(matrix_b_spline_d, orderV, ctrlPointNumV, j + orderV - 1);
-	float *Mw = matrixCase(matrix_b_spline_d, orderW, ctrlPointNumW, k + orderW - 1);
+    /* 确定此 block 需要的 u、v、w 三个方向的 B 样条矩阵 */
+    float *Mu = matrixCase(matrix_b_spline_d, orderU, ctrlPointNumU, i + orderU - 1);
+    float *Mv = matrixCase(matrix_b_spline_d, orderV, ctrlPointNumV, j + orderV - 1);
+    float *Mw = matrixCase(matrix_b_spline_d, orderW, ctrlPointNumW, k + orderW - 1);
 
-	float tmpKnot = knotListD[i + orderU - 1];
-	float tmpKnot1 = knotListD[i + orderU];
-	u = (u - tmpKnot) / (tmpKnot1 - tmpKnot);
+    float tmpKnot = knotListD[i + orderU - 1];
+    float tmpKnot1 = knotListD[i + orderU];
+    u = (u - tmpKnot) / (tmpKnot1 - tmpKnot);
 
-	tmpKnot = knotListD[20 + j + orderV - 1];
-	tmpKnot1 = knotListD[20 + j + orderV];
-	v = (v - tmpKnot) / (tmpKnot1 - tmpKnot);
+    tmpKnot = knotListD[20 + j + orderV - 1];
+    tmpKnot1 = knotListD[20 + j + orderV];
+    v = (v - tmpKnot) / (tmpKnot1 - tmpKnot);
 
-	tmpKnot = knotListD[40 + k + orderW - 1];
-	tmpKnot1 = knotListD[40 + k + orderW];
-	w = (w - tmpKnot) / (tmpKnot1 - tmpKnot);
+    tmpKnot = knotListD[40 + k + orderW - 1];
+    tmpKnot1 = knotListD[40 + k + orderW];
+    w = (w - tmpKnot) / (tmpKnot1 - tmpKnot);
 
-	extern __shared__ float shared_array[];
-	/* 算出该线程负责的采样点的 B 样条体值 */
-	float3 result = BSplineVolumeValueMatrixD2(Mu, Mv, Mw,
-											   u, v, w, shared_array,
-											   i + orderU - 1, j + orderV - 1, k + orderW - 1,
-											   orderU, orderV, orderW);
+    extern __shared__ float shared_array[];
+    /* 算出该线程负责的采样点的 B 样条体值 */
+    float3 result = BSplineVolumeValueMatrixD2(Mu, Mv, Mw,
+                                               u, v, w, shared_array,
+                                               i + orderU - 1, j + orderV - 1, k + orderW - 1,
+                                               orderU, orderV, orderW);
 
-	sampleValueD_truth[index2c(localIdx, triangleIdx, m)] = result.x;
-	sampleValueD_truth[index2c(localIdx, triangleIdx + f, m)] = result.y;
-	sampleValueD_truth[index2c(localIdx, triangleIdx + f * 2, m)] = result.z;
+    sampleValueD_truth[index2c(localIdx, triangleIdx, m)] = result.x;
+    sampleValueD_truth[index2c(localIdx, triangleIdx + f, m)] = result.y;
+    sampleValueD_truth[index2c(localIdx, triangleIdx + f * 2, m)] = result.z;
 }
 
 void calcSampleValue_truth()
 {
-	calcSampleValueThread_truth<<<blockNumStep0_truth, blockSizeStep0, sizeof(float) * blockSizeStep0 * 11>>>
-										(triangleListD, sampleValueD_truth,
-										 activeThreadNumStep0_truth, triangleCtrlPointNum, triangleNum,
-										 degree, order[U], order[V], order[W],
-										 ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+    calcSampleValueThread_truth<<<blockNumStep0_truth, blockSizeStep0, sizeof(float) * blockSizeStep0 * 11>>>
+                                        (triangleListD, sampleValueD_truth,
+                                         activeThreadNumStep0_truth, triangleCtrlPointNum, triangleNum,
+                                         degree, order[U], order[V], order[W],
+                                         ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
 }
 #endif
 
@@ -2326,14 +2363,14 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
             float3 result = p - ((p - v_ctrlpoint_corner) * n_ctrlpoint_corner) * n_ctrlpoint_corner;
 
 #ifdef RE_LENGTH
-				float len0 = length(result);
-				float3 result_vector = result - v_ctrlpoint_corner;
-				float l_origin = length(p - v_ctrlpoint_corner);
-				float l_current = length(result_vector);
-				result_vector *= l_origin / l_current;
-				result = v_ctrlpoint_corner + result_vector;
-				float len1 = length(result);
-				printf("delta_leng_1_normal = %f\n", len1 - len0);
+            float len0 = length(result);
+            float3 result_vector = result - v_ctrlpoint_corner;
+            float l_origin = length(p - v_ctrlpoint_corner);
+            float l_current = length(result_vector);
+            result_vector *= l_origin / l_current;
+            result = v_ctrlpoint_corner + result_vector;
+            float len1 = length(result);
+            printf("delta_leng_1_normal = %f\n", len1 - len0);
 #endif
 
             delta += (result - p);
@@ -2361,14 +2398,14 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
             float3 result =
                     v_ctrlpoint_corner + ((p - v_ctrlpoint_corner) * n_ave) * n_ave;    // 由我的算法改良而来，将差的控制顶点往法向上投影，效果很好
 #ifdef RE_LENGTH
-				float len0 = length(result);
-				float3 result_vector = result - v_ctrlpoint_corner;
-				float l_origin = length(p - v_ctrlpoint_corner);
-				float l_current = length(result_vector);
-				result_vector *= l_origin / l_current;
-				result = v_ctrlpoint_corner + result_vector;
-				float len1 = length(result);
-				printf("delta_leng_pn = %f\n", len1 - len0);
+            float len0 = length(result);
+            float3 result_vector = result - v_ctrlpoint_corner;
+            float l_origin = length(p - v_ctrlpoint_corner);
+            float l_current = length(result_vector);
+            result_vector *= l_origin / l_current;
+            result = v_ctrlpoint_corner + result_vector;
+            float len1 = length(result);
+            printf("delta_leng_pn = %f\n", len1 - len0);
 #endif
             delta += (result - p);
             *(p_x + edge_ctrlpoint_idx[i]) = result.x;
@@ -2475,7 +2512,7 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
 
     // 中间控制顶点，即4号控制顶点
 #ifdef LESS_THAN_2
-	if (n_count[0] < 2 && n_count[1] < 2 && n_count[2] < 2)
+    if (n_count[0] < 2 && n_count[1] < 2 && n_count[2] < 2)
 #endif
     {
         float3 p = make_float3(*(p_x + 4), *(p_y + 4), *(p_z + 4));
@@ -2500,105 +2537,105 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
 #else
 __global__ void	move(TriangleD *triangleListD, float *triangleCtrlPointD, float *triangleNormalCtrlPointD, int m_, int f)
 {
-	int triangleIdx = blockIdx.x * blockDim.x + threadIdx.x;
-	if (triangleIdx >= f)
-		return;
+    int triangleIdx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (triangleIdx >= f)
+        return;
 
-	float *p_x = &triangleCtrlPointD[m_ * triangleIdx];
-	float *p_y = &triangleCtrlPointD[m_ * (f + triangleIdx)];
-	float *p_z = &triangleCtrlPointD[m_ * (f * 2 + triangleIdx)];
-	float *pn_x = &triangleNormalCtrlPointD[m_ * triangleIdx];
-	float *pn_y = &triangleNormalCtrlPointD[m_ * (f + triangleIdx)];
-	float *pn_z = &triangleNormalCtrlPointD[m_ * (f * 2 + triangleIdx)];
+    float *p_x = &triangleCtrlPointD[m_ * triangleIdx];
+    float *p_y = &triangleCtrlPointD[m_ * (f + triangleIdx)];
+    float *p_z = &triangleCtrlPointD[m_ * (f * 2 + triangleIdx)];
+    float *pn_x = &triangleNormalCtrlPointD[m_ * triangleIdx];
+    float *pn_y = &triangleNormalCtrlPointD[m_ * (f + triangleIdx)];
+    float *pn_z = &triangleNormalCtrlPointD[m_ * (f * 2 + triangleIdx)];
 
-	/******* 点1 *******/
+    /******* 点1 *******/
 /*#define MOVE1*/ 	// MOVE1被定义表示永远使用原始三角形的信息进行调整，理论上是错误的，只有初始情况下正确，仅供调试时用
 #ifdef MOVE1
-	float3 v = triangleListD[triangleIdx].v[0];
-	float3 n = triangleListD[triangleIdx].n[0];
+    float3 v = triangleListD[triangleIdx].v[0];
+    float3 n = triangleListD[triangleIdx].n[0];
 #else
-	float3 v = make_float3(*p_x, *p_y, *p_z);
-	float3 n = make_float3(*pn_x, *pn_y, *pn_z);
-	float length = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
-	normalize(n);
+    float3 v = make_float3(*p_x, *p_y, *p_z);
+    float3 n = make_float3(*pn_x, *pn_y, *pn_z);
+    float length = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+    normalize(n);
 #endif
-	float3 p = make_float3(*(p_x + 1), *(p_y + 1), *(p_z + 1));
-	float3 result = p - ((p - v) * n) * n;
-	float3 delta = result - p;
-	/*if (threadIdx.x == 0)*/
-	/*{*/
-		/*printf("triangleIdx = %d\n", triangleIdx);*/
-		/*printf("待投点 = (%f, %f, %f), 法向 = (%f, %f, %f), 角点 = (%f, %f, %f),\n结果 = (%f, %f, %f), 差值 = (%f, %f, %f)\n",*/
-				/*p.x, p.y, p.z,			n.x, n.y, n.z,		v.x, v.y, v.z,		result.x, result.y, result.z,		delta.x, delta.y, delta.z);*/
-	/*}*/
-	*(p_x + 1) = result.x;
-	*(p_y + 1) = result.y;
-	*(p_z + 1) = result.z;
-	float3 sum = result;
+    float3 p = make_float3(*(p_x + 1), *(p_y + 1), *(p_z + 1));
+    float3 result = p - ((p - v) * n) * n;
+    float3 delta = result - p;
+    /*if (threadIdx.x == 0)*/
+    /*{*/
+        /*printf("triangleIdx = %d\n", triangleIdx);*/
+        /*printf("待投点 = (%f, %f, %f), 法向 = (%f, %f, %f), 角点 = (%f, %f, %f),\n结果 = (%f, %f, %f), 差值 = (%f, %f, %f)\n",*/
+                /*p.x, p.y, p.z,			n.x, n.y, n.z,		v.x, v.y, v.z,		result.x, result.y, result.z,		delta.x, delta.y, delta.z);*/
+    /*}*/
+    *(p_x + 1) = result.x;
+    *(p_y + 1) = result.y;
+    *(p_z + 1) = result.z;
+    float3 sum = result;
 
-	// 点2
-	p = make_float3(*(p_x + 2), *(p_y + 2), *(p_z + 2));
-	result = p - ((p - v) * n) * n;
-	*(p_x + 2) = result.x;
-	*(p_y + 2) = result.y;
-	*(p_z + 2) = result.z;
-	sum += result;
+    // 点2
+    p = make_float3(*(p_x + 2), *(p_y + 2), *(p_z + 2));
+    result = p - ((p - v) * n) * n;
+    *(p_x + 2) = result.x;
+    *(p_y + 2) = result.y;
+    *(p_z + 2) = result.z;
+    sum += result;
 
-	/******* 点3 *******/
+    /******* 点3 *******/
 #ifdef MOVE1
-	v = triangleListD[triangleIdx].v[1];
-	n = triangleListD[triangleIdx].n[1];
+    v = triangleListD[triangleIdx].v[1];
+    n = triangleListD[triangleIdx].n[1];
 #else
-	v = make_float3(*(p_x + 6), *(p_y + 6), *(p_z + 6));
-	n = make_float3(*(pn_x + 6), *(pn_y + 6), *(pn_z + 6));
-	normalize(n);
+    v = make_float3(*(p_x + 6), *(p_y + 6), *(p_z + 6));
+    n = make_float3(*(pn_x + 6), *(pn_y + 6), *(pn_z + 6));
+    normalize(n);
 #endif
-	p = make_float3(*(p_x + 3), *(p_y + 3), *(p_z + 3));
-	result = p - ((p - v) * n) * n;
-	*(p_x + 3) = result.x;
-	*(p_y + 3) = result.y;
-	*(p_z + 3) = result.z;
-	sum += result;
+    p = make_float3(*(p_x + 3), *(p_y + 3), *(p_z + 3));
+    result = p - ((p - v) * n) * n;
+    *(p_x + 3) = result.x;
+    *(p_y + 3) = result.y;
+    *(p_z + 3) = result.z;
+    sum += result;
 
-	// 点7
-	p = make_float3(*(p_x + 7), *(p_y + 7), *(p_z + 7));
-	result = p - ((p - v) * n) * n;
-	*(p_x + 7) = result.x;
-	*(p_y + 7) = result.y;
-	*(p_z + 7) = result.z;
-	sum += result;
+    // 点7
+    p = make_float3(*(p_x + 7), *(p_y + 7), *(p_z + 7));
+    result = p - ((p - v) * n) * n;
+    *(p_x + 7) = result.x;
+    *(p_y + 7) = result.y;
+    *(p_z + 7) = result.z;
+    sum += result;
 
-	/******* 点8 *******/
+    /******* 点8 *******/
 #ifdef MOVE1
-	v = triangleListD[triangleIdx].v[2];
-	n = triangleListD[triangleIdx].n[2];
+    v = triangleListD[triangleIdx].v[2];
+    n = triangleListD[triangleIdx].n[2];
 #else
-	v = make_float3(*(p_x + 9), *(p_y + 9), *(p_z + 9));
-	n = make_float3(*(pn_x + 9), *(pn_y + 9), *(pn_z + 9));
-	normalize(n);
+    v = make_float3(*(p_x + 9), *(p_y + 9), *(p_z + 9));
+    n = make_float3(*(pn_x + 9), *(pn_y + 9), *(pn_z + 9));
+    normalize(n);
 #endif
-	p = make_float3(*(p_x + 8), *(p_y + 8), *(p_z + 8));
-	result = p - ((p - v) * n) * n;
-	*(p_x + 8) = result.x;
-	*(p_y + 8) = result.y;
-	*(p_z + 8) = result.z;
-	sum += result;
+    p = make_float3(*(p_x + 8), *(p_y + 8), *(p_z + 8));
+    result = p - ((p - v) * n) * n;
+    *(p_x + 8) = result.x;
+    *(p_y + 8) = result.y;
+    *(p_z + 8) = result.z;
+    sum += result;
 
-	// 点5
-	p = make_float3(*(p_x + 5), *(p_y + 5), *(p_z + 5));
-	result = p - ((p - v) * n) * n;
-	*(p_x + 5) = result.x;
-	*(p_y + 5) = result.y;
-	*(p_z + 5) = result.z;
-	sum += result;
+    // 点5
+    p = make_float3(*(p_x + 5), *(p_y + 5), *(p_z + 5));
+    result = p - ((p - v) * n) * n;
+    *(p_x + 5) = result.x;
+    *(p_y + 5) = result.y;
+    *(p_z + 5) = result.z;
+    sum += result;
 
-	/******* 点4 *******/
-	p = make_float3(*(p_x + 4), *(p_y + 4), *(p_z + 4));
-	sum *= 1.0 / 6;
-	result = sum + (sum - p) * 0.5;
-	*(p_x + 4) = result.x;
-	*(p_y + 4) = result.y;
-	*(p_z + 4) = result.z;
+    /******* 点4 *******/
+    p = make_float3(*(p_x + 4), *(p_y + 4), *(p_z + 4));
+    sum *= 1.0 / 6;
+    result = sum + (sum - p) * 0.5;
+    *(p_x + 4) = result.x;
+    *(p_y + 4) = result.y;
+    *(p_z + 4) = result.z;
 }
 #endif
 
@@ -2639,7 +2676,7 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
             move << < move_block_num, move_block_size >> > (triangleListD, triangleCtrlPointD, triangle_adjacent_tableD,
                     triangleCtrlPointNum_lower, triangleNum, center_factor, use_pn);
 #else
-			move<<<move_block_num, move_block_size>>>(triangleListD, triangleCtrlPointD, triangleCtrlPointD + 3 * triangleNum * triangleCtrlPointNum_lower, triangleCtrlPointNum_lower, triangleNum);
+            move<<<move_block_num, move_block_size>>>(triangleListD, triangleCtrlPointD, triangleCtrlPointD + 3 * triangleNum * triangleCtrlPointNum_lower, triangleCtrlPointNum_lower, triangleNum);
 #endif
 
 //cudaThreadSynchronize();
@@ -2647,13 +2684,13 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
             //move<<<move_block_num, move_block_size>>>(triangleListD, triangleCtrlPointD, triangleCtrlPointD + 3 * triangleNum * triangleCtrlPointNum_lower, triangle_adjacent_tableD,
             //triangleCtrlPointNum_lower, triangleNum, center_factor);
 #ifndef MORPH
-			cout << "center_factor = " << center_factor << endl;
+            cout << "center_factor = " << center_factor << endl;
 #endif
             printCudaError(__FILE__, __FUNCTION__, __LINE__);
         }
 #ifdef DRAW_TRIANGULAR_CTRL_POINTS
-		// 将计算好的控制顶点传回内存，仅用于调试，在最终结果上显示控制顶点，测效率时需删除
-		cudaMemcpy(triangular_ctrl_points, triangleCtrlPointD, sizeof(float) * 3 * triangleNum * triangleCtrlPointNum_lower, cudaMemcpyDeviceToHost);
+        // 将计算好的控制顶点传回内存，仅用于调试，在最终结果上显示控制顶点，测效率时需删除
+        cudaMemcpy(triangular_ctrl_points, triangleCtrlPointD, sizeof(float) * 3 * triangleNum * triangleCtrlPointNum_lower, cudaMemcpyDeviceToHost);
 #endif
     }
     else {
@@ -2661,14 +2698,14 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
         calcCtrlPoint_PN << < blockNum, 128 >> >
                                         (triangleListD, triangle_adjacent_tableD, sampleValueD_PN, triangleCtrlPointD_PN, triangleNormalCtrlPointD_PN, triangleNum, triangleCtrlPointNum_lower);
 #ifdef DRAW_TRIANGULAR_CTRL_POINTS
-		// 将计算好的控制顶点传回内存，仅用于调试，在最终结果上显示控制顶点，测效率时需删除
-		cudaMemcpy(triangular_ctrl_points, triangleCtrlPointD_PN, sizeof(float) * 3 * triangleNum * triangleCtrlPointNum_lower, cudaMemcpyDeviceToHost);
+        // 将计算好的控制顶点传回内存，仅用于调试，在最终结果上显示控制顶点，测效率时需删除
+        cudaMemcpy(triangular_ctrl_points, triangleCtrlPointD_PN, sizeof(float) * 3 * triangleNum * triangleCtrlPointNum_lower, cudaMemcpyDeviceToHost);
 #endif
     }
 
 
 #ifndef MORPH
-	cout << "triangleNum = " << triangleNum << endl;
+    cout << "triangleNum = " << triangleNum << endl;
 #endif
     //float *test = new float[6 * triangleNum * 3];
     //cudaMemcpy(test, triangleNormalCtrlPointD_PN, sizeof(float) * 6 * triangleNum * 3, cudaMemcpyDeviceToHost);
@@ -2713,20 +2750,20 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
 #ifdef TRUTH
 void matrixMul1_truth()
 {
-	float alpha = 1.0f, beta = 0.0f;
-	cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
-									  samplePointPerTriangle * 3, triangleCtrlPointNum, triangleCtrlPointNum, 
-									  &alpha,
-									  BqD_truth, samplePointPerTriangle * 3,
-									  B_1D_truth, triangleCtrlPointNum,
-									  &beta,
-									  BBD_truth, samplePointPerTriangle * 3);
-	if (stat != CUBLAS_STATUS_SUCCESS)
-	{
-		cout << "CtrlPoint_truth fail!!!!!!!!!!!!!\tstat = " << stat << endl;
-		printCudaError(__FILE__, __FUNCTION__, __LINE__);
-		return;
-	}
+    float alpha = 1.0f, beta = 0.0f;
+    cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
+                                      samplePointPerTriangle * 3, triangleCtrlPointNum, triangleCtrlPointNum,
+                                      &alpha,
+                                      BqD_truth, samplePointPerTriangle * 3,
+                                      B_1D_truth, triangleCtrlPointNum,
+                                      &beta,
+                                      BBD_truth, samplePointPerTriangle * 3);
+    if (stat != CUBLAS_STATUS_SUCCESS)
+    {
+        cout << "CtrlPoint_truth fail!!!!!!!!!!!!!\tstat = " << stat << endl;
+        printCudaError(__FILE__, __FUNCTION__, __LINE__);
+        return;
+    }
 }
 #endif
 
@@ -2792,81 +2829,83 @@ __global__ void copy(float *RD,
 }
 
 #ifdef LINE
-__global__ void make_bary(TriangleD *triangleListD, float *baryPtrVBO, float *oriBaryPtrVBO, int n, int q)
-{
-	/***************************** 生成切割后每个顶点的重心坐标 ******************************/
-	int localIdx = threadIdx.x;
-	float tempFloorFloat = (sqrtf((float)localIdx * 8 + 9) - 3) / 2;
-	int floor = rintf(tempFloorFloat);
-	if ((floor * 2 + 3) * (floor * 2 + 3) != localIdx * 8 + 9)
-		floor = ceilf(tempFloorFloat);
-	int room = localIdx - (floor + 1) * floor / 2;
-	float3 barycentric_coord;
-	barycentric_coord.x = (float)(n - floor) / n;
-	barycentric_coord.y = (float)(floor - room) / n;
-	barycentric_coord.z = 1.0f - barycentric_coord.x - barycentric_coord.y;
 
-	int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
-	baryPtrVBO[globalIdx * 3 + 0] = (float)(n - floor) / n;
-	baryPtrVBO[globalIdx * 3 + 1] = barycentric_coord.y;
-	baryPtrVBO[globalIdx * 3 + 2] = barycentric_coord.z;
+__global__ void make_bary(TriangleD *triangleListD, float *baryPtrVBO, float *oriBaryPtrVBO, int n, int q) {
+    /***************************** 生成切割后每个顶点的重心坐标 ******************************/
+    int localIdx = threadIdx.x;
+    float tempFloorFloat = (sqrtf((float) localIdx * 8 + 9) - 3) / 2;
+    int floor = rintf(tempFloorFloat);
+    if ((floor * 2 + 3) * (floor * 2 + 3) != localIdx * 8 + 9)
+        floor = ceilf(tempFloorFloat);
+    int room = localIdx - (floor + 1) * floor / 2;
+    float3 barycentric_coord;
+    barycentric_coord.x = (float) (n - floor) / n;
+    barycentric_coord.y = (float) (floor - room) / n;
+    barycentric_coord.z = 1.0f - barycentric_coord.x - barycentric_coord.y;
 
-	/***************************** 生成切割前每个顶点的重心坐标 ******************************/
-	int triangleIdx = blockIdx.x;
+    int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
+    baryPtrVBO[globalIdx * 3 + 0] = (float) (n - floor) / n;
+    baryPtrVBO[globalIdx * 3 + 1] = barycentric_coord.y;
+    baryPtrVBO[globalIdx * 3 + 2] = barycentric_coord.z;
 
-	// 切割后三角形三个顶点在原始三角形中的重心坐标
-	float3 bary_origin0 = triangleListD[triangleIdx].bary_origin[0];
-	float3 bary_origin1 = triangleListD[triangleIdx].bary_origin[1];
-	float3 bary_origin2 = triangleListD[triangleIdx].bary_origin[2];
+    /***************************** 生成切割前每个顶点的重心坐标 ******************************/
+    int triangleIdx = blockIdx.x;
 
-	// 当前点在原始三角形上的重心坐标
-	float3 bary_origin = bary_origin0 * barycentric_coord.x + bary_origin1 * barycentric_coord.y + bary_origin2 * barycentric_coord.z;
+    // 切割后三角形三个顶点在原始三角形中的重心坐标
+    float3 bary_origin0 = triangleListD[triangleIdx].bary_origin[0];
+    float3 bary_origin1 = triangleListD[triangleIdx].bary_origin[1];
+    float3 bary_origin2 = triangleListD[triangleIdx].bary_origin[2];
 
-	// 存储目前处理的采样点在原始三角片上的重心坐标
-	oriBaryPtrVBO[globalIdx * 3 + 0] = bary_origin.x;
-	oriBaryPtrVBO[globalIdx * 3 + 1] = bary_origin.y;
-	oriBaryPtrVBO[globalIdx * 3 + 2] = bary_origin.z;
+    // 当前点在原始三角形上的重心坐标
+    float3 bary_origin = bary_origin0 * barycentric_coord.x + bary_origin1 * barycentric_coord.y +
+                         bary_origin2 * barycentric_coord.z;
+
+    // 存储目前处理的采样点在原始三角片上的重心坐标
+    oriBaryPtrVBO[globalIdx * 3 + 0] = bary_origin.x;
+    oriBaryPtrVBO[globalIdx * 3 + 1] = bary_origin.y;
+    oriBaryPtrVBO[globalIdx * 3 + 2] = bary_origin.z;
 }
+
 #endif
 
 #ifdef TRUTH
 __global__ void copy_truth(float *RD_truth,
-					 int activeThreadNumCopy, bool firstLoad,
-					 TriangleD *triangleListD, int segmentPerEdge, int f, int q,
-					 float *normalPtrVBO_truth, float *vertexPtrVBO_truth)
+                     int activeThreadNumCopy, bool firstLoad,
+                     TriangleD *triangleListD, int segmentPerEdge, int f, int q,
+                     float *normalPtrVBO_truth, float *vertexPtrVBO_truth)
 {
-	int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (globalIdx >= activeThreadNumCopy)
-		return;
+    int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
+    if (globalIdx >= activeThreadNumCopy)
+        return;
 
-	int triangleIdx = globalIdx / q;
-	int localIdx = globalIdx % q;
+    int triangleIdx = globalIdx / q;
+    int localIdx = globalIdx % q;
 
-	vertexPtrVBO_truth[globalIdx * 3 + 0] = RD_truth[triangleIdx * q * 3 + localIdx];
-	vertexPtrVBO_truth[globalIdx * 3 + 1] = RD_truth[(triangleIdx + f) * q * 3 + localIdx];
-	vertexPtrVBO_truth[globalIdx * 3 + 2] = RD_truth[(triangleIdx + f * 2) * q * 3 + localIdx];
+    vertexPtrVBO_truth[globalIdx * 3 + 0] = RD_truth[triangleIdx * q * 3 + localIdx];
+    vertexPtrVBO_truth[globalIdx * 3 + 1] = RD_truth[(triangleIdx + f) * q * 3 + localIdx];
+    vertexPtrVBO_truth[globalIdx * 3 + 2] = RD_truth[(triangleIdx + f * 2) * q * 3 + localIdx];
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	float ux = RD_truth[triangleIdx * q * 3 + q + localIdx];
-	float uy = RD_truth[(triangleIdx + f) * q * 3 + q + localIdx];
-	float uz = RD_truth[(triangleIdx + f * 2) * q * 3 + q + localIdx];
+    float ux = RD_truth[triangleIdx * q * 3 + q + localIdx];
+    float uy = RD_truth[(triangleIdx + f) * q * 3 + q + localIdx];
+    float uz = RD_truth[(triangleIdx + f * 2) * q * 3 + q + localIdx];
 
-	float vx = RD_truth[triangleIdx * q * 3 + q * 2 + localIdx];
-	float vy = RD_truth[(triangleIdx + f) * q * 3 + q * 2 + localIdx];
-	float vz = RD_truth[(triangleIdx + f * 2) * q * 3 + q * 2 + localIdx];
+    float vx = RD_truth[triangleIdx * q * 3 + q * 2 + localIdx];
+    float vy = RD_truth[(triangleIdx + f) * q * 3 + q * 2 + localIdx];
+    float vz = RD_truth[(triangleIdx + f * 2) * q * 3 + q * 2 + localIdx];
 
-	float nx = uy * vz - uz * vy;
-	float ny = uz * vx - ux * vz;
-	float nz = ux * vy - uy * vx;
-	float l = sqrtf(nx * nx + ny * ny + nz * nz);
-	nx /= l;
-	ny /= l;
-	nz /= l;
+    float nx = uy * vz - uz * vy;
+    float ny = uz * vx - ux * vz;
+    float nz = ux * vy - uy * vx;
+    float l = sqrtf(nx * nx + ny * ny + nz * nz);
+    nx /= l;
+    ny /= l;
+    nz /= l;
 
-	normalPtrVBO_truth[globalIdx * 3 + 0] = nx;
-	normalPtrVBO_truth[globalIdx * 3 + 1] = ny;
-	normalPtrVBO_truth[globalIdx * 3 + 2] = nz;
+    normalPtrVBO_truth[globalIdx * 3 + 0] = nx;
+    normalPtrVBO_truth[globalIdx * 3 + 1] = ny;
+    normalPtrVBO_truth[globalIdx * 3 + 2] = nz;
 }
 #endif
 
@@ -2880,7 +2919,7 @@ float *texCoordPtrVBO;                            // 读写缓冲区对象所用
 float *texCoord3DPtrVBO;                        // 读写缓冲区对象所用的指针
 float *vertexPtrVBO;                            // 读写缓冲区对象所用的指针
 #ifdef LINE
-float *baryPtrVBO, *oriBaryPtrVBO;							// 读写缓冲区对象所用的指针
+float *baryPtrVBO, *oriBaryPtrVBO;                            // 读写缓冲区对象所用的指针
 #endif
 
 struct cudaGraphicsResource *normalVBO_CUDA, *texCoordVBO_CUDA, *texCoord3DVBO_CUDA, *vertexVBO_CUDA;
@@ -2894,8 +2933,8 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     cudaGraphicsMapResources(1, &texCoord3DVBO_CUDA, 0);
     cudaGraphicsMapResources(1, &vertexVBO_CUDA, 0);
 #ifdef LINE
-	cudaGraphicsMapResources(1, &baryVBO_CUDA, 0);
-	cudaGraphicsMapResources(1, &oriBaryVBO_CUDA, 0);
+    cudaGraphicsMapResources(1, &baryVBO_CUDA, 0);
+    cudaGraphicsMapResources(1, &oriBaryVBO_CUDA, 0);
 #endif
     size_t size2 = sizeof(float) * samplePointPerTriangle * triangleNum * 2;
     size_t size3 = sizeof(float) * samplePointPerTriangle * triangleNum * 3;
@@ -2904,8 +2943,8 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     cudaGraphicsResourceGetMappedPointer((void **) &texCoord3DPtrVBO, &size3, texCoord3DVBO_CUDA);
     cudaGraphicsResourceGetMappedPointer((void **) &vertexPtrVBO, &size3, vertexVBO_CUDA);
 #ifdef LINE
-	cudaGraphicsResourceGetMappedPointer((void**)&baryPtrVBO, &size3, baryVBO_CUDA);
-	cudaGraphicsResourceGetMappedPointer((void**)&oriBaryPtrVBO, &size3, oriBaryVBO_CUDA);
+    cudaGraphicsResourceGetMappedPointer((void **) &baryPtrVBO, &size3, baryVBO_CUDA);
+    cudaGraphicsResourceGetMappedPointer((void **) &oriBaryPtrVBO, &size3, oriBaryVBO_CUDA);
 #endif
 
     float alpha = 1.0f, beta = 0.0f;
@@ -2949,7 +2988,8 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
             normalPtrVBO, texCoordPtrVBO, texCoord3DPtrVBO, vertexPtrVBO);
 
 #ifdef LINE
-	make_bary<<<triangleNum, samplePointPerTriangle>>>(triangleListD, baryPtrVBO, oriBaryPtrVBO, segmentPerEdge, samplePointPerTriangle);
+    make_bary << < triangleNum, samplePointPerTriangle >> >
+                                (triangleListD, baryPtrVBO, oriBaryPtrVBO, segmentPerEdge, samplePointPerTriangle);
 #endif
 
     cudaGraphicsUnmapResources(1, &normalVBO_CUDA, 0);
@@ -2957,8 +2997,8 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     cudaGraphicsUnmapResources(1, &texCoord3DVBO_CUDA, 0);
     cudaGraphicsUnmapResources(1, &vertexVBO_CUDA, 0);
 #ifdef LINE
-	cudaGraphicsUnmapResources(1, &baryVBO_CUDA, 0);
-	cudaGraphicsUnmapResources(1, &oriBaryVBO_CUDA, 0);
+    cudaGraphicsUnmapResources(1, &baryVBO_CUDA, 0);
+    cudaGraphicsUnmapResources(1, &oriBaryVBO_CUDA, 0);
 #endif
 }
 
@@ -2975,106 +3015,106 @@ double normal_error_ave_max = 0.0, normal_error_max_max = 0.0;
 
 void tessellateD_truth(bool firstLoad)
 {
-	cudaGraphicsMapResources(1, &normalVBO_CUDA_truth, 0);
-	cudaGraphicsMapResources(1, &vertexVBO_CUDA_truth, 0);
-	size_t size3 = sizeof(float) * samplePointPerTriangle * triangleNum * 3;
-	cudaGraphicsResourceGetMappedPointer((void**)&normalPtrVBO_truth, &size3, normalVBO_CUDA_truth);
-	cudaGraphicsResourceGetMappedPointer((void**)&vertexPtrVBO_truth, &size3, vertexVBO_CUDA_truth);
+    cudaGraphicsMapResources(1, &normalVBO_CUDA_truth, 0);
+    cudaGraphicsMapResources(1, &vertexVBO_CUDA_truth, 0);
+    size_t size3 = sizeof(float) * samplePointPerTriangle * triangleNum * 3;
+    cudaGraphicsResourceGetMappedPointer((void**)&normalPtrVBO_truth, &size3, normalVBO_CUDA_truth);
+    cudaGraphicsResourceGetMappedPointer((void**)&vertexPtrVBO_truth, &size3, vertexVBO_CUDA_truth);
 
-	float alpha = 1.0f, beta = 0.0f;
-	cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
-									  samplePointPerTriangle * 3, triangleNum * 3, triangleCtrlPointNum,
-									  &alpha,
-									  BBD_truth, samplePointPerTriangle * 3,
-									  sampleValueD_truth, triangleCtrlPointNum,
-									  &beta,
-									  RD_truth, samplePointPerTriangle * 3);
-	if (stat != CUBLAS_STATUS_SUCCESS)
-	{
-		cout << "RD fail!!!!!!!!!!!!!\tstat = " << stat << endl;
-		cudaError_t error = cudaGetLastError();
-		printf("CUDA error: %s\n", cudaGetErrorString(error));
-		return;
-	}
+    float alpha = 1.0f, beta = 0.0f;
+    cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
+                                      samplePointPerTriangle * 3, triangleNum * 3, triangleCtrlPointNum,
+                                      &alpha,
+                                      BBD_truth, samplePointPerTriangle * 3,
+                                      sampleValueD_truth, triangleCtrlPointNum,
+                                      &beta,
+                                      RD_truth, samplePointPerTriangle * 3);
+    if (stat != CUBLAS_STATUS_SUCCESS)
+    {
+        cout << "RD fail!!!!!!!!!!!!!\tstat = " << stat << endl;
+        cudaError_t error = cudaGetLastError();
+        printf("CUDA error: %s\n", cudaGetErrorString(error));
+        return;
+    }
 
-	copy_truth<<<blockNumCopy, blockSizeCopy>>>(RD_truth,
-										  activeThreadNumCopy, firstLoad, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
-										  normalPtrVBO_truth, vertexPtrVBO_truth);
+    copy_truth<<<blockNumCopy, blockSizeCopy>>>(RD_truth,
+                                          activeThreadNumCopy, firstLoad, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
+                                          normalPtrVBO_truth, vertexPtrVBO_truth);
 
-	/*------------------------ 测量误差 ----------------------------*/
+    /*------------------------ 测量误差 ----------------------------*/
 
-	float *result = new float[size3 / sizeof(float)];
-	float *result_truth = new float[size3 / sizeof(float)];
+    float *result = new float[size3 / sizeof(float)];
+    float *result_truth = new float[size3 / sizeof(float)];
 
-	/* 顶点误差 */
-	cudaMemcpy(result, vertexPtrVBO, size3, cudaMemcpyDeviceToHost);
-	cudaMemcpy(result_truth, vertexPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
+    /* 顶点误差 */
+    cudaMemcpy(result, vertexPtrVBO, size3, cudaMemcpyDeviceToHost);
+    cudaMemcpy(result_truth, vertexPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
 
-	double error_ave = 0.0, error_max = 0.0;
-	for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
-	{
-		double x0 = result[i * 3];
-		double y0 = result[i * 3 + 1];
-		double z0 = result[i * 3 + 2];
-		double x1 = result_truth[i * 3];
-		double y1 = result_truth[i * 3 + 1];
-		double z1 = result_truth[i * 3 + 2];
-		double error = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1));
-		error_ave += error;
-		if (error_max < error)
-			error_max = error;
-	}
-	/*cout << "eeeeee samplePonitPerTriangle = " << samplePointPerTriangle << endl;*/
-	/*cout << "eeeeee triangleNum = " << triangleNum << endl;*/
-	/*cout << "eeeeee samplePonitPerTriangle * triangleNum = " << samplePointPerTriangle * triangleNum << endl;*/
+    double error_ave = 0.0, error_max = 0.0;
+    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
+    {
+        double x0 = result[i * 3];
+        double y0 = result[i * 3 + 1];
+        double z0 = result[i * 3 + 2];
+        double x1 = result_truth[i * 3];
+        double y1 = result_truth[i * 3 + 1];
+        double z1 = result_truth[i * 3 + 2];
+        double error = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1));
+        error_ave += error;
+        if (error_max < error)
+            error_max = error;
+    }
+    /*cout << "eeeeee samplePonitPerTriangle = " << samplePointPerTriangle << endl;*/
+    /*cout << "eeeeee triangleNum = " << triangleNum << endl;*/
+    /*cout << "eeeeee samplePonitPerTriangle * triangleNum = " << samplePointPerTriangle * triangleNum << endl;*/
 
-	/*cout << "eeeeee error = " << error_ave / (samplePointPerTriangle * triangleNum)*/
-		 /*<< ", error_max = " << error_max << endl;*/
+    /*cout << "eeeeee error = " << error_ave / (samplePointPerTriangle * triangleNum)*/
+         /*<< ", error_max = " << error_max << endl;*/
 
-	if (error_ave > vertex_error_ave_max)
-		vertex_error_ave_max = error_ave;
-	if (error_max > vertex_error_max_max)
-		vertex_error_max_max = error_max;
-	cout << "eeeeee 平均顶点误差 = " << vertex_error_ave_max / (samplePointPerTriangle * triangleNum) << ", 最大顶点误差 = " << vertex_error_max_max << endl;
+    if (error_ave > vertex_error_ave_max)
+        vertex_error_ave_max = error_ave;
+    if (error_max > vertex_error_max_max)
+        vertex_error_max_max = error_max;
+    cout << "eeeeee 平均顶点误差 = " << vertex_error_ave_max / (samplePointPerTriangle * triangleNum) << ", 最大顶点误差 = " << vertex_error_max_max << endl;
 
-	/* 法向误差 */
-	cudaMemcpy(result, normalPtrVBO, size3, cudaMemcpyDeviceToHost);
-	cudaMemcpy(result_truth, normalPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
+    /* 法向误差 */
+    cudaMemcpy(result, normalPtrVBO, size3, cudaMemcpyDeviceToHost);
+    cudaMemcpy(result_truth, normalPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
 
-	error_ave = 0.0, error_max = 0.0;
-	for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
-	{
-		double x0 = result[i * 3];
-		double y0 = result[i * 3 + 1];
-		double z0 = result[i * 3 + 2];
-		double x1 = result_truth[i * 3];
-		double y1 = result_truth[i * 3 + 1];
-		double z1 = result_truth[i * 3 + 2];
-		double length = sqrt(x0 * x0 + y0 * y0 + z0 * z0);
-		x0 /= length; y0 /= length; z0 /= length;
-		length = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
-		x1 /= length; y1 /= length; z1 /= length;
-		double error = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1));
-		error = 2 * asin(error * 0.5);
-		//error = 1 * asin(error / 1);
-		error_ave += error;
-		if (error_max < error)
-			error_max = error;
-	}
-	const float PI = 3.14159265358979;
-	if (error_ave > normal_error_ave_max)
-		normal_error_ave_max = error_ave;
-	if (error_max > normal_error_max_max)
-		normal_error_max_max = error_max;
-	cout << "eeeeee 平均法向误差（角度） = " << normal_error_ave_max / (samplePointPerTriangle * triangleNum) * 180 / PI
-		 << ", 最大法向误差（角度） = " << normal_error_max_max * 180 / PI << endl;
+    error_ave = 0.0, error_max = 0.0;
+    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
+    {
+        double x0 = result[i * 3];
+        double y0 = result[i * 3 + 1];
+        double z0 = result[i * 3 + 2];
+        double x1 = result_truth[i * 3];
+        double y1 = result_truth[i * 3 + 1];
+        double z1 = result_truth[i * 3 + 2];
+        double length = sqrt(x0 * x0 + y0 * y0 + z0 * z0);
+        x0 /= length; y0 /= length; z0 /= length;
+        length = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+        x1 /= length; y1 /= length; z1 /= length;
+        double error = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1));
+        error = 2 * asin(error * 0.5);
+        //error = 1 * asin(error / 1);
+        error_ave += error;
+        if (error_max < error)
+            error_max = error;
+    }
+    const float PI = 3.14159265358979;
+    if (error_ave > normal_error_ave_max)
+        normal_error_ave_max = error_ave;
+    if (error_max > normal_error_max_max)
+        normal_error_max_max = error_max;
+    cout << "eeeeee 平均法向误差（角度） = " << normal_error_ave_max / (samplePointPerTriangle * triangleNum) * 180 / PI
+         << ", 最大法向误差（角度） = " << normal_error_max_max * 180 / PI << endl;
 
-	delete []result;
-	delete []result_truth;
-	/*---------------------- 测量误差完成 --------------------------*/
+    delete []result;
+    delete []result_truth;
+    /*---------------------- 测量误差完成 --------------------------*/
 
-	cudaGraphicsUnmapResources(1, &normalVBO_CUDA_truth, 0);
-	cudaGraphicsUnmapResources(1, &vertexVBO_CUDA_truth, 0);
+    cudaGraphicsUnmapResources(1, &normalVBO_CUDA_truth, 0);
+    cudaGraphicsUnmapResources(1, &vertexVBO_CUDA_truth, 0);
 }
 #endif
 
@@ -3092,13 +3132,13 @@ void regGLBuffer() {
         cudaGraphicsUnregisterResource(texCoord3DVBO_CUDA);
         cudaGraphicsUnregisterResource(vertexVBO_CUDA);
 #ifdef LINE
-		cudaGraphicsUnregisterResource(baryVBO_CUDA);
-		cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);
+        cudaGraphicsUnregisterResource(baryVBO_CUDA);
+        cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);
 #endif
 
 #ifdef TRUTH
-		cudaGraphicsUnregisterResource(normalVBO_CUDA_truth);
-		cudaGraphicsUnregisterResource(vertexVBO_CUDA_truth);
+        cudaGraphicsUnregisterResource(normalVBO_CUDA_truth);
+        cudaGraphicsUnregisterResource(vertexVBO_CUDA_truth);
 #endif
         registered = false;
     }
@@ -3107,12 +3147,12 @@ void regGLBuffer() {
     cudaGraphicsGLRegisterBuffer(&texCoord3DVBO_CUDA, texCoord3DVBO, cudaGraphicsMapFlagsWriteDiscard);
     cudaGraphicsGLRegisterBuffer(&vertexVBO_CUDA, vertexVBO, cudaGraphicsMapFlagsWriteDiscard);
 #ifdef LINE
-	cudaGraphicsGLRegisterBuffer(&baryVBO_CUDA, baryVBO, cudaGraphicsMapFlagsWriteDiscard);
-	cudaGraphicsGLRegisterBuffer(&oriBaryVBO_CUDA, oriBaryVBO, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&baryVBO_CUDA, baryVBO, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&oriBaryVBO_CUDA, oriBaryVBO, cudaGraphicsMapFlagsWriteDiscard);
 #endif
 #ifdef TRUTH
-	cudaGraphicsGLRegisterBuffer(&normalVBO_CUDA_truth, normalVBO_truth, cudaGraphicsMapFlagsWriteDiscard);
-	cudaGraphicsGLRegisterBuffer(&vertexVBO_CUDA_truth, vertexVBO_truth, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&normalVBO_CUDA_truth, normalVBO_truth, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&vertexVBO_CUDA_truth, vertexVBO_truth, cudaGraphicsMapFlagsWriteDiscard);
 #endif
     registered = true;
     printCudaError(__FILE__, __FUNCTION__, __LINE__);
@@ -3132,9 +3172,9 @@ void freeTessMemD() {
     cudaFreeNonZero((void **) &BqD_PN);
     cudaFreeNonZero((void **) &RD);
 #ifdef TRUTH
-	cudaFreeNonZero((void**)&BqD_truth);
-	cudaFreeNonZero((void**)&BBD_truth);
-	cudaFreeNonZero((void**)&RD_truth);
+    cudaFreeNonZero((void**)&BqD_truth);
+    cudaFreeNonZero((void**)&BBD_truth);
+    cudaFreeNonZero((void**)&RD_truth);
 #endif
 }
 
@@ -3150,15 +3190,15 @@ void freeModelMemD() {
     cudaFreeNonZero((void **) &triangleNormalCtrlPointD_PN);
     cudaFreeNonZero((void **) &triangle_adjacent_tableD);
 #ifdef TRUTH
-	cudaFreeNonZero((void**)&sampleValueD_truth);
-	cudaFreeNonZero((void**)&B_1D_truth);
+    cudaFreeNonZero((void**)&sampleValueD_truth);
+    cudaFreeNonZero((void**)&B_1D_truth);
 #endif
 
     degreeMemD = 0;
     modelMemD = 0;
 
 #ifdef DRAW_TRIANGULAR_CTRL_POINTS
-	delete []triangular_ctrl_points;
+    delete []triangular_ctrl_points;
 #endif
 
     freeTessMemD();
@@ -3171,12 +3211,12 @@ void freeMemD() {
         cudaGraphicsUnregisterResource(texCoord3DVBO_CUDA);
         cudaGraphicsUnregisterResource(vertexVBO_CUDA);
 #ifdef LINE
-		cudaGraphicsUnregisterResource(baryVBO_CUDA);
-		cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);
+        cudaGraphicsUnregisterResource(baryVBO_CUDA);
+        cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);
 #endif
 #ifdef TRUTH
-		cudaGraphicsUnregisterResource(normalVBO_CUDA_truth);
-		cudaGraphicsUnregisterResource(vertexVBO_CUDA_truth);
+        cudaGraphicsUnregisterResource(normalVBO_CUDA_truth);
+        cudaGraphicsUnregisterResource(vertexVBO_CUDA_truth);
 #endif
         registered = false;
     }

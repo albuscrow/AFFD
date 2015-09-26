@@ -2420,7 +2420,7 @@ void View::calcThetaAndRotateAxis(double *cPos, double *lPos, double &theta, dou
 void View::wheelEvent(QWheelEvent *event) {
     if (event->orientation() == Qt::Vertical) {
         //m_fScale *= (1.0 + 0.0003 * event->delta());
-        m_fScale += 0.03 * event->delta();
+        m_fScale += 0.003 * event->delta();
         cout << "m_fScale = " << m_fScale << endl;
         setProjection();
         update();

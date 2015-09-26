@@ -11,6 +11,7 @@
 
 
 #include <sstream>
+#include <vector_types.h>
 
 using std::cout;
 using std::endl;
@@ -231,7 +232,7 @@ CommonData::CommonData() {
     m_nSamplePointCount = 2;        // Bézier 曲面片三角化时各方向的采样点数量为11
     //m_nSamplePointCount = 30;		// Bézier 曲面片三角化时各方向的采样点数量为11
 #else
-	m_nSamplePointCount = 2;		// Bézier 曲面片三角化时各方向的采样点数量为2
+    m_nSamplePointCount = 2;		// Bézier 曲面片三角化时各方向的采样点数量为2
 #endif
 
 #ifndef ALGO_TEST
@@ -262,16 +263,16 @@ CommonData::CommonData() {
     //m_nCtrlPointCount[U] = 11;	m_nCtrlPointCount[V] = 5; m_nCtrlPointCount[W] = 5;		// 飞船
     //m_nCtrlPointCount[U] = 5;	m_nCtrlPointCount[V] = 8; m_nCtrlPointCount[W] = 5;		// 树
 #else
-	//m_nCtrlPointCount[U] = 9;	m_nCtrlPointCount[V] = 4; m_nCtrlPointCount[W] = 4;
+    //m_nCtrlPointCount[U] = 9;	m_nCtrlPointCount[V] = 4; m_nCtrlPointCount[W] = 4;
 
-	//m_nOrder[U] = m_nOrder[V] = m_nOrder[W] = 3;
-	//m_nCtrlPointCount[U] = m_nCtrlPointCount[V] = m_nCtrlPointCount[W] = 3;
-	//m_nOrder[U] = 2;				m_nOrder[V] = 2;				m_nOrder[W] = 3;
-	//m_nCtrlPointCount[U] = 2;		m_nCtrlPointCount[V] = 2;		m_nCtrlPointCount[W] = 4;
-	//m_nOrder[U] = 4;				m_nOrder[V] = 4;				m_nOrder[W] = 4;
-	//m_nCtrlPointCount[U] = 15;		m_nCtrlPointCount[V] = 15;		m_nCtrlPointCount[W] = 15;
-	//m_nOrder[U] = 2;				m_nOrder[V] = 2;				m_nOrder[W] = 2;
-	//m_nCtrlPointCount[U] = 2;		m_nCtrlPointCount[V] = 2;		m_nCtrlPointCount[W] = 2;
+    //m_nOrder[U] = m_nOrder[V] = m_nOrder[W] = 3;
+    //m_nCtrlPointCount[U] = m_nCtrlPointCount[V] = m_nCtrlPointCount[W] = 3;
+    //m_nOrder[U] = 2;				m_nOrder[V] = 2;				m_nOrder[W] = 3;
+    //m_nCtrlPointCount[U] = 2;		m_nCtrlPointCount[V] = 2;		m_nCtrlPointCount[W] = 4;
+    //m_nOrder[U] = 4;				m_nOrder[V] = 4;				m_nOrder[W] = 4;
+    //m_nCtrlPointCount[U] = 15;		m_nCtrlPointCount[V] = 15;		m_nCtrlPointCount[W] = 15;
+    //m_nOrder[U] = 2;				m_nOrder[V] = 2;				m_nOrder[W] = 2;
+    //m_nCtrlPointCount[U] = 2;		m_nCtrlPointCount[V] = 2;		m_nCtrlPointCount[W] = 2;
 #endif
 
     /* 各种次数 Bézier 曲线的节点向量 */
@@ -352,43 +353,43 @@ void CommonData::loadObj(const char *fileName) {
     /* 将面片信息存放到新的地方 */
 //#define selectFace
 #ifdef selectFace
-	vector<Face> temp_face_list;
-	for (vector<Face>::size_type i = 0; i < objData->faceList.size(); ++i)
-	{
-		//if (i <= 41100)
-		if (i <= 41098)
-		{
-			temp_face_list.push_back(objData->faceList[i]);
-			//int faceSize = objData->faceList[i].vertexCoordIndex.size();
-			//cout << "唯一面片" << endl;
-			//for (int j = 0; j < faceSize; ++j)
-			//{
-				//int idx = objData->faceList[i].vertexCoordIndex[j];
-				//VertexCoord vc = objData->vertexCoordList[idx];
-				//NormalCoord n = objData->normalCoordList[idx];
-				//cout << vc << "->" << n << endl;
-			//}
+    vector<Face> temp_face_list;
+    for (vector<Face>::size_type i = 0; i < objData->faceList.size(); ++i)
+    {
+        //if (i <= 41100)
+        if (i <= 41098)
+        {
+            temp_face_list.push_back(objData->faceList[i]);
+            //int faceSize = objData->faceList[i].vertexCoordIndex.size();
+            //cout << "唯一面片" << endl;
+            //for (int j = 0; j < faceSize; ++j)
+            //{
+                //int idx = objData->faceList[i].vertexCoordIndex[j];
+                //VertexCoord vc = objData->vertexCoordList[idx];
+                //NormalCoord n = objData->normalCoordList[idx];
+                //cout << vc << "->" << n << endl;
+            //}
 
-			/*outFile << "i = " << i << std::endl << "\t";
-			int faceSize = objData->faceList[i].vertexCoordIndex.size();
-			for (int j = 0; j < faceSize; ++j)
-			{
-				int idx = objData->faceList[i].vertexCoordIndex[j];
-				VertexCoord vc = objData->vertexCoordList[idx];
-				outFile << "(" << vc.x() << ", " << vc.y() << ", " << vc.z() << ") ";
-			}
-			outFile << endl;
+            /*outFile << "i = " << i << std::endl << "\t";
+            int faceSize = objData->faceList[i].vertexCoordIndex.size();
+            for (int j = 0; j < faceSize; ++j)
+            {
+                int idx = objData->faceList[i].vertexCoordIndex[j];
+                VertexCoord vc = objData->vertexCoordList[idx];
+                outFile << "(" << vc.x() << ", " << vc.y() << ", " << vc.z() << ") ";
+            }
+            outFile << endl;
 
-			faceSize = objData->faceList[i].textureCoordIndex.size();
-			for (int j = 0; j < faceSize; ++j)
-			{
-				int idx = objData->faceList[i].textureCoordIndex[j];
-				TextureCoord tc = objData->textureCoordList[idx];
-				outFile << "(" << tc.u() << ", " << tc.v() << ", " << tc.w() << ") ";
-			}
-			outFile << endl << endl;*/
-		}
-	}
+            faceSize = objData->faceList[i].textureCoordIndex.size();
+            for (int j = 0; j < faceSize; ++j)
+            {
+                int idx = objData->faceList[i].textureCoordIndex[j];
+                TextureCoord tc = objData->textureCoordList[idx];
+                outFile << "(" << tc.u() << ", " << tc.v() << ", " << tc.w() << ") ";
+            }
+            outFile << endl << endl;*/
+        }
+    }
 #else
     vector<Face> temp_face_list = objData->faceList;
     //faceList = objData->faceList;
@@ -577,49 +578,49 @@ void CommonData::loadObj(const char *fileName) {
 
 void CommonData::calcFinalResult() {
 #ifndef MORPH
-	int elapsedTimeChange;
-	cout << "\n===================================================\n" << endl;
-	elapsedTimeChange = calcTimeChange.restart();
-	cout << "改变\t" << elapsedTimeChange << "\tCPU : 改变控制顶点" << endl;
+    int elapsedTimeChange;
+    cout << "\n===================================================\n" << endl;
+    elapsedTimeChange = calcTimeChange.restart();
+    cout << "改变\t" << elapsedTimeChange << "\tCPU : 改变控制顶点" << endl;
 #endif
     if (m_bGPU) {
 #ifndef MORPH
-		cout << "改变\t**** GPU ****" << endl;
+        cout << "改变\t**** GPU ****" << endl;
 #endif
         copyCtrlPointD(this);
 #ifndef MORPH
-		callCudaThreadSynchronize();
-		elapsedTimeChange = calcTimeChange.restart();
-		cout << "改变\t" << elapsedTimeChange << "\tGPU : 将新的控制顶点传入显存" << endl;
+        callCudaThreadSynchronize();
+        elapsedTimeChange = calcTimeChange.restart();
+        cout << "改变\t" << elapsedTimeChange << "\tGPU : 将新的控制顶点传入显存" << endl;
 #endif
         if (m_eAlgorithm == AFFD) {
             calcSampleValue(algorithm_type_);
 #ifndef MORPH
-			callCudaThreadSynchronize();
-			elapsedTimeChange = calcTimeChange.restart();
-			cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算 Bezier 曲面片采样点的值" << endl;
+            callCudaThreadSynchronize();
+            elapsedTimeChange = calcTimeChange.restart();
+            cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算 Bezier 曲面片采样点的值" << endl;
 #endif
 
             calcTriangleCtrlPoint(adjust_silhouette_, use_pn_, algorithm_type_);
 #ifndef MORPH
-			callCudaThreadSynchronize();
-			elapsedTimeChange = calcTimeChange.restart();
-			cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算三角Bezier曲面片控制顶点" << endl;
+            callCudaThreadSynchronize();
+            elapsedTimeChange = calcTimeChange.restart();
+            cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算三角Bezier曲面片控制顶点" << endl;
 #endif
 
             tessellateD(m_bFirstLoad, m_fMax[0], m_fMax[1], m_fMax[2], algorithm_type_);
 #ifndef MORPH
-			callCudaThreadSynchronize();
-			elapsedTimeChange = calcTimeChange.restart();
-			cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算三角化点的值" << endl;
+            callCudaThreadSynchronize();
+            elapsedTimeChange = calcTimeChange.restart();
+            cout << "改变\t" << elapsedTimeChange << "\tGPU : 计算三角化点的值" << endl;
 #endif
 
 #ifdef TRUTH
-			/*-------------------- 计算 ground truth 开始 ----------------------*/
-			calcSampleValue_truth();
-			matrixMul1_truth();
-			tessellateD_truth(m_bFirstLoad);
-			/*-------------------- 计算 ground truth 结束 ----------------------*/
+            /*-------------------- 计算 ground truth 开始 ----------------------*/
+            calcSampleValue_truth();
+            matrixMul1_truth();
+            tessellateD_truth(m_bFirstLoad);
+            /*-------------------- 计算 ground truth 结束 ----------------------*/
 #endif
 
             // 将未选中的直接编辑顶点移动到新位置
@@ -699,15 +700,11 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tGPU : 按照PN-Triangle方法计算原始面片的控制顶点" << endl;
 
-//        clipPolygon();
-//        elapsedTimeLoad = calcTimeLoad.restart();
-//        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形" << endl;
-//
-//        triangulatePolygon();
-//        elapsedTimeLoad = calcTimeLoad.restart();
-//        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
-
         acSplit();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
+
+        preComputerSamplerParamter();
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
     } else {
@@ -724,9 +721,6 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 多边形三角化" << endl;
 
-//        acSplit();
-        elapsedTimeLoad = calcTimeLoad.restart();
-        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
     }
 
     loadTriangleListD(triangleList, triangle_adjacent_table_, m_nOrder[0] + m_nOrder[1] + m_nOrder[2] - 3);
@@ -737,7 +731,7 @@ void CommonData::preCalc(bool reset_ctrl_point) {
 
     generateUVW(m_nSamplePointCount);
 #ifdef TRUTH
-	generateUVW_truth(m_nSamplePointCount);
+    generateUVW_truth(m_nSamplePointCount);
 #endif
     callCudaThreadSynchronize();
     elapsedTimeLoad = calcTimeLoad.restart();
@@ -748,36 +742,36 @@ void CommonData::preCalc(bool reset_ctrl_point) {
 void CommonData::execute() {
     if (m_bGPU) {
 #ifndef MORPH
-		int elapsedTimeLoad = calcTimeChange.restart();
+        int elapsedTimeLoad = calcTimeChange.restart();
 #endif
 
         calcSampleValue(algorithm_type_);
 #ifndef MORPH
-		callCudaThreadSynchronize();
-		elapsedTimeLoad = calcTimeChange.restart();
-		cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算 Bezier 曲面片采样点的值" << endl;
+        callCudaThreadSynchronize();
+        elapsedTimeLoad = calcTimeChange.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算 Bezier 曲面片采样点的值" << endl;
 #endif
 
         calcTriangleCtrlPoint(adjust_silhouette_, use_pn_, algorithm_type_);
 #ifndef MORPH
-		callCudaThreadSynchronize();
-		elapsedTimeLoad = calcTimeChange.restart();
-		cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算三角Bezier曲面片控制顶点" << endl;
+        callCudaThreadSynchronize();
+        elapsedTimeLoad = calcTimeChange.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算三角Bezier曲面片控制顶点" << endl;
 #endif
 
         tessellateD(m_bFirstLoad, m_fMax[0], m_fMax[1], m_fMax[2], algorithm_type_);
 #ifndef MORPH
-		callCudaThreadSynchronize();
-		elapsedTimeLoad = calcTimeChange.restart();
-		cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算三角化点的值" << endl;
+        callCudaThreadSynchronize();
+        elapsedTimeLoad = calcTimeChange.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tGPU : 计算三角化点的值" << endl;
 #endif
 
 #ifdef TRUTH
-		/*-------------------- 计算 ground truth 开始 ----------------------*/
-		calcSampleValue_truth();
-		matrixMul1_truth();
-		tessellateD_truth(m_bFirstLoad);
-		/*-------------------- 计算 ground truth 结束 ----------------------*/
+        /*-------------------- 计算 ground truth 开始 ----------------------*/
+        calcSampleValue_truth();
+        matrixMul1_truth();
+        tessellateD_truth(m_bFirstLoad);
+        /*-------------------- 计算 ground truth 结束 ----------------------*/
 #endif
     } else { }
 
@@ -795,7 +789,7 @@ void CommonData::newSamplePointTesslate() {
         triangulatePolygon();
         generateUVW(m_nSamplePointCount);
 #ifdef TRUTH
-		generateUVW_truth(m_nSamplePointCount);
+        generateUVW_truth(m_nSamplePointCount);
 #endif
     }
 }
@@ -807,11 +801,11 @@ void CommonData::callTesslateD() {
         tessellateD(m_bFirstLoad, m_fMax[0], m_fMax[1], m_fMax[2], algorithm_type_);
 
 #ifdef TRUTH
-		/*-------------------- 计算 ground truth 开始 ----------------------*/
-		calcSampleValue_truth();
-		matrixMul1_truth();
-		tessellateD_truth(m_bFirstLoad);
-		/*-------------------- 计算 ground truth 结束 ----------------------*/
+        /*-------------------- 计算 ground truth 开始 ----------------------*/
+        calcSampleValue_truth();
+        matrixMul1_truth();
+        tessellateD_truth(m_bFirstLoad);
+        /*-------------------- 计算 ground truth 结束 ----------------------*/
 #endif
     }
 }
@@ -1458,8 +1452,9 @@ void CommonData::triangulatePolygon() {
                     if (useTex)
                         vt0 = trimmedPolygon.getTexture(0);
                     int mtlIdx = trimmedPolygon.mtlIdx();
-                    if (mtlIdx == -1)
-                        mtlIdx = mtlFaceList.size() - 1;
+                    if (mtlIdx == -1) {
+                        mtlIdx = (int) (mtlFaceList.size() - 1);
+                    }
                     const VertexCoord *v_origin = trimmedPolygon.v_origin;
 #ifdef LINE
                     const VertexCoord &bary_origin0 = trimmedPolygonList[i][j][k][p].getBary(0);
@@ -1555,13 +1550,14 @@ void CommonData::triangulatePolygon() {
 
     /* 将此模型中所有的三角形顶点统一编号，所有面片根据材质的不同，存入faceMtlList中 */
     int samplePointPerTriangle = m_nSamplePointCount * (m_nSamplePointCount + 1) / 2;
-    m_nTessPointCount = samplePointPerTriangle * triangleList.size();
+    m_nTessPointCount = (int) (samplePointPerTriangle * triangleList.size());
     int segment = m_nSamplePointCount - 1;
     int subTrianglePerTriangle = segment * segment;
 
     int totalFaceNum = 0;
-    for (vector<vector<int> >::size_type ii = 0; ii < mtlFaceList.size(); ++ii)
+    for (auto ii = 0; ii < mtlFaceList.size(); ++ii)
         totalFaceNum += mtlFaceList[ii].size();
+
     int faceCounter = 0;
     for (vector<vector<int> >::size_type ii = 0; ii < mtlFaceList.size(); ++ii) {
         int *tempFaceList = new int[mtlFaceList[ii].size() * subTrianglePerTriangle * 3];
@@ -2044,23 +2040,23 @@ void CommonData::morph() {
         //targetIdx = 10;
     }
 #else		// METHOD1
-	// 变形方法2（鱼游动）
-	double r = 20.0;
+    // 变形方法2（鱼游动）
+    double r = 20.0;
 
-	for (int i = 0; i < m_nCtrlPointCount[U]; ++i)
-		for (int j = 0; j < m_nCtrlPointCount[V]; ++j)
-			for (int k = 0; k < m_nCtrlPointCount[W]; ++k)
-			{
-				double theta = (2 * PI * morphStep) / max - PI / 2 * i / 8;
-				double rou = r + sin(theta * 10) + j * 2;
-				bool selected = ctrlPoint[i][j][k].selected();
-				double x = rou * cos(theta);
-				double y = rou * sin(theta);
-				double z = sourceCtrlPoint[i][j][k].z();
-				ctrlPoint[i][j][k] = CtrlPoint(x, y, z, selected);
-			}
-	if (morphStep++ == max)
-		morphStep = 0;
+    for (int i = 0; i < m_nCtrlPointCount[U]; ++i)
+        for (int j = 0; j < m_nCtrlPointCount[V]; ++j)
+            for (int k = 0; k < m_nCtrlPointCount[W]; ++k)
+            {
+                double theta = (2 * PI * morphStep) / max - PI / 2 * i / 8;
+                double rou = r + sin(theta * 10) + j * 2;
+                bool selected = ctrlPoint[i][j][k].selected();
+                double x = rou * cos(theta);
+                double y = rou * sin(theta);
+                double z = sourceCtrlPoint[i][j][k].z();
+                ctrlPoint[i][j][k] = CtrlPoint(x, y, z, selected);
+            }
+    if (morphStep++ == max)
+        morphStep = 0;
 #endif		// METHOD1
     calcFinalResult();
 }
@@ -2405,23 +2401,23 @@ void CommonData::calcKnotCtrlPoint() {
 #ifdef a1231412341234
 void BSplineBase(double t, int leftIdx, const Direction direction)
 {
-	double temp[4] = {0.0};
-	for (int r = 1; r <= m_nOrder[direction] - 1; ++r)
-	{
-		for (int iter = 0; iter <= m_nOrder[direction] - r - 1; ++iter)
-		{
-			int i = leftIndex - iter;
-			double coefficient0, coefficient1;
-			coefficient0 = (t - knotList[direction][i]) / (knotList[direction][i + m_nOrder[direction] - r] - knotList[direction][i]);
-			coefficient1 = (knotList[direction][i + m_nOrder[direction] - r] - t) / (knotList[direction][i + m_nOrder[direction] - r] - knotList[direction][i]);
-			temp[iter] = cp[iter] * coefficient0 + cp[iter + 1] * coefficient1;
-		}
-		for (int j = 0; j < 5; ++j)
-		{
-			cp[j] = temp[j];
-		}
-	}
-	return cp[0];
+    double temp[4] = {0.0};
+    for (int r = 1; r <= m_nOrder[direction] - 1; ++r)
+    {
+        for (int iter = 0; iter <= m_nOrder[direction] - r - 1; ++iter)
+        {
+            int i = leftIndex - iter;
+            double coefficient0, coefficient1;
+            coefficient0 = (t - knotList[direction][i]) / (knotList[direction][i + m_nOrder[direction] - r] - knotList[direction][i]);
+            coefficient1 = (knotList[direction][i + m_nOrder[direction] - r] - t) / (knotList[direction][i + m_nOrder[direction] - r] - knotList[direction][i]);
+            temp[iter] = cp[iter] * coefficient0 + cp[iter + 1] * coefficient1;
+        }
+        for (int j = 0; j < 5; ++j)
+        {
+            cp[j] = temp[j];
+        }
+    }
+    return cp[0];
 }
 #endif
 
@@ -2498,7 +2494,7 @@ void report(struct triangulateio *io) {
     }
 }
 
-#define SPLIT_DEGREE 0.04
+#define SPLIT_DEGREE 0.4
 
 void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
                        vector<SplitResultTriangle> &triangles) {
@@ -2820,7 +2816,8 @@ int getID(std::map<point *, int> ids, vector<pointSharePtr> &points, pointShareP
     return ids[key.get()];
 }
 
-void CommonData::splitUseNewMethod(VertexCoord pCoord[], int normalCount[], std::vector<objdata::SplitResultPoint> &outPoints,
+void CommonData::splitUseNewMethod(VertexCoord pCoord[], int normalCount[],
+                                   std::vector<objdata::SplitResultPoint> &outPoints,
                                    std::vector<objdata::SplitResultTriangle> &outTriangles) {
 
     triangle t(std::make_shared<point>(pCoord[0].x(), pCoord[0].y(), pCoord[0].z()),
@@ -2909,6 +2906,91 @@ void CommonData::splitUseNewMethod(VertexCoord pCoord[], int normalCount[], std:
 
 }
 
+static const int DEGREE = 3;
+
+void CommonData::preComputerSamplerParamter() {
+    for (Triangle &triangle : triangleList) {
+        //表示是第几个控制顶点，degree是3,一共有十个控制顶点
+        for (int samplePointIndex = 0; samplePointIndex < 10; ++samplePointIndex) {
+            float tempFloorFloat = (sqrtf((float) samplePointIndex * 8 + 9) - 3) * 0.5;
+            int floor = rintf(tempFloorFloat);
+            if ((floor * 2 + 3) * (floor * 2 + 3) != samplePointIndex * 8 + 9)
+                floor = ceilf(tempFloorFloat);
+            int room = samplePointIndex - ((floor + 1) * floor >> 1);
+            VertexCoord barycentric_coord;
+            barycentric_coord.x((float) (DEGREE - floor) / DEGREE);
+            barycentric_coord.y((float) (floor - room) / DEGREE);
+            barycentric_coord.z(1.0f - barycentric_coord.x() - barycentric_coord.y());
+
+            VertexCoord v0 = triangle.v[0];
+            VertexCoord v1 = triangle.v[1];
+            VertexCoord v2 = triangle.v[2];
+
+            // u, v, w 表示经过重心坐标插值之后的采样点的x, y, z分量
+            float u = (float) (
+                    v0.x() * barycentric_coord.x() + v1.x() * barycentric_coord.y() + v2.x() * barycentric_coord.z());
+            float v = (float) (
+                    v0.y() * barycentric_coord.x() + v1.y() * barycentric_coord.y() + v2.y() * barycentric_coord.z());
+            float w = (float) (
+                    v0.z() * barycentric_coord.x() + v1.z() * barycentric_coord.y() + v2.z() * barycentric_coord.z());
+            
+            int orderU = 3, orderV = 3, orderW = 3;
+            int ctrlPointNumU = 5;
+            int ctrlPointNumV = 5;
+            int ctrlPointNumW = 5;
+
+            // u, v, w方向节点区间数量
+            int knot_interval_count_u = orderU + ctrlPointNumU - (orderU - 1) * 2 - 1;
+            int knot_interval_count_v = orderV + ctrlPointNumV - (orderV - 1) * 2 - 1;
+            int knot_interval_count_w = orderW + ctrlPointNumW - (orderW - 1) * 2 - 1;
+
+            // 预先将其值设为最大，将末端点归入最后一段
+            int left_idx_u = orderU - 1 + knot_interval_count_u - 1;
+            int left_idx_v = orderV - 1 + knot_interval_count_v - 1;
+            int left_idx_w = orderW - 1 + knot_interval_count_w - 1;
+
+            // 沿 U 方向查找当前点所在的节点区间
+            for (int ii = orderU - 1; ii <= orderU - 1 + knot_interval_count_u - 1; ++ii) {
+                if (u >= knotList[0][ii] && u < knotList[0][ii + 1]) {
+                    left_idx_u = ii;
+                    break;
+                }
+            }
+            // 沿 V 方向查找当前点所在的节点区间
+            for (int jj = orderV - 1; jj <= orderV - 1 + knot_interval_count_v - 1; ++jj) {
+                if (v >= knotList[1][jj] && v < knotList[1][jj + 1]) {
+                    left_idx_v = jj;
+                    break;
+                }
+            }
+            // 沿 W 方向查找当前点所在的节点区间
+            for (int kk = orderW - 1; kk <= orderW - 1 + knot_interval_count_w - 1; ++kk) {
+                if (w >= knotList[2][kk] && w < knotList[2][kk + 1]) {
+                    left_idx_w = kk;
+                    break;
+                }
+            }
+
+            float tmpKnot = knotList[0][left_idx_u];
+            float tmpKnot1 = knotList[0][left_idx_u + 1];
+            float x_stride = tmpKnot1 - tmpKnot;
+            u = (u - tmpKnot) / x_stride;
+
+            tmpKnot = knotList[1][left_idx_v];
+            tmpKnot1 = knotList[1][left_idx_v + 1];
+            float y_stride = tmpKnot1 - tmpKnot;
+            v = (v - tmpKnot) / y_stride;
+
+            tmpKnot = knotList[2][left_idx_w];
+            tmpKnot1 = knotList[2][left_idx_w + 1];
+            float z_stride = tmpKnot1 - tmpKnot;
+            w = (w - tmpKnot) / z_stride;
+
+        }
+    }
+
+}
+
 void CommonData::acSplit() {
     vector<vector<int> > mtlFaceList(objData->mtlTexList.size() + 1);
     int triangleIdx = 0;
@@ -2937,11 +3019,10 @@ void CommonData::acSplit() {
         vector<SplitResultTriangle> splitResultTriangle;
         vector<SplitResultPoint> splitResultPoint;
 //        split(v_origin, normalCount, splitResultPoint, splitResultTriangle);
-        #ifdef TEST
+#ifdef TEST
         std::cout << "acsplit face index:" << i << endl;
-        #endif
+#endif
         splitUseNewMethod(v_origin, normalCount, splitResultPoint, splitResultTriangle);
-
 
         //取出原始三角片的三个顶点法向
         VertexCoord normal1 = objData->normalCoordList[faceList[i].normalCoordIndex[0]];
@@ -2951,10 +3032,10 @@ void CommonData::acSplit() {
         normal2.normalize();
         normal3.normalize();
 
-        #ifdef TEST
+#ifdef TEST
         cout << "acSplit result triangle size :"
         << splitResultTriangle.size() << endl;
-        #endif
+#endif
 
 //        if (splitResultTriangle.size() > 20) {
 //            cout << normal1 << endl;
@@ -3028,8 +3109,8 @@ void CommonData::acSplit() {
                        point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
                        point1.bary, point2.bary, point3.bary,
                        v_origin, i,
-                       point1.normalCount, point2.normalCount, point3.normalCount);
-//                       1, 1, 1);
+//                       point1.normalCount, point2.normalCount, point3.normalCount);
+                       1, 1, 1);
 //                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
             triangleList.push_back(t);
 
@@ -3040,7 +3121,7 @@ void CommonData::acSplit() {
 
     /* 将此模型中所有的三角形顶点统一编号，所有面片根据材质的不同，存入faceMtlList中 */
     int samplePointPerTriangle = m_nSamplePointCount * (m_nSamplePointCount + 1) / 2;
-    m_nTessPointCount = samplePointPerTriangle * triangleList.size();
+    m_nTessPointCount = (int) (samplePointPerTriangle * triangleList.size());
     int segment = m_nSamplePointCount - 1;
     int subTrianglePerTriangle = segment * segment;
 
@@ -3069,7 +3150,7 @@ void CommonData::acSplit() {
         }
         faceCounter += mtlFaceList[ii].size();
         faceMtlList.push_back(tempFaceList);
-        faceMtlCountList.push_back(mtlFaceList[ii].size() * subTrianglePerTriangle);
+        faceMtlCountList.push_back((const int &) (mtlFaceList[ii].size() * subTrianglePerTriangle));
     }
 
 
