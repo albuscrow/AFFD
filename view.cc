@@ -25,6 +25,7 @@ extern GLuint normalVBO;                // 结果法向量的缓冲区对象标�
 extern GLuint texCoordVBO;                // 结果纹理坐标的缓冲区对象标识符
 extern GLuint texCoord3DVBO;            // 结果纹理三维坐标的缓冲区对象标识符
 extern GLuint vertexVBO;                // 结果顶点坐标的缓冲区对象标识符
+extern GLuint isStrangeVBO;                // 结果顶点坐标的缓冲区对象标识符
 #ifdef LINE
 extern GLuint baryVBO;                    // 结果顶点在切割后的三角形中的坐标的缓冲区对象标识符
 extern GLuint oriBaryVBO;                // 结果顶点在切割前的三角形中的坐标的缓冲区对象标识符
@@ -288,6 +289,7 @@ void View::genBuffers() {
     glGenBuffers(1, &texCoordVBO);
     glGenBuffers(1, &texCoord3DVBO);
     glGenBuffers(1, &vertexVBO);
+    glGenBuffers(1, &isStrangeVBO);
 #ifdef LINE
     glGenBuffers(1, &baryVBO);
     glGenBuffers(1, &oriBaryVBO);
@@ -329,6 +331,8 @@ void View::delBuffers() {
     glDeleteBuffers(1, &texCoord3DVBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glDeleteBuffers(1, &vertexVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, isStrangeVBO);
+    glDeleteBuffers(1, &isStrangeVBO);
 #ifdef LINE
     glBindBuffer(GL_ARRAY_BUFFER, baryVBO);
     glDeleteBuffers(1, &baryVBO);
@@ -372,11 +376,19 @@ void View::setBufferData() {
     viewMemD += sizeof(float) * tessPointCount * 3;
     printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@三维纹理坐标VBO");
 
+
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 3, 0, GL_DYNAMIC_DRAW);
     //cout << "@顶点坐标VBO" << endl << "\t";
     viewMemD += sizeof(float) * tessPointCount * 3;
     printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 3, "@顶点坐标VBO");
+
+    glBindBuffer(GL_ARRAY_BUFFER, isStrangeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tessPointCount * 1, 0, GL_DYNAMIC_DRAW);
+    //cout << "@顶点坐标VBO" << endl << "\t";
+    viewMemD += sizeof(float) * tessPointCount * 1;
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * tessPointCount * 1, "@顶点坐标VBO");
 
     //cout << "nVBO = " << normalVBO << ", texVBO = " << texCoordVBO
     //<< ", vVBO = " << vertexVBO << endl;
@@ -885,6 +897,11 @@ void View::paintGL()                                        // 完成opengl绘�
                     const GLuint index_mPosition = glGetAttribLocation(prog, "MCvertex");
                     glVertexAttribPointer(index_mPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
                     glEnableVertexAttribArray(index_mPosition);
+
+                    glBindBuffer(GL_ARRAY_BUFFER, isStrangeVBO);
+                    const GLuint index_isStrange = glGetAttribLocation(prog, "isStrange");
+                    glVertexAttribPointer(index_isStrange, 1, GL_INT, GL_FALSE, 0, 0);
+                    glEnableVertexAttribArray(index_isStrange);
 
                     glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
                     const GLuint index_mTexCoord = glGetAttribLocation(prog, "TexCoord2D0");

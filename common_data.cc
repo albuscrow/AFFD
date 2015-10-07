@@ -704,10 +704,6 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
 
-        checkStrangeTriangle();
-        elapsedTimeLoad = calcTimeLoad.restart();
-        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 检测狭长三角形" << endl;
-
         preComputerSamplerParamter();
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 预计算采样点信息" << endl;
@@ -2498,7 +2494,7 @@ void report(struct triangulateio *io) {
     }
 }
 
-#define SPLIT_DEGREE 0.05
+#define SPLIT_DEGREE 0.2
 
 void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
                        vector<SplitResultTriangle> &triangles) {

@@ -1,84 +1,41 @@
 #version 440
 
-uniform sampler2D TexSampler2D;
-uniform sampler3D TexSampler3D;
-uniform samplerCube TexSamplerCube;
-uniform int TexCase;
-uniform mat3 CubeMapRotInvMat;
-uniform bool LocalViewer, UseEnvMap;
+uniform mat4 MVMatrix, PMatrix;
+uniform mat3 NormalMatrix;
 
-in vec2 TexCoord2D;
-in vec3 TexCoord3D, ecPosition, tnorm; 
+in vec2 TexCoord2D0;
+in vec3 TexCoord3D0, MCvertex, MCnormal; 
 
-out vec4 FragColor;
-
-struct PointLightSource
-{
-	vec4 position, ambient, diffuse, specular;
-	float constantAttenuation, linearAttenuation, quadraticAttenuation;
-};
-uniform PointLightSource PointLightSource0;
-
-struct Material
-{
-	vec4 ka, kd, ks;
-};
-uniform Material Mtl;
-
-void PointLight(const vec3 eye, const vec3 ecPosition3, const vec3 normal,
-				inout vec4 ambient, inout vec4 diffuse, inout vec4 specular)
-{
-	vec3 VP = vec3(PointLightSource0.position) - ecPosition3;	// 片元到光源的向量
-	float d = length(VP);										// 片元和光源的距离
-	VP = normalize(VP);
-	float attenuation = 1.0 / (PointLightSource0.constantAttenuation +
-						 PointLightSource0.linearAttenuation * d +
-						 PointLightSource0.quadraticAttenuation * d * d);// 衰减因子
-// 方法1:
-	float nDotHV = max(0.0, dot(reflect(-VP, normal), eye));
-// 方法2:
-	//vec3 halfVector = normalize(VP + eye);		// direction of maximum highlights
-	//float nDotHV = max(0.0, dot(normal, halfVector));
-
-	float nDotVP = max(0.0, dot(normal, VP));	// normal.light
-	float pf = 0.0;								// power factor
-	if (nDotVP > 0.0)
-		pf = pow(nDotHV, 10.0);
-
-	ambient += PointLightSource0.ambient * attenuation;
-	diffuse += PointLightSource0.diffuse * nDotVP * attenuation;
-	specular += PointLightSource0.specular * pf * attenuation;
-}
+out vec2 TexCoord2D;
+out vec3 TexCoord3D, ecPosition, tnorm; 
 
 void main()
 {
-	vec3 eye = vec3(0.0, 0.0, 1.0);
-	if (LocalViewer)
-		eye = -normalize(ecPosition);
-	vec4 amb = vec4(0.0), diff = vec4(0.0), spec = vec4(0.0);
-	PointLight(eye, ecPosition, normalize(tnorm), amb, diff, spec);
-	FragColor = amb * Mtl.ka + diff * Mtl.kd;
-	vec4 SecondaryColor = spec * Mtl.ks;
-	FragColor = clamp(FragColor, 0.0, 1.0);
+	TexCoord2D = TexCoord2D0;
+	TexCoord3D = TexCoord3D0;
 
-	if (TexCase == 2)
-	{
-		/*FragColor = texture(TexSampler2D, TexCoord2D);*/
-		FragColor *= texture(TexSampler2D, TexCoord2D);
-	}
-	else if (TexCase == 3)
-	{
-		FragColor *= texture(TexSampler3D, TexCoord3D);
-	}
-	if (UseEnvMap)
-	{
-		vec3 ReflectDir = CubeMapRotInvMat * reflect(ecPosition, tnorm);
-		ReflectDir.z = -ReflectDir.z;
-		FragColor = texture(TexSamplerCube, ReflectDir);
-	}
-	FragColor += SecondaryColor;
-	FragColor = clamp(FragColor, 0.0, 1.0);
+	ecPosition = vec3(MVMatrix * vec4(MCvertex, 1.0f));
+	gl_Position = PMatrix * MVMatrix * vec4(MCvertex, 1.0f);
+	tnorm = normalize(NormalMatrix * MCnormal);
 
-	/*FragColor = SecondaryColor;*/
-	/*FragColor = vec4(abs(norm), 1.0);*/
+	/************** 以下为旋转三位纹理的代码，如无必要可以注释掉 ***************/
+	//float theta = 3.1415926535f * 0.333333333;
+	float theta = 3.1415926535f * 0.5;
+	//float theta = 3.1415926535f / 3;
+	float factor = 1;
+
+	// 绕x轴旋转
+	TexCoord3D.x = TexCoord3D0.x * factor;
+	TexCoord3D.y = (cos(theta) * TexCoord3D0.y - sin(theta) * TexCoord3D0.z) * factor;
+	TexCoord3D.z = (sin(theta) * TexCoord3D0.y + cos(theta) * TexCoord3D0.z) * factor;
+
+	// 绕y轴旋转
+	//TexCoord3D.x = (cos(theta) * TexCoord3D0.x + sin(theta) * TexCoord3D0.z) * factor;
+	//TexCoord3D.y = TexCoord3D0.y * factor;
+	//TexCoord3D.z = (-sin(theta) * TexCoord3D0.x + cos(theta) * TexCoord3D0.z) * factor;
+
+	// 绕z轴旋转
+	//TexCoord3D.x = (cos(theta) * TexCoord3D0.x - sin(theta) * TexCoord3D0.y) * factor;
+	//TexCoord3D.y = (sin(theta) * TexCoord3D0.x + cos(theta) * TexCoord3D0.y) * factor;
+	//TexCoord3D.z = TexCoord3D0.z * factor;
 }

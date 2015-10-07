@@ -299,7 +299,7 @@ void printMemD(const char *file, const char *function, int line, int memSize, st
     int lastSlashPos = fileName.rfind('/');
     fileName = fileName.substr(lastSlashPos + 1, fileName.size());
 
-/*#define PRINT_MEM*/
+//#define PRINT_MEM
 #ifdef PRINT_MEM
     /*作废totalMemD += memSize;*/
     cout << info << "\n"
@@ -2231,20 +2231,17 @@ long long getSystemTime() {
 void calcSampleValue(AlgorithmType algo_type) {
     if (algo_type == CYM) {
         long long timeStart = getSystemTime();
-        for (int i = 0; i < 100; ++i) {
-            // 计算采样点的值和法向
-            //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
-            calcSampleValueThread << < blockNumStep0,
-                    blockSizeStep0,
-                    sizeof(float) * blockSizeStep0 * 13 >> >
-                    (triangleListD, sampleValueD,
-                            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-                            degree, order[U], order[V], order[W],
-                            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
-            callCudaThreadSynchronize();
+        // 计算采样点的值和法向
+        //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
+        calcSampleValueThread << < blockNumStep0,
+                blockSizeStep0,
+                sizeof(float) * blockSizeStep0 * 13 >> >
+                (triangleListD, sampleValueD,
+                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                        degree, order[U], order[V], order[W],
+                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+        callCudaThreadSynchronize();
 
-        }
-        cout << "\n<<<<cost of old" << (getSystemTime() - timeStart) / 100.0f << endl;
 
 
         // 计算约束点的值和法向
@@ -2258,18 +2255,15 @@ void calcSampleValue(AlgorithmType algo_type) {
 
         cout << "lzq sample" << endl;
         long long timeStart = getSystemTime();
-        for (int i = 0; i < 100; ++i) {
-            // 计算采样点的值和法向
-            calcSampleValueThreadLZQ << < blockNumStep0,
-                    blockSizeStep0,
-                    sizeof(float) * blockSizeStep0 * 13 >> >
-                    (triangleListD, sampleValueD,
-                            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-                            degree, order[U], order[V], order[W],
-                            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
-            callCudaThreadSynchronize();
-        }
-        cout << "\n<<<<cost of new" << (getSystemTime() - timeStart) / 100.0f << endl;
+        // 计算采样点的值和法向
+        calcSampleValueThreadLZQ << < blockNumStep0,
+                blockSizeStep0,
+                sizeof(float) * blockSizeStep0 * 13 >> >
+                (triangleListD, sampleValueD,
+                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                        degree, order[U], order[V], order[W],
+                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+        callCudaThreadSynchronize();
 
         // 计算约束点的值和法向
         calcConstraitSampleValueThread << < blockNumStep1, blockSizeStep1, sizeof(float) * blockSizeStep1 * 13 >> >
@@ -2892,7 +2886,8 @@ void matrixMul1_truth()
 __global__ void copy(float *RD,
                      int activeThreadNumCopy, bool firstLoad, float maxX, float maxY, float maxZ,
                      TriangleD *triangleListD, int segmentPerEdge, int f, int q,
-                     float *normalPtrVBO, float *texCoordPtrVBO, float *texCoord3DPtrVBO, float *vertexPtrVBO) {
+                     float *normalPtrVBO, float *texCoordPtrVBO, float *texCoord3DPtrVBO, float *vertexPtrVBO,
+                     float *isStrangePtrVBO) {
     int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
     if (globalIdx >= activeThreadNumCopy)
         return;
@@ -2903,6 +2898,25 @@ __global__ void copy(float *RD,
     vertexPtrVBO[globalIdx * 3 + 0] = RD[triangleIdx * q + localIdx];
     vertexPtrVBO[globalIdx * 3 + 1] = RD[(triangleIdx + f) * q + localIdx];
     vertexPtrVBO[globalIdx * 3 + 2] = RD[(triangleIdx + f * 2) * q + localIdx];
+
+    float3 v0 = triangleListD[triangleIdx].v[0];
+    float3 v1 = triangleListD[triangleIdx].v[1];
+    float3 v2 = triangleListD[triangleIdx].v[2];
+
+    float3 t0 = v0 - v1;
+    float3 t1 = v1 - v2;
+    float3 t2 = v2 - v0;
+
+    double l0 = sqrt(t0.x * t0.x + t0.y * t0.y + t0.z * t0.z);
+    double l1 = sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z);
+    double l2 = sqrt(t2.x * t2.x + t2.y * t2.y + t2.z * t2.z);
+    double minl = min(l0, min(l1, l2));
+    if (l0 / minl > 4 || l1 / minl > 4 || l2 / minl > 4) {
+        isStrangePtrVBO[globalIdx] = 1.0f;
+    } else {
+        isStrangePtrVBO[globalIdx] = 0.0f;
+    }
+
 
     float *ND = RD + 3 * f * q;
     normalPtrVBO[globalIdx * 3 + 0] = ND[triangleIdx * +q + localIdx];
@@ -3030,7 +3044,7 @@ __global__ void copy_truth(float *RD_truth,
 #endif
 
 bool registered = false;
-GLuint normalVBO = 0, texCoordVBO = 0, texCoord3DVBO = 0, vertexVBO = 0;
+GLuint normalVBO = 0, texCoordVBO = 0, texCoord3DVBO = 0, vertexVBO = 0, isStrangeVBO = 0;
 #ifdef LINE
 GLuint baryVBO = 0, oriBaryVBO = 0;
 #endif
@@ -3038,11 +3052,12 @@ float *normalPtrVBO;                            // 读写缓冲区对象所用�
 float *texCoordPtrVBO;                            // 读写缓冲区对象所用的指针
 float *texCoord3DPtrVBO;                        // 读写缓冲区对象所用的指针
 float *vertexPtrVBO;                            // 读写缓冲区对象所用的指针
+float *isStrangePtrVBO;                            // 读写缓冲区对象所用的指针
 #ifdef LINE
 float *baryPtrVBO, *oriBaryPtrVBO;                            // 读写缓冲区对象所用的指针
 #endif
 
-struct cudaGraphicsResource *normalVBO_CUDA, *texCoordVBO_CUDA, *texCoord3DVBO_CUDA, *vertexVBO_CUDA;
+struct cudaGraphicsResource *normalVBO_CUDA, *texCoordVBO_CUDA, *texCoord3DVBO_CUDA, *vertexVBO_CUDA, *isStrangeVBO_CUDA;
 #ifdef LINE
 struct cudaGraphicsResource *baryVBO_CUDA, *oriBaryVBO_CUDA;
 #endif
@@ -3052,16 +3067,19 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     cudaGraphicsMapResources(1, &texCoordVBO_CUDA, 0);
     cudaGraphicsMapResources(1, &texCoord3DVBO_CUDA, 0);
     cudaGraphicsMapResources(1, &vertexVBO_CUDA, 0);
+    cudaGraphicsMapResources(1, &isStrangeVBO_CUDA, 0);
 #ifdef LINE
     cudaGraphicsMapResources(1, &baryVBO_CUDA, 0);
     cudaGraphicsMapResources(1, &oriBaryVBO_CUDA, 0);
 #endif
     size_t size2 = sizeof(float) * samplePointPerTriangle * triangleNum * 2;
     size_t size3 = sizeof(float) * samplePointPerTriangle * triangleNum * 3;
+    size_t size1 = sizeof(float) * samplePointPerTriangle * triangleNum * 1;
     cudaGraphicsResourceGetMappedPointer((void **) &normalPtrVBO, &size3, normalVBO_CUDA);
     cudaGraphicsResourceGetMappedPointer((void **) &texCoordPtrVBO, &size2, texCoordVBO_CUDA);
     cudaGraphicsResourceGetMappedPointer((void **) &texCoord3DPtrVBO, &size3, texCoord3DVBO_CUDA);
     cudaGraphicsResourceGetMappedPointer((void **) &vertexPtrVBO, &size3, vertexVBO_CUDA);
+    cudaGraphicsResourceGetMappedPointer((void **) &isStrangePtrVBO, &size1, isStrangeVBO_CUDA);
 #ifdef LINE
     cudaGraphicsResourceGetMappedPointer((void **) &baryPtrVBO, &size3, baryVBO_CUDA);
     cudaGraphicsResourceGetMappedPointer((void **) &oriBaryPtrVBO, &size3, oriBaryVBO_CUDA);
@@ -3105,7 +3123,7 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
 
     copy << < blockNumCopy, blockSizeCopy >> > (RD,
             activeThreadNumCopy, firstLoad, maxX, maxY, maxZ, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
-            normalPtrVBO, texCoordPtrVBO, texCoord3DPtrVBO, vertexPtrVBO);
+            normalPtrVBO, texCoordPtrVBO, texCoord3DPtrVBO, vertexPtrVBO, isStrangePtrVBO);
 
 #ifdef LINE
     make_bary << < triangleNum, samplePointPerTriangle >> >
@@ -3116,6 +3134,7 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
     cudaGraphicsUnmapResources(1, &texCoordVBO_CUDA, 0);
     cudaGraphicsUnmapResources(1, &texCoord3DVBO_CUDA, 0);
     cudaGraphicsUnmapResources(1, &vertexVBO_CUDA, 0);
+    cudaGraphicsUnmapResources(1, &isStrangeVBO_CUDA, 0);
 #ifdef LINE
     cudaGraphicsUnmapResources(1, &baryVBO_CUDA, 0);
     cudaGraphicsUnmapResources(1, &oriBaryVBO_CUDA, 0);
@@ -3251,6 +3270,7 @@ void regGLBuffer() {
         cudaGraphicsUnregisterResource(texCoordVBO_CUDA);
         cudaGraphicsUnregisterResource(texCoord3DVBO_CUDA);
         cudaGraphicsUnregisterResource(vertexVBO_CUDA);
+        cudaGraphicsUnregisterResource(isStrangeVBO_CUDA);
 #ifdef LINE
         cudaGraphicsUnregisterResource(baryVBO_CUDA);
         cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);
@@ -3266,6 +3286,7 @@ void regGLBuffer() {
     cudaGraphicsGLRegisterBuffer(&texCoordVBO_CUDA, texCoordVBO, cudaGraphicsMapFlagsWriteDiscard);
     cudaGraphicsGLRegisterBuffer(&texCoord3DVBO_CUDA, texCoord3DVBO, cudaGraphicsMapFlagsWriteDiscard);
     cudaGraphicsGLRegisterBuffer(&vertexVBO_CUDA, vertexVBO, cudaGraphicsMapFlagsWriteDiscard);
+    cudaGraphicsGLRegisterBuffer(&isStrangeVBO_CUDA, isStrangeVBO, cudaGraphicsMapFlagsWriteDiscard);
 #ifdef LINE
     cudaGraphicsGLRegisterBuffer(&baryVBO_CUDA, baryVBO, cudaGraphicsMapFlagsWriteDiscard);
     cudaGraphicsGLRegisterBuffer(&oriBaryVBO_CUDA, oriBaryVBO, cudaGraphicsMapFlagsWriteDiscard);
@@ -3330,6 +3351,7 @@ void freeMemD() {
         cudaGraphicsUnregisterResource(texCoordVBO_CUDA);
         cudaGraphicsUnregisterResource(texCoord3DVBO_CUDA);
         cudaGraphicsUnregisterResource(vertexVBO_CUDA);
+        cudaGraphicsUnregisterResource(isStrangeVBO_CUDA);
 #ifdef LINE
         cudaGraphicsUnregisterResource(baryVBO_CUDA);
         cudaGraphicsUnregisterResource(oriBaryVBO_CUDA);

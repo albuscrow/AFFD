@@ -4,15 +4,18 @@ uniform mat4 MVMatrix, PMatrix;
 uniform mat3 NormalMatrix;
 uniform vec3 min_vertex, delta_vertex_inverse;
 
-in vec2 TexCoord2D0;
-in vec3 MCvertex, MCnormal, Bary, OriBary;
+attribute vec2 TexCoord2D0;
+attribute vec3 MCvertex, MCnormal, Bary, OriBary;
+attribute float isStrange;
 
 out vec2 TexCoord2D;
 out vec3 TexCoord3D, ecPosition, tnorm, bary, oriBary;
+out float f_isStrange;
 
 void main()
 {
 	TexCoord2D = TexCoord2D0;
+	f_isStrange = isStrange;
 
 	//TexCoord3D = (MCvertex - min_vertex) * delta_vertex_inverse;
 

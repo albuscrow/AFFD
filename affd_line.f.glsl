@@ -8,7 +8,8 @@ uniform bool UseEnvMap, LocalViewer, UseLine;
 uniform mat3 CubeMapRotInvMat;
 
 in vec2 TexCoord2D;
-in vec3 TexCoord3D, ecPosition, tnorm, bary, oriBary; 
+in vec3 TexCoord3D, ecPosition, tnorm, bary, oriBary;
+in flat float f_isStrange;
 out vec4 FragColor;
 
 struct PointLightSource
@@ -51,6 +52,10 @@ void PointLight(const vec3 eye, const vec3 ecPosition3, const vec3 normal,
 
 void main()
 {
+    if (f_isStrange > 0.5) {
+        FragColor = vec4(1.0, 1.0, 0, 0);
+        return;
+    }
 	vec3 eye = vec3(0.0, 0.0, 1.0);
 	if (LocalViewer)
 		eye = -normalize(ecPosition);
