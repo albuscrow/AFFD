@@ -2741,8 +2741,8 @@ void View::printProgramInfoLog(GLuint program) {
 }
 
 int View::readShaderSource(const char *fileName, string &vertexShader, string &fragmentShader) {
-    string vsFileName = string("/home/ac/code/c++/affd/") + fileName + ".vs";
-    string fsFileName = string("/home/ac/code/c++/affd/") + fileName + ".fs";
+    string vsFileName = string("/home/ac/code/c++/affd/") + fileName + ".v.glsl";
+    string fsFileName = string("/home/ac/code/c++/affd/") + fileName + ".f.glsl";
 
     std::ifstream inFile(vsFileName.c_str());
     string line;

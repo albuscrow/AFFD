@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <cuda.h>
 #include <cuda_gl_interop.h>
 #include <cublas_v2.h>
 #include <cuda_runtime_api.h>
 #include <vector_functions.hpp>
 #include "common_data.h"
+#include <time.h>
+#include <sys/timeb.h>
 
 using namespace std;
 
@@ -545,6 +546,10 @@ struct TriangleD {
 #endif
     int nc[3];        // nc0, nc1, nc2分别代表v2v0, v0v1, v1v2边的法向数量
     float2 vt[3];
+    float3 samplePointParameter[28];
+    int3 boxInfo[28];
+    float3 barr[28];
+    float3 strip[28];
 };
 
 TriangleD *triangleListD;
@@ -612,12 +617,35 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
             tempTriangleList[i].vt[j].x = triangleList[i].vt[j].u();
             tempTriangleList[i].vt[j].y = triangleList[i].vt[j].v();
         }
+        for (int j = 0; j < 28; ++j) {
+            tempTriangleList[i].samplePointParameter[j].x = triangleList[i].samplePoint[j].x();
+            tempTriangleList[i].samplePointParameter[j].y = triangleList[i].samplePoint[j].y();
+            tempTriangleList[i].samplePointParameter[j].z = triangleList[i].samplePoint[j].z();
+
+            tempTriangleList[i].boxInfo[j].x = triangleList[i].boxInfo[j][0];
+            tempTriangleList[i].boxInfo[j].y = triangleList[i].boxInfo[j][1];
+            tempTriangleList[i].boxInfo[j].z = triangleList[i].boxInfo[j][2];
+
+            tempTriangleList[i].barr[j].x = triangleList[i].barr[j].x();
+            tempTriangleList[i].barr[j].y = triangleList[i].barr[j].y();
+            tempTriangleList[i].barr[j].z = triangleList[i].barr[j].z();
+
+            tempTriangleList[i].strip[j].x = triangleList[i].strip[j].x();
+            tempTriangleList[i].strip[j].y = triangleList[i].strip[j].y();
+            tempTriangleList[i].strip[j].z = triangleList[i].strip[j].z();
+        }
+
     }
     cudaMalloc((void **) &triangleListD, sizeof(TriangleD) * triangleNum);
     degreeMemD += sizeof(TriangleD) * triangleNum;
     printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(TriangleD) * triangleNum, "@原始模型上所有三角形信息");
-
     cudaMemcpy(triangleListD, tempTriangleList, sizeof(TriangleD) * triangleNum, cudaMemcpyHostToDevice);
+
+//    for (vector<Triangle>::size_type i = 0; i < triangleNum; ++i) {
+//        for (int j = 0; j < 10; ++j) {
+//            cout <<  triangleListD[i].boxInfo[j].x << triangleListD[i].boxInfo[j].y << triangleListD[i].boxInfo[j].z << endl;
+//        }
+//    }
 
     delete[]tempTriangleList;
 
@@ -1719,19 +1747,95 @@ __global__ void calcSampleValueThread_PN(TriangleD *triangleListD, float3 *sampl
 }
 
 //采样控制顶点
+__global__ void calcSampleValueThreadLZQ(TriangleD *triangleListD, float *sampleValueD,
+                                         int activeThreadNum, int m /*triangleCtrlPointNum*/,
+                                         int f/*triangleNum*/, int c/*constrait_point_num*/, int n/*degree*/,
+                                         int orderU, int orderV, int orderW,
+                                         int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW) {
+
+    //在所有线程中的ID
+    int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
+    if (globalIdx >= activeThreadNum)
+        return;
+
+    //表示是第几个三角形的控制顶点
+    int triangleIdx = globalIdx / m;
+    TriangleD &triangle = triangleListD[triangleIdx];
+
+    //表示是第几个控制顶点，degree是3,一共有十个控制顶点
+    int localIdx = globalIdx % m;
+
+    int left_idx_u = triangle.boxInfo[localIdx].x;
+    int left_idx_v = triangle.boxInfo[localIdx].y;
+    int left_idx_w = triangle.boxInfo[localIdx].z;
+
+    float u = triangle.samplePointParameter[localIdx].x;
+    float v = triangle.samplePointParameter[localIdx].y;
+    float w = triangle.samplePointParameter[localIdx].z;
+
+
+    extern __shared__ float shared_array[];
+    // 算出该线程负责的采样点的 B 样条体值
+    // fu 表示J_bar矩阵第一列三个元素：偏F_bar_x偏u、偏F_bar_y偏u、偏F_bar_z偏u
+    // fv 表示J_bar矩阵第二列三个元素：偏F_bar_x偏v、偏F_bar_y偏v、偏F_bar_z偏v
+    float3 result, fu, fv;
+    BSplineVolumeValueMatrixD_combine(u, v, w, shared_array,
+                                      left_idx_u - (orderU - 1), left_idx_v - (orderV - 1), left_idx_w - (orderW - 1),
+                                      orderU, orderV, orderW,
+                                      result, fu, fv);
+    __syncthreads();
+
+    sampleValueD[index2c(localIdx, triangleIdx, m + c)] = result.x;
+    sampleValueD[index2c(localIdx, triangleIdx + f, m + c)] = result.y;
+    sampleValueD[index2c(localIdx, triangleIdx + f * 2, m + c)] = result.z;
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // fw 表示J_bar矩阵第三列三个元素：偏F_bar_x偏w、偏F_bar_y偏w、偏F_bar_z偏w
+    float3 fw = BSplineVolumeValueMatrixDw(u, v, w, shared_array,
+                                           left_idx_u - (orderU - 1), left_idx_v - (orderV - 1),
+                                           left_idx_w - (orderW - 1),
+                                           orderU, orderV, orderW);
+    //__syncthreads();
+
+    // u, v, w 表示经过重心坐标插值之后的法向的x, y, z分量
+    u = triangle.barr[localIdx].x;
+    v = triangle.barr[localIdx].y;
+    w = triangle.barr[localIdx].z;
+
+    float x_stride = triangle.strip[localIdx].x;
+    float y_stride = triangle.strip[localIdx].y;
+    float z_stride = triangle.strip[localIdx].z;
+
+    float *sampleNormalD = sampleValueD + 3 * f * (m + c);
+    // J_bar_star_T_[012]表示J_bar的伴随矩阵的转置(即J_bar*T)的第一行三个元素
+    float J_bar_star_T_0 = fv.y * fw.z - fw.y * fv.z;
+    float J_bar_star_T_1 = fw.y * fu.z - fu.y * fw.z;
+    float J_bar_star_T_2 = fu.y * fv.z - fv.y * fu.z;
+    sampleNormalD[index2c(localIdx, triangleIdx, m + c)] =
+            u * J_bar_star_T_0 * x_stride + v * J_bar_star_T_1 * y_stride + w * J_bar_star_T_2 * z_stride;
+
+    // J_bar_star_T_[012]表示J_bar的伴随矩阵的转置(即J_bar*T)的第二行三个元素
+    J_bar_star_T_0 = fv.z * fw.x - fw.z * fv.x;
+    J_bar_star_T_1 = fw.z * fu.x - fu.z * fw.x;
+    J_bar_star_T_2 = fu.z * fv.x - fv.z * fu.x;
+    sampleNormalD[index2c(localIdx, triangleIdx + f, m + c)] =
+            u * J_bar_star_T_0 * x_stride + v * J_bar_star_T_1 * y_stride + w * J_bar_star_T_2 * z_stride;
+
+    // J_bar_star_T_[012]表示J_bar的伴随矩阵的转置(即J_bar*T)的第三行三个元素
+    J_bar_star_T_0 = fv.x * fw.y - fw.x * fv.y;
+    J_bar_star_T_1 = fw.x * fu.y - fu.x * fw.y;
+    J_bar_star_T_2 = fu.x * fv.y - fv.x * fu.y;
+    sampleNormalD[index2c(localIdx, triangleIdx + f * 2, m + c)] =
+            u * J_bar_star_T_0 * x_stride + v * J_bar_star_T_1 * y_stride + w * J_bar_star_T_2 * z_stride;
+}
+
+//采样控制顶点
 __global__ void calcSampleValueThread(TriangleD *triangleListD, float *sampleValueD,
                                       int activeThreadNum, int m /*triangleCtrlPointNum*/,
                                       int f/*triangleNum*/, int c/*constrait_point_num*/, int n/*degree*/,
                                       int orderU, int orderV, int orderW,
                                       int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW) {
-
-    /*(triangleListD, sampleValueD,
-            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-            degree, order[U], order[V], order[W],
-            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);*/
-
-
-
 
     //在所有线程中的ID
     int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -2118,18 +2222,30 @@ __global__ void calcAdjustNormal(TriangleD *triangleListD, int f,
             u * J_bar_star_T_0 * x_stride + v * J_bar_star_T_1 * y_stride + w * J_bar_star_T_2 * z_stride;
 }
 
+long long getSystemTime() {
+    struct timeb t;
+    ftime(&t);
+    return 1000 * t.time + t.millitm;
+}
+
 void calcSampleValue(AlgorithmType algo_type) {
     if (algo_type == CYM) {
-        // 计算采样点的值和法向
-        //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
-        calcSampleValueThread << < blockNumStep0,
-                blockSizeStep0,
-                sizeof(float) * blockSizeStep0 * 13 >> >
+        long long timeStart = getSystemTime();
+        for (int i = 0; i < 100; ++i) {
+            // 计算采样点的值和法向
+            //calcSampleValueThread<<<blockNumStep0, blockSizeStep0, sizeof(float) * blockSizeStep0 * 9>>>
+            calcSampleValueThread << < blockNumStep0,
+                    blockSizeStep0,
+                    sizeof(float) * blockSizeStep0 * 13 >> >
+                    (triangleListD, sampleValueD,
+                            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                            degree, order[U], order[V], order[W],
+                            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+            callCudaThreadSynchronize();
 
-                (triangleListD, sampleValueD,
-                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-                        degree, order[U], order[V], order[W],
-                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+        }
+        cout << "\n<<<<cost of old" << (getSystemTime() - timeStart) / 100.0f << endl;
+
 
         // 计算约束点的值和法向
         //calcConstraitSampleValueThread<<<blockNumStep1, blockSizeStep1, sizeof(float) * blockSizeStep1 * 9>>>
@@ -2138,17 +2254,22 @@ void calcSampleValue(AlgorithmType algo_type) {
                                                                                    activeThreadNumStep1, triangleCtrlPointNum, triangleNum, constrait_point_num,
                                                                                    degree_lower, order[U], order[V], order[W],
                                                                                    ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
-    } else if (algo_type == LZQ){
+    } else if (algo_type == LZQ) {
 
-        // 计算采样点的值和法向
-        calcSampleValueThread << < blockNumStep0,
-                blockSizeStep0,
-                sizeof(float) * blockSizeStep0 * 13 >> >
-
-                (triangleListD, sampleValueD,
-                        activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
-                        degree, order[U], order[V], order[W],
-                        ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+        cout << "lzq sample" << endl;
+        long long timeStart = getSystemTime();
+        for (int i = 0; i < 100; ++i) {
+            // 计算采样点的值和法向
+            calcSampleValueThreadLZQ << < blockNumStep0,
+                    blockSizeStep0,
+                    sizeof(float) * blockSizeStep0 * 13 >> >
+                    (triangleListD, sampleValueD,
+                            activeThreadNumStep0, triangleCtrlPointNum, triangleNum, constrait_point_num,
+                            degree, order[U], order[V], order[W],
+                            ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+            callCudaThreadSynchronize();
+        }
+        cout << "\n<<<<cost of new" << (getSystemTime() - timeStart) / 100.0f << endl;
 
         // 计算约束点的值和法向
         calcConstraitSampleValueThread << < blockNumStep1, blockSizeStep1, sizeof(float) * blockSizeStep1 * 13 >> >
@@ -2156,7 +2277,6 @@ void calcSampleValue(AlgorithmType algo_type) {
                                                                                    activeThreadNumStep1, triangleCtrlPointNum, triangleNum, constrait_point_num,
                                                                                    degree_lower, order[U], order[V], order[W],
                                                                                    ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
-
     } else {
         calcSampleValueThread_PN << < blockNumStep0_PN, blockSizeStep0_PN, sizeof(float) * blockSizeStep1 * 13 >> >
                                                                            (triangleListD, sampleValueD_PN,

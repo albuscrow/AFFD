@@ -704,9 +704,13 @@ void CommonData::preCalc(bool reset_ctrl_point) {
         elapsedTimeLoad = calcTimeLoad.restart();
         cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
 
+        checkStrangeTriangle();
+        elapsedTimeLoad = calcTimeLoad.restart();
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 检测狭长三角形" << endl;
+
         preComputerSamplerParamter();
         elapsedTimeLoad = calcTimeLoad.restart();
-        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 分割多边形并三角化" << endl;
+        cout << "载入\t" << elapsedTimeLoad << "\tCPU : 预计算采样点信息" << endl;
     } else {
         PN();
         callCudaThreadSynchronize();
@@ -1856,7 +1860,7 @@ double *matrixCaseHost(double *matrix_b_spline, int order, int ctrlPointNum, int
 
 extern double matrix_b_spline[185];
 
-/* 
+/*
  * 使用矩阵乘法计算 B 样条体值
  * 仅用于 FFD 算法和计算未选中的直接编辑点的新位置
  */
@@ -2494,7 +2498,7 @@ void report(struct triangulateio *io) {
     }
 }
 
-#define SPLIT_DEGREE 0.4
+#define SPLIT_DEGREE 0.05
 
 void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResultPoint> &points,
                        vector<SplitResultTriangle> &triangles) {
@@ -2911,7 +2915,7 @@ static const int DEGREE = 3;
 void CommonData::preComputerSamplerParamter() {
     for (Triangle &triangle : triangleList) {
         //表示是第几个控制顶点，degree是3,一共有十个控制顶点
-        for (int samplePointIndex = 0; samplePointIndex < 10; ++samplePointIndex) {
+        for (int samplePointIndex = 0; samplePointIndex < 28; ++samplePointIndex) {
             float tempFloorFloat = (sqrtf((float) samplePointIndex * 8 + 9) - 3) * 0.5;
             int floor = rintf(tempFloorFloat);
             if ((floor * 2 + 3) * (floor * 2 + 3) != samplePointIndex * 8 + 9)
@@ -2933,7 +2937,10 @@ void CommonData::preComputerSamplerParamter() {
                     v0.y() * barycentric_coord.x() + v1.y() * barycentric_coord.y() + v2.y() * barycentric_coord.z());
             float w = (float) (
                     v0.z() * barycentric_coord.x() + v1.z() * barycentric_coord.y() + v2.z() * barycentric_coord.z());
-            
+            triangle.barr[samplePointIndex].x(u);
+            triangle.barr[samplePointIndex].y(v);
+            triangle.barr[samplePointIndex].z(w);
+
             int orderU = 3, orderV = 3, orderW = 3;
             int ctrlPointNumU = 5;
             int ctrlPointNumV = 5;
@@ -2948,6 +2955,7 @@ void CommonData::preComputerSamplerParamter() {
             int left_idx_u = orderU - 1 + knot_interval_count_u - 1;
             int left_idx_v = orderV - 1 + knot_interval_count_v - 1;
             int left_idx_w = orderW - 1 + knot_interval_count_w - 1;
+
 
             // 沿 U 方向查找当前点所在的节点区间
             for (int ii = orderU - 1; ii <= orderU - 1 + knot_interval_count_u - 1; ++ii) {
@@ -2971,24 +2979,32 @@ void CommonData::preComputerSamplerParamter() {
                 }
             }
 
+            triangle.boxInfo[samplePointIndex][0] = left_idx_u;
+            triangle.boxInfo[samplePointIndex][1] = left_idx_v;
+            triangle.boxInfo[samplePointIndex][2] = left_idx_w;
+
             float tmpKnot = knotList[0][left_idx_u];
             float tmpKnot1 = knotList[0][left_idx_u + 1];
             float x_stride = tmpKnot1 - tmpKnot;
-            u = (u - tmpKnot) / x_stride;
 
             tmpKnot = knotList[1][left_idx_v];
             tmpKnot1 = knotList[1][left_idx_v + 1];
             float y_stride = tmpKnot1 - tmpKnot;
-            v = (v - tmpKnot) / y_stride;
 
             tmpKnot = knotList[2][left_idx_w];
             tmpKnot1 = knotList[2][left_idx_w + 1];
             float z_stride = tmpKnot1 - tmpKnot;
-            w = (w - tmpKnot) / z_stride;
+
+            triangle.samplePoint[samplePointIndex].x((u - tmpKnot) / x_stride);
+            triangle.samplePoint[samplePointIndex].y((v - tmpKnot) / y_stride);
+            triangle.samplePoint[samplePointIndex].z((w - tmpKnot) / z_stride);
+
+            triangle.strip[samplePointIndex].x(x_stride);
+            triangle.strip[samplePointIndex].y(y_stride);
+            triangle.strip[samplePointIndex].z(z_stride);
 
         }
     }
-
 }
 
 void CommonData::acSplit() {
@@ -3200,3 +3216,16 @@ void CommonData::acSplit() {
     }
 }
 
+void CommonData::checkStrangeTriangle() {
+    triangleList.erase(
+            std::remove_if(
+                    triangleList.begin(),
+                    triangleList.end(),
+                    [](Triangle t) {
+                        // Do "some stuff", then return true if element should be removed.
+                        return random() % 2 == 0;
+                    }
+            ),
+            triangleList.end()
+    );
+}
