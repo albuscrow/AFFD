@@ -15,7 +15,7 @@
  * 注意：TRUTH模式和LINE模式不能同时使用
  * 如果同时define，只能得到其中之一的效果
  */
-//#define TRUTH
+#define TRUTH
 #define LINE
 
 //#define RE_LENGTH		// 对边控制顶点的调整要不要保持长度

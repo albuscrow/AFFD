@@ -94,11 +94,11 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 
     outputAsFile(result);
 #ifdef TEST
-//    cout << point::getPointPool().size() << endl;
-//    cout << pointTriangleMap.size() << endl;
-//    for (auto iter = pointTriangleMap.begin(); iter != pointTriangleMap.end(); ++iter) {
-//        cout << iter->second.size() << endl;
-//    }
+    //    cout << point::getPointPool().size() << endl;
+    //    cout << pointTriangleMap.size() << endl;
+    //    for (auto iter = pointTriangleMap.begin(); iter != pointTriangleMap.end(); ++iter) {
+    //        cout << iter->second.size() << endl;
+    //    }
 #endif
 
     return result;
@@ -107,7 +107,7 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 void cvt(const triangle &t) {
 #ifdef TEST
     cout << pointTriangleMap.size() << endl;
-    #endif
+#endif
     std::map<point *, point> temp;
     for (auto iter = pointTriangleMap.begin(); iter != pointTriangleMap.end(); ++iter) {
         point *keyPoint = iter->first;
@@ -355,7 +355,7 @@ void splitOneLevel(edge edge1, edge edge2, double l, vector<TriangleSharePtr> &r
 int index = 0;
 
 void outputAsFile(std::vector<TriangleSharePtr> &triangles) {
-//#ifdef TEST
+#ifdef TEST
     std::string s1 = "result";
     std::string s2 = ".poly";
     std::ofstream of(s1 + std::to_string(index) + s2);
@@ -377,7 +377,7 @@ void outputAsFile(std::vector<TriangleSharePtr> &triangles) {
 
     of << "0" << endl;
     of.close();
-//    #endif
+#endif
 }
 
 std::vector<pointSharePtr> splitEdge(const edge &e, const double &l) {

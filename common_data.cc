@@ -2612,13 +2612,6 @@ void CommonData::split(VertexCoord pCoord[], int normalCount[], vector<SplitResu
             }
         }
     }
-//    for (int k1 = 0; k1 < in.numberofpoints; ++k1) {
-//        cout << k1 + 1  << " " << k1 + 1 << " " << k1 + 2 << endl;
-//    }
-//    cout << endl;
-//    if (in.numberofpoints * 2 != index) {
-//        cout << "no!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1" << endl;
-//    }
     in.pointmarkerlist = (int *) NULL;
     in.numberofsegments = in.numberofpoints;
     in.segmentlist = (int *) malloc(in.numberofsegments * 2 * sizeof(int));
