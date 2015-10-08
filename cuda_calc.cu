@@ -687,18 +687,17 @@ void loadTriangleListD(const vector<Triangle> &triangleList, int *triangle_adjac
     blockNumStep0_PN = ceil(static_cast<double>(3 * triangleNum) / blockSizeStep0_PN);
 
 #ifdef TRUTH
-    extern float matrixTriangle[9][55*55];
+    extern float matrixTriangle[9][55 * 55];
     float *temp = new float[triangleCtrlPointNum * triangleCtrlPointNum];
-    for (int i = 0; i < triangleCtrlPointNum; ++i)
-    {
-        for (int j = 0; j < triangleCtrlPointNum; ++j)
-        {
+    for (int i = 0; i < triangleCtrlPointNum; ++i) {
+        for (int j = 0; j < triangleCtrlPointNum; ++j) {
             temp[index2c(i, j, triangleCtrlPointNum)] = matrixTriangle[degree - 1][i * triangleCtrlPointNum + j];
         }
     }
     cudaMalloc(&B_1D_truth, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum);
     degreeMemD += sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum;
-    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, "@第一个矩阵乘法用到的矩阵(B-1)T存放在这里");
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum,
+              "@第一个矩阵乘法用到的矩阵(B-1)T存放在这里");
     cudaMemcpy(B_1D_truth, temp, sizeof(float) * triangleCtrlPointNum * triangleCtrlPointNum, cudaMemcpyHostToDevice);
     delete temp;
 #endif
@@ -823,29 +822,24 @@ void generateUVW(int samplePointPerEdge) {
 }
 
 #ifdef TRUTH
-void generateUVW_truth(int samplePointPerEdge)
-{
+
+void generateUVW_truth(int samplePointPerEdge) {
     double *a = new double[samplePointPerTriangle * 3];
     int idx = 0;
-    for (int i = segmentPerEdge; i >= 0; --i)
-    {
-        for (int j = segmentPerEdge - i; j >= 0; --j)
-        {
+    for (int i = segmentPerEdge; i >= 0; --i) {
+        for (int j = segmentPerEdge - i; j >= 0; --j) {
             int k = segmentPerEdge - i - j;
-            a[idx++] = (double)i / segmentPerEdge;
-            a[idx++] = (double)j / segmentPerEdge;
-            a[idx++] = (double)k / segmentPerEdge;
+            a[idx++] = (double) i / segmentPerEdge;
+            a[idx++] = (double) j / segmentPerEdge;
+            a[idx++] = (double) k / segmentPerEdge;
         }
     }
 
     float *b = new float[samplePointPerTriangle * triangleCtrlPointNum * 3];
-    for (int row = 0; row < samplePointPerTriangle; ++row)
-    {
+    for (int row = 0; row < samplePointPerTriangle; ++row) {
         int idx = 0;
-        for (int i = degree; i >= 0; --i)
-        {
-            for (int j = degree - i; j >= 0; --j)
-            {
+        for (int i = degree; i >= 0; --i) {
+            for (int j = degree - i; j >= 0; --j) {
                 int k = degree - i - j;
                 double u = a[row * 3 + 0];
                 double v = a[row * 3 + 1];
@@ -859,19 +853,18 @@ void generateUVW_truth(int samplePointPerEdge)
 
     /***********************************************************************************************************************************/
 
-    for (int row = 0; row < samplePointPerTriangle; ++row)
-    {
+    for (int row = 0; row < samplePointPerTriangle; ++row) {
         int idx = 0;
-        for (int i = degree; i >= 0; --i)
-        {
-            for (int j = degree - i; j >= 0; --j)
-            {
+        for (int i = degree; i >= 0; --i) {
+            for (int j = degree - i; j >= 0; --j) {
                 int k = degree - i - j;
                 double u = a[row * 3 + 0];
                 double v = a[row * 3 + 1];
                 double w = a[row * 3 + 2];
-                b[index2c(row + samplePointPerTriangle, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
-                                                 (i * power(u, i - 1) * power(v, j) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
+                b[index2c(row + samplePointPerTriangle, idx, samplePointPerTriangle * 3)] =
+                        factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
+                        (i * power(u, i - 1) * power(v, j) * power(w, k) -
+                         k * power(u, i) * power(v, j) * power(w, k - 1));
                 ++idx;
             }
         }
@@ -880,39 +873,42 @@ void generateUVW_truth(int samplePointPerEdge)
     /***********************************************************************************************************************************/
 
     for (int row = 0; row < samplePointPerTriangle; ++row)
-    //for (int row = samplePointPerTriangle * 2; row < samplePointPerTriangle * 3; ++row)
+        //for (int row = samplePointPerTriangle * 2; row < samplePointPerTriangle * 3; ++row)
     {
         int idx = 0;
-        for (int i = degree; i >= 0; --i)
-        {
-            for (int j = degree - i; j >= 0; --j)
-            {
+        for (int i = degree; i >= 0; --i) {
+            for (int j = degree - i; j >= 0; --j) {
                 int k = degree - i - j;
                 double u = a[row * 3 + 0];
                 double v = a[row * 3 + 1];
                 double w = a[row * 3 + 2];
-                b[index2c(row + samplePointPerTriangle * 2, idx, samplePointPerTriangle * 3)] = factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
-                                                 (j * power(u, i) * power(v, j - 1) * power(w, k) - k * power(u, i) * power(v, j) * power(w, k - 1));
+                b[index2c(row + samplePointPerTriangle * 2, idx, samplePointPerTriangle * 3)] =
+                        factorial(degree) / (factorial(i) * factorial(j) * factorial(k)) *
+                        (j * power(u, i) * power(v, j - 1) * power(w, k) -
+                         k * power(u, i) * power(v, j) * power(w, k - 1));
                 ++idx;
             }
         }
     }
     cudaMalloc(&BqD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
     tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
-    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第一个矩阵乘法用到的矩阵Bq存放在这里");
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3,
+              "@第一个矩阵乘法用到的矩阵Bq存放在这里");
     cudaMemcpy(BqD_truth, b, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, cudaMemcpyHostToDevice);
 
     /***********************************************************************************************************************************/
     cudaMalloc(&BBD_truth, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3);
     tessMemD += sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3;
-    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3, "@第二个矩阵乘法用到的矩阵BB存放在这里");
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * triangleCtrlPointNum * 3,
+              "@第二个矩阵乘法用到的矩阵BB存放在这里");
 
     cudaMalloc(&RD_truth, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3);
     tessMemD += sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3;
-    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3, "@第二个矩阵乘法的结果RD存放在这里");
+    printMemD(__FILE__, __FUNCTION__, __LINE__, sizeof(float) * samplePointPerTriangle * 3 * triangleNum * 3,
+              "@第二个矩阵乘法的结果RD存放在这里");
 
-    delete []a;
-    delete []b;
+    delete[]a;
+    delete[]b;
 }
 #endif
 
@@ -2323,11 +2319,11 @@ void calcSampleValue(AlgorithmType algo_type) {
 }
 
 #ifdef TRUTH
+
 __global__ void calcSampleValueThread_truth(TriangleD *triangleListD, float *sampleValueD_truth,
-                                      int activeThreadNum, int m, int f, int n,
-                                      int orderU, int orderV, int orderW,
-                                      int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW)
-{
+                                            int activeThreadNum, int m, int f, int n,
+                                            int orderU, int orderV, int orderW,
+                                            int ctrlPointNumU, int ctrlPointNumV, int ctrlPointNumW) {
     int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
     if (globalIdx >= activeThreadNum)
         return;
@@ -2336,14 +2332,14 @@ __global__ void calcSampleValueThread_truth(TriangleD *triangleListD, float *sam
 
     int localIdx = globalIdx % m;
 
-    float tempFloorFloat = (sqrtf((float)localIdx * 8 + 9) - 3) / 2;
+    float tempFloorFloat = (sqrtf((float) localIdx * 8 + 9) - 3) / 2;
     int floor = rintf(tempFloorFloat);
     if ((floor * 2 + 3) * (floor * 2 + 3) != localIdx * 8 + 9)
         floor = ceilf(tempFloorFloat);
     int room = localIdx - (floor + 1) * floor / 2;
     float3 barycentric_coord;
-    barycentric_coord.x = (float)(n - floor) / n;
-    barycentric_coord.y = (float)(floor - room) / n;
+    barycentric_coord.x = (float) (n - floor) / n;
+    barycentric_coord.y = (float) (floor - room) / n;
     barycentric_coord.z = 1.0f - barycentric_coord.x - barycentric_coord.y;
 
     TriangleD &triangle = triangleListD[triangleIdx];
@@ -2394,13 +2390,12 @@ __global__ void calcSampleValueThread_truth(TriangleD *triangleListD, float *sam
     sampleValueD_truth[index2c(localIdx, triangleIdx + f * 2, m)] = result.z;
 }
 
-void calcSampleValue_truth()
-{
-    calcSampleValueThread_truth<<<blockNumStep0_truth, blockSizeStep0, sizeof(float) * blockSizeStep0 * 11>>>
-                                        (triangleListD, sampleValueD_truth,
-                                         activeThreadNumStep0_truth, triangleCtrlPointNum, triangleNum,
-                                         degree, order[U], order[V], order[W],
-                                         ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
+void calcSampleValue_truth() {
+    calcSampleValueThread_truth << < blockNumStep0_truth, blockSizeStep0, sizeof(float) * blockSizeStep0 * 11 >> >
+                                                                          (triangleListD, sampleValueD_truth,
+                                                                                  activeThreadNumStep0_truth, triangleCtrlPointNum, triangleNum,
+                                                                                  degree, order[U], order[V], order[W],
+                                                                                  ctrlPointNum[U], ctrlPointNum[V], ctrlPointNum[W]);
 }
 #endif
 
@@ -2862,8 +2857,8 @@ void calcTriangleCtrlPoint(bool adjust_silhouette, bool use_pn, AlgorithmType al
 }
 
 #ifdef TRUTH
-void matrixMul1_truth()
-{
+
+void matrixMul1_truth() {
     float alpha = 1.0f, beta = 0.0f;
     cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
                                       samplePointPerTriangle * 3, triangleCtrlPointNum, triangleCtrlPointNum,
@@ -2872,8 +2867,7 @@ void matrixMul1_truth()
                                       B_1D_truth, triangleCtrlPointNum,
                                       &beta,
                                       BBD_truth, samplePointPerTriangle * 3);
-    if (stat != CUBLAS_STATUS_SUCCESS)
-    {
+    if (stat != CUBLAS_STATUS_SUCCESS) {
         cout << "CtrlPoint_truth fail!!!!!!!!!!!!!\tstat = " << stat << endl;
         printCudaError(__FILE__, __FUNCTION__, __LINE__);
         return;
@@ -2907,16 +2901,33 @@ __global__ void copy(float *RD,
     float3 t1 = v1 - v2;
     float3 t2 = v2 - v0;
 
-    double l0 = sqrt(t0.x * t0.x + t0.y * t0.y + t0.z * t0.z);
-    double l1 = sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z);
-    double l2 = sqrt(t2.x * t2.x + t2.y * t2.y + t2.z * t2.z);
-    double minl = min(l0, min(l1, l2));
-    if (l0 / minl > 4 || l1 / minl > 4 || l2 / minl > 4) {
-        isStrangePtrVBO[globalIdx] = 1.0f;
+    float l0 = sqrt(t0.x * t0.x + t0.y * t0.y + t0.z * t0.z);
+    float l1 = sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z);
+    float l2 = sqrt(t2.x * t2.x + t2.y * t2.y + t2.z * t2.z);
+    float short_edge = 0;
+    float long_edge1 = 0;
+    float long_edge2 = 0;
+    if (l0 < l1) {
+        short_edge = l0;
+        long_edge1 = l1;
     } else {
-        isStrangePtrVBO[globalIdx] = 0.0f;
+        short_edge = l1;
+        long_edge1 = l0;
     }
 
+    if (short_edge < l2) {
+        long_edge2 = l2;
+    } else {
+        long_edge2 = short_edge;
+        short_edge = l2;
+    }
+
+    float sin_min = acosf((long_edge1 * long_edge1 + long_edge2 * long_edge2 - short_edge * short_edge)
+                          / (2 * long_edge1 * long_edge2));
+
+
+    isStrangePtrVBO[globalIdx] = sin_min / (3.1415926f / 3);
+//    printf("%f\n", isStrangePtrVBO[globalIdx]);
 
     float *ND = RD + 3 * f * q;
     normalPtrVBO[globalIdx * 3 + 0] = ND[triangleIdx * +q + localIdx];
@@ -3003,11 +3014,11 @@ __global__ void make_bary(TriangleD *triangleListD, float *baryPtrVBO, float *or
 #endif
 
 #ifdef TRUTH
+
 __global__ void copy_truth(float *RD_truth,
-                     int activeThreadNumCopy, bool firstLoad,
-                     TriangleD *triangleListD, int segmentPerEdge, int f, int q,
-                     float *normalPtrVBO_truth, float *vertexPtrVBO_truth)
-{
+                           int activeThreadNumCopy, bool firstLoad,
+                           TriangleD *triangleListD, int segmentPerEdge, int f, int q,
+                           float *normalPtrVBO_truth, float *vertexPtrVBO_truth) {
     int globalIdx = blockDim.x * blockIdx.x + threadIdx.x;
     if (globalIdx >= activeThreadNumCopy)
         return;
@@ -3041,6 +3052,7 @@ __global__ void copy_truth(float *RD_truth,
     normalPtrVBO_truth[globalIdx * 3 + 1] = ny;
     normalPtrVBO_truth[globalIdx * 3 + 2] = nz;
 }
+
 #endif
 
 bool registered = false;
@@ -3125,6 +3137,8 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
             activeThreadNumCopy, firstLoad, maxX, maxY, maxZ, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
             normalPtrVBO, texCoordPtrVBO, texCoord3DPtrVBO, vertexPtrVBO, isStrangePtrVBO);
 
+    fflush(stdout);
+
 #ifdef LINE
     make_bary << < triangleNum, samplePointPerTriangle >> >
                                 (triangleListD, baryPtrVBO, oriBaryPtrVBO, segmentPerEdge, samplePointPerTriangle);
@@ -3143,22 +3157,21 @@ void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmTy
 
 #ifdef TRUTH
 GLuint normalVBO_truth = 0, vertexVBO_truth = 0;
-float *normalPtrVBO_truth;						// 读写缓冲区对象所用的指针
-float *vertexPtrVBO_truth;						// 读写缓冲区对象所用的指针
+float *normalPtrVBO_truth;                        // 读写缓冲区对象所用的指针
+float *vertexPtrVBO_truth;                        // 读写缓冲区对象所用的指针
 
-struct cudaGraphicsResource* normalVBO_CUDA_truth;
-struct cudaGraphicsResource* vertexVBO_CUDA_truth;
+struct cudaGraphicsResource *normalVBO_CUDA_truth;
+struct cudaGraphicsResource *vertexVBO_CUDA_truth;
 
 double vertex_error_ave_max = 0.0, vertex_error_max_max = 0.0;
 double normal_error_ave_max = 0.0, normal_error_max_max = 0.0;
 
-void tessellateD_truth(bool firstLoad)
-{
+void tessellateD_truth(bool firstLoad) {
     cudaGraphicsMapResources(1, &normalVBO_CUDA_truth, 0);
     cudaGraphicsMapResources(1, &vertexVBO_CUDA_truth, 0);
     size_t size3 = sizeof(float) * samplePointPerTriangle * triangleNum * 3;
-    cudaGraphicsResourceGetMappedPointer((void**)&normalPtrVBO_truth, &size3, normalVBO_CUDA_truth);
-    cudaGraphicsResourceGetMappedPointer((void**)&vertexPtrVBO_truth, &size3, vertexVBO_CUDA_truth);
+    cudaGraphicsResourceGetMappedPointer((void **) &normalPtrVBO_truth, &size3, normalVBO_CUDA_truth);
+    cudaGraphicsResourceGetMappedPointer((void **) &vertexPtrVBO_truth, &size3, vertexVBO_CUDA_truth);
 
     float alpha = 1.0f, beta = 0.0f;
     cublasStatus_t stat = cublasSgemm(cublas_handle, CUBLAS_OP_N, CUBLAS_OP_N,
@@ -3168,17 +3181,16 @@ void tessellateD_truth(bool firstLoad)
                                       sampleValueD_truth, triangleCtrlPointNum,
                                       &beta,
                                       RD_truth, samplePointPerTriangle * 3);
-    if (stat != CUBLAS_STATUS_SUCCESS)
-    {
+    if (stat != CUBLAS_STATUS_SUCCESS) {
         cout << "RD fail!!!!!!!!!!!!!\tstat = " << stat << endl;
         cudaError_t error = cudaGetLastError();
         printf("CUDA error: %s\n", cudaGetErrorString(error));
         return;
     }
 
-    copy_truth<<<blockNumCopy, blockSizeCopy>>>(RD_truth,
-                                          activeThreadNumCopy, firstLoad, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
-                                          normalPtrVBO_truth, vertexPtrVBO_truth);
+    copy_truth << < blockNumCopy, blockSizeCopy >> > (RD_truth,
+            activeThreadNumCopy, firstLoad, triangleListD, segmentPerEdge, triangleNum, samplePointPerTriangle,
+            normalPtrVBO_truth, vertexPtrVBO_truth);
 
     /*------------------------ 测量误差 ----------------------------*/
 
@@ -3190,8 +3202,7 @@ void tessellateD_truth(bool firstLoad)
     cudaMemcpy(result_truth, vertexPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
 
     double error_ave = 0.0, error_max = 0.0;
-    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
-    {
+    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i) {
         double x0 = result[i * 3];
         double y0 = result[i * 3 + 1];
         double z0 = result[i * 3 + 2];
@@ -3208,21 +3219,21 @@ void tessellateD_truth(bool firstLoad)
     /*cout << "eeeeee samplePonitPerTriangle * triangleNum = " << samplePointPerTriangle * triangleNum << endl;*/
 
     /*cout << "eeeeee error = " << error_ave / (samplePointPerTriangle * triangleNum)*/
-         /*<< ", error_max = " << error_max << endl;*/
+    /*<< ", error_max = " << error_max << endl;*/
 
     if (error_ave > vertex_error_ave_max)
         vertex_error_ave_max = error_ave;
     if (error_max > vertex_error_max_max)
         vertex_error_max_max = error_max;
-    cout << "eeeeee 平均顶点误差 = " << vertex_error_ave_max / (samplePointPerTriangle * triangleNum) << ", 最大顶点误差 = " << vertex_error_max_max << endl;
+    cout << "eeeeee 平均顶点误差 = " << vertex_error_ave_max / (samplePointPerTriangle * triangleNum) << ", 最大顶点误差 = " <<
+    vertex_error_max_max << endl;
 
     /* 法向误差 */
     cudaMemcpy(result, normalPtrVBO, size3, cudaMemcpyDeviceToHost);
     cudaMemcpy(result_truth, normalPtrVBO_truth, size3, cudaMemcpyDeviceToHost);
 
     error_ave = 0.0, error_max = 0.0;
-    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i)
-    {
+    for (int i = 0; i < samplePointPerTriangle * triangleNum; ++i) {
         double x0 = result[i * 3];
         double y0 = result[i * 3 + 1];
         double z0 = result[i * 3 + 2];
@@ -3230,9 +3241,13 @@ void tessellateD_truth(bool firstLoad)
         double y1 = result_truth[i * 3 + 1];
         double z1 = result_truth[i * 3 + 2];
         double length = sqrt(x0 * x0 + y0 * y0 + z0 * z0);
-        x0 /= length; y0 /= length; z0 /= length;
+        x0 /= length;
+        y0 /= length;
+        z0 /= length;
         length = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
-        x1 /= length; y1 /= length; z1 /= length;
+        x1 /= length;
+        y1 /= length;
+        z1 /= length;
         double error = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1));
         error = 2 * asin(error * 0.5);
         //error = 1 * asin(error / 1);
@@ -3246,15 +3261,16 @@ void tessellateD_truth(bool firstLoad)
     if (error_max > normal_error_max_max)
         normal_error_max_max = error_max;
     cout << "eeeeee 平均法向误差（角度） = " << normal_error_ave_max / (samplePointPerTriangle * triangleNum) * 180 / PI
-         << ", 最大法向误差（角度） = " << normal_error_max_max * 180 / PI << endl;
+    << ", 最大法向误差（角度） = " << normal_error_max_max * 180 / PI << endl;
 
-    delete []result;
-    delete []result_truth;
+    delete[]result;
+    delete[]result_truth;
     /*---------------------- 测量误差完成 --------------------------*/
 
     cudaGraphicsUnmapResources(1, &normalVBO_CUDA_truth, 0);
     cudaGraphicsUnmapResources(1, &vertexVBO_CUDA_truth, 0);
 }
+
 #endif
 
 /************************************************************************************************************/
@@ -3313,9 +3329,9 @@ void freeTessMemD() {
     cudaFreeNonZero((void **) &BqD_PN);
     cudaFreeNonZero((void **) &RD);
 #ifdef TRUTH
-    cudaFreeNonZero((void**)&BqD_truth);
-    cudaFreeNonZero((void**)&BBD_truth);
-    cudaFreeNonZero((void**)&RD_truth);
+    cudaFreeNonZero((void **) &BqD_truth);
+    cudaFreeNonZero((void **) &BBD_truth);
+    cudaFreeNonZero((void **) &RD_truth);
 #endif
 }
 
@@ -3331,8 +3347,8 @@ void freeModelMemD() {
     cudaFreeNonZero((void **) &triangleNormalCtrlPointD_PN);
     cudaFreeNonZero((void **) &triangle_adjacent_tableD);
 #ifdef TRUTH
-    cudaFreeNonZero((void**)&sampleValueD_truth);
-    cudaFreeNonZero((void**)&B_1D_truth);
+    cudaFreeNonZero((void **) &sampleValueD_truth);
+    cudaFreeNonZero((void **) &B_1D_truth);
 #endif
 
     degreeMemD = 0;

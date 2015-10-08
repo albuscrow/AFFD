@@ -52,10 +52,12 @@ void PointLight(const vec3 eye, const vec3 ecPosition3, const vec3 normal,
 
 void main()
 {
-    if (f_isStrange > 0.5) {
-        FragColor = vec4(1.0, 1.0, 0, 0);
-        return;
-    }
+
+	FragColor.g = f_isStrange;
+	FragColor.r = 1 - f_isStrange;
+	FragColor.b = 0;
+	return;
+
 	vec3 eye = vec3(0.0, 0.0, 1.0);
 	if (LocalViewer)
 		eye = -normalize(ecPosition);
@@ -110,4 +112,5 @@ void main()
 		if (oriBary.x < limit || oriBary.y < limit || oriBary.z < limit)
 			FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
+
 }

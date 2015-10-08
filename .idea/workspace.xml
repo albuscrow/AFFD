@@ -8,15 +8,15 @@
       <config projectName="Project" targetName="triangle.c_automoc" />
       <config projectName="Project" targetName="cudaLib" />
       <config projectName="Project" targetName="affd_automoc" />
-      <config projectName="Project" targetName="affd" />
       <config projectName="Project" targetName="splitTriangle" />
+      <config projectName="Project" targetName="affd" />
       <config projectName="Project" targetName="splitTest_automoc" />
       <config projectName="Project" targetName="testSplit" />
-      <config projectName="Project" targetName="tri_automoc" />
+      <config projectName="Project" targetName="triangle.c" />
       <config projectName="Project" targetName="splitTest" />
       <config projectName="Project" targetName="tri" />
       <config projectName="Project" targetName="cudaLib_automoc" />
-      <config projectName="Project" targetName="triangle.c" />
+      <config projectName="Project" targetName="tri_automoc" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true" GENERATION_PASS_SYSTEM_ENVIRONMENT="true" BUILD_OUTPUT_DIR="build">
@@ -26,9 +26,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51a5be61-2f9c-40f2-b9bc-3932e7c16bf4" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/affd_line.f.glsl" afterPath="$PROJECT_DIR$/affd_line.f.glsl" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_data.cc" afterPath="$PROJECT_DIR$/common_data.cc" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_data.h" afterPath="$PROJECT_DIR$/common_data.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/split_library/split.cpp" afterPath="$PROJECT_DIR$/split_library/split.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cuda_calc.cu" afterPath="$PROJECT_DIR$/cuda_calc.cu" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/view.cc" afterPath="$PROJECT_DIR$/view.cc" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="affd.iws" />
@@ -50,20 +52,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="common_data.cc" pinned="false" current-in-tab="false">
+      <file leaf-file-name="common_data.cc" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/common_data.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="2480" column="13" selection-start-line="2480" selection-start-column="13" selection-end-line="2480" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.58960766">
+              <caret line="2312" column="28" selection-start-line="2312" selection-start-column="28" selection-end-line="2312" selection-end-column="28" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
+                <element signature="e#1046#1188#0" expanded="true" />
                 <element signature="e#5711#5733#0" expanded="true" />
+                <element signature="e#21681#21940#0" expanded="true" />
+                <element signature="e#25793#25832#0" expanded="true" />
                 <element signature="e#26113#26160#0" expanded="true" />
                 <element signature="e#26233#26396#0" expanded="true" />
                 <element signature="e#26504#26666#0" expanded="true" />
                 <element signature="e#26782#26935#0" expanded="true" />
-                <element signature="e#117516#117564#0" expanded="true" />
-                <element signature="e#118062#118149#0" expanded="true" />
+                <element signature="e#26965#27208#0" expanded="true" />
+                <element signature="e#27557#27596#0" expanded="true" />
+                <element signature="e#27892#28135#0" expanded="true" />
+                <element signature="e#117509#117557#0" expanded="true" />
+                <element signature="e#118055#118142#0" expanded="true" />
+                <element signature="e#121546#122069#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -83,17 +92,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="view.cc" pinned="false" current-in-tab="true">
+      <file leaf-file-name="view.cc" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/view.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.48440367">
-              <caret line="416" column="23" selection-start-line="416" selection-start-column="23" selection-end-line="416" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="2516" column="31" selection-start-line="2516" selection-start-column="31" selection-end-line="2516" selection-end-column="31" />
               <folding>
                 <element signature="e#27808#27956#0" expanded="true" />
-                <element signature="e#39078#39090#0" expanded="true" />
-                <element signature="e#39367#39399#0" expanded="true" />
-                <element signature="e#40819#40844#0" expanded="true" />
-                <element signature="e#40972#41147#0" expanded="true" />
+                <element signature="e#39080#39092#0" expanded="true" />
+                <element signature="e#39369#39401#0" expanded="true" />
+                <element signature="e#40821#40846#0" expanded="true" />
+                <element signature="e#40974#41149#0" expanded="true" />
+                <element signature="e#96131#96201#0" expanded="true" />
+                <element signature="e#96223#96904#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="widget.cc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/widget.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="1115" column="31" selection-start-line="1115" selection-start-column="31" selection-end-line="1115" selection-end-column="31" />
+              <folding>
+                <element signature="e#34892#35480#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -103,39 +126,46 @@
         <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="3137" column="8" selection-start-line="3137" selection-start-column="8" selection-end-line="3137" selection-end-column="8" />
+              <caret line="3305" column="10" selection-start-line="3305" selection-start-column="10" selection-end-line="3305" selection-end-column="10" />
               <folding>
                 <element signature="e#881#893#0" expanded="true" />
                 <element signature="e#10601#11133#0" expanded="true" />
-                <element signature="e#100209#100627#0" expanded="true" />
-                <marker date="1444225793959" expanded="false" signature="20454:20546" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="25404:25909" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="26469:27276" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="28581:28621" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="28775:32258" placeholder="{...}" />
-                <marker date="1444225793959" expanded="false" signature="32273:36500" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="86870:92277" placeholder="{...}" />
-                <marker date="1444225793959" expanded="false" signature="92292:96006" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="111430:116811" placeholder="{...}" />
-                <marker date="1444225793959" expanded="false" signature="116826:117600" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="121289:122846" placeholder="{...}" />
-                <marker date="1444225793959" expanded="false" signature="122869:124462" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="129241:134397" placeholder="..." />
-                <marker date="1444225793959" expanded="true" signature="135099:135214" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="135980:136191" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="136645:136762" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="137282:137369" placeholder="..." />
-                <marker date="1444225793959" expanded="false" signature="138001:138116" placeholder="..." />
+                <element signature="e#20454#20546#0" expanded="true" />
+                <element signature="e#25404#25909#0" expanded="true" />
+                <element signature="e#26469#27280#0" expanded="true" />
+                <element signature="e#28585#28625#0" expanded="true" />
+                <element signature="e#32278#36520#0" expanded="true" />
+                <element signature="e#92313#96210#0" expanded="true" />
+                <element signature="e#100413#100831#0" expanded="true" />
+                <element signature="e#108141#111507#0" expanded="true" />
+                <element signature="e#117031#117801#0" expanded="true" />
+                <element signature="e#123487#125098#0" expanded="true" />
+                <element signature="e#129899#135053#0" expanded="true" />
+                <element signature="e#135756#135871#0" expanded="true" />
+                <element signature="e#136637#136848#0" expanded="true" />
+                <element signature="e#137302#137425#0" expanded="true" />
+                <element signature="e#137945#138036#0" expanded="true" />
+                <element signature="e#138668#138783#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="common_data.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common_data.h">
+      <file leaf-file-name="affd_line.f.glsl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/affd_line.f.glsl">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+              <caret line="56" column="33" selection-start-line="56" selection-start-column="33" selection-end-line="56" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="affd_line.v.glsl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/affd_line.v.glsl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="12" column="17" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -180,12 +210,12 @@
         <option value="$PROJECT_DIR$/affd_line.fs" />
         <option value="$PROJECT_DIR$/ghgh.glsl" />
         <option value="$PROJECT_DIR$/affd_line.v.glsl" />
-        <option value="$PROJECT_DIR$/affd_line.f.glsl" />
-        <option value="$PROJECT_DIR$/view.cc" />
-        <option value="$PROJECT_DIR$/cuda_calc.cu" />
-        <option value="$PROJECT_DIR$/common_data.cc" />
-        <option value="$PROJECT_DIR$/common_data.h" />
         <option value="$PROJECT_DIR$/split_library/split.cpp" />
+        <option value="$PROJECT_DIR$/common_data.h" />
+        <option value="$PROJECT_DIR$/cuda_calc.cu" />
+        <option value="$PROJECT_DIR$/view.cc" />
+        <option value="$PROJECT_DIR$/affd_line.f.glsl" />
+        <option value="$PROJECT_DIR$/common_data.cc" />
       </list>
     </option>
   </component>
@@ -198,9 +228,9 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="y" value="18" />
-    <option name="width" value="1600" />
-    <option name="height" value="882" />
+    <option name="x" value="1600" />
+    <option name="width" value="1916" />
+    <option name="height" value="1076" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -227,7 +257,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -238,7 +268,42 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="affd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/tess" />
@@ -349,14 +414,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="18" width="1600" height="882" extended-state="1" />
+    <frame x="1600" y="0" width="1916" height="1076" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.12309644" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24894291" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.49757868" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.48789346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37460318" sideWeight="0.5266344" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2612036" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20717949" sideWeight="0.47578692" order="11" side_tool="false" content_ui="tabs" />
@@ -370,6 +434,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24307692" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2612036" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25224072" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -387,9 +452,9 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3271795" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24307692" sideWeight="0.49031478" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20717949" sideWeight="0.47578692" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12309644" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24894291" sideWeight="0.49356914" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2612036" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2612036" sideWeight="0.49757868" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30266345" sideWeight="0.50643086" order="2" side_tool="true" content_ui="tabs" />
@@ -423,10 +488,12 @@
           <caret line="2422" column="23" selection-start-line="2422" selection-start-column="23" selection-end-line="2422" selection-end-column="23" />
           <folding>
             <element signature="e#27808#27956#0" expanded="true" />
-            <element signature="e#39078#39090#0" expanded="true" />
-            <element signature="e#39367#39399#0" expanded="true" />
-            <element signature="e#40819#40844#0" expanded="true" />
-            <element signature="e#40972#41147#0" expanded="true" />
+            <element signature="e#39080#39092#0" expanded="true" />
+            <element signature="e#39369#39401#0" expanded="true" />
+            <element signature="e#40821#40846#0" expanded="true" />
+            <element signature="e#40974#41149#0" expanded="true" />
+            <element signature="e#96131#96201#0" expanded="true" />
+            <element signature="e#96223#96904#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -634,14 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/widget.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.46659598">
-          <caret line="370" column="57" selection-start-line="370" selection-start-column="57" selection-end-line="370" selection-end-column="57" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/5.2.0/bits/stl_algo.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -691,26 +750,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/affd_line.f.glsl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.27653632">
-          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/affd_line.v.glsl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="12" column="7" selection-start-line="12" selection-start-column="7" selection-end-line="12" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/affd.v.glsl">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -725,7 +768,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="481" column="2" selection-start-line="481" selection-start-column="2" selection-end-line="481" selection-end-column="2" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -733,7 +775,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="237" column="33" selection-start-line="237" selection-start-column="33" selection-end-line="237" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -741,7 +782,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="111" column="4" selection-start-line="111" selection-start-column="4" selection-end-line="111" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -749,62 +789,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.23364486">
           <caret line="395" column="39" selection-start-line="395" selection-start-column="39" selection-end-line="395" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="3137" column="8" selection-start-line="3137" selection-start-column="8" selection-end-line="3137" selection-end-column="8" />
-          <folding>
-            <element signature="e#881#893#0" expanded="true" />
-            <element signature="e#10601#11133#0" expanded="true" />
-            <element signature="e#100209#100627#0" expanded="true" />
-            <marker date="1444225793959" expanded="false" signature="20454:20546" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="25404:25909" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="26469:27276" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="28581:28621" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="28775:32258" placeholder="{...}" />
-            <marker date="1444225793959" expanded="false" signature="32273:36500" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="86870:92277" placeholder="{...}" />
-            <marker date="1444225793959" expanded="false" signature="92292:96006" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="111430:116811" placeholder="{...}" />
-            <marker date="1444225793959" expanded="false" signature="116826:117600" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="121289:122846" placeholder="{...}" />
-            <marker date="1444225793959" expanded="false" signature="122869:124462" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="129241:134397" placeholder="..." />
-            <marker date="1444225793959" expanded="true" signature="135099:135214" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="135980:136191" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="136645:136762" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="137282:137369" placeholder="..." />
-            <marker date="1444225793959" expanded="false" signature="138001:138116" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common_data.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common_data.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="2480" column="13" selection-start-line="2480" selection-start-column="13" selection-end-line="2480" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-            <element signature="e#5711#5733#0" expanded="true" />
-            <element signature="e#26113#26160#0" expanded="true" />
-            <element signature="e#26233#26396#0" expanded="true" />
-            <element signature="e#26504#26666#0" expanded="true" />
-            <element signature="e#26782#26935#0" expanded="true" />
-            <element signature="e#117516#117564#0" expanded="true" />
-            <element signature="e#118062#118149#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -820,16 +804,103 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/common_data.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2566278">
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/affd_line.v.glsl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="12" column="17" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cuda_calc.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3305" column="10" selection-start-line="3305" selection-start-column="10" selection-end-line="3305" selection-end-column="10" />
+          <folding>
+            <element signature="e#881#893#0" expanded="true" />
+            <element signature="e#10601#11133#0" expanded="true" />
+            <element signature="e#20454#20546#0" expanded="true" />
+            <element signature="e#25404#25909#0" expanded="true" />
+            <element signature="e#26469#27280#0" expanded="true" />
+            <element signature="e#28585#28625#0" expanded="true" />
+            <element signature="e#32278#36520#0" expanded="true" />
+            <element signature="e#92313#96210#0" expanded="true" />
+            <element signature="e#100413#100831#0" expanded="true" />
+            <element signature="e#108141#111507#0" expanded="true" />
+            <element signature="e#117031#117801#0" expanded="true" />
+            <element signature="e#123487#125098#0" expanded="true" />
+            <element signature="e#129899#135053#0" expanded="true" />
+            <element signature="e#135756#135871#0" expanded="true" />
+            <element signature="e#136637#136848#0" expanded="true" />
+            <element signature="e#137302#137425#0" expanded="true" />
+            <element signature="e#137945#138036#0" expanded="true" />
+            <element signature="e#138668#138783#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/affd_line.f.glsl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="33" selection-start-line="56" selection-start-column="33" selection-end-line="56" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/view.cc">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.48440367">
-          <caret line="416" column="23" selection-start-line="416" selection-start-column="23" selection-end-line="416" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2516" column="31" selection-start-line="2516" selection-start-column="31" selection-end-line="2516" selection-end-column="31" />
           <folding>
             <element signature="e#27808#27956#0" expanded="true" />
-            <element signature="e#39078#39090#0" expanded="true" />
-            <element signature="e#39367#39399#0" expanded="true" />
-            <element signature="e#40819#40844#0" expanded="true" />
-            <element signature="e#40972#41147#0" expanded="true" />
+            <element signature="e#39080#39092#0" expanded="true" />
+            <element signature="e#39369#39401#0" expanded="true" />
+            <element signature="e#40821#40846#0" expanded="true" />
+            <element signature="e#40974#41149#0" expanded="true" />
+            <element signature="e#96131#96201#0" expanded="true" />
+            <element signature="e#96223#96904#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/widget.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1115" column="31" selection-start-line="1115" selection-start-column="31" selection-end-line="1115" selection-end-column="31" />
+          <folding>
+            <element signature="e#34892#35480#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_data.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.58960766">
+          <caret line="2312" column="28" selection-start-line="2312" selection-start-column="28" selection-end-line="2312" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#1046#1188#0" expanded="true" />
+            <element signature="e#5711#5733#0" expanded="true" />
+            <element signature="e#21681#21940#0" expanded="true" />
+            <element signature="e#25793#25832#0" expanded="true" />
+            <element signature="e#26113#26160#0" expanded="true" />
+            <element signature="e#26233#26396#0" expanded="true" />
+            <element signature="e#26504#26666#0" expanded="true" />
+            <element signature="e#26782#26935#0" expanded="true" />
+            <element signature="e#26965#27208#0" expanded="true" />
+            <element signature="e#27557#27596#0" expanded="true" />
+            <element signature="e#27892#28135#0" expanded="true" />
+            <element signature="e#117509#117557#0" expanded="true" />
+            <element signature="e#118055#118142#0" expanded="true" />
+            <element signature="e#121546#122069#0" expanded="true" />
           </folding>
         </state>
       </provider>

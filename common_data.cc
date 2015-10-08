@@ -2301,7 +2301,7 @@ void CommonData::setSamplePointCount(int count) {
 
 void CommonData::setAlgorithmType() {
     if (algorithm_type_ == CYM) {
-        algorithm_type_ = PN_CUTTING;
+        algorithm_type_ = LZQ;
         cout << "pn_cutting" << endl;
     } else if (algorithm_type_ == PN_CUTTING) {
         algorithm_type_ = PN_NO_CUTTING;
@@ -3108,6 +3108,7 @@ void CommonData::acSplit() {
 //                point2 = splitResultPoint[splitResultTriangle[j].vertexId[2]];
 //                point3 = splitResultPoint[splitResultTriangle[j].vertexId[1]];
 //            }
+#ifdef LINE
 
             Triangle t(point1.vertex, point2.vertex, point3.vertex,
                        point1.normal, point2.normal, point3.normal,
@@ -3117,6 +3118,18 @@ void CommonData::acSplit() {
 //                       point1.normalCount, point2.normalCount, point3.normalCount);
                        1, 1, 1);
 //                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
+#else
+
+            Triangle t(point1.vertex, point2.vertex, point3.vertex,
+                       point1.normal, point2.normal, point3.normal,
+                       point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
+//                       point1.bary, point2.bary, point3.bary,
+                       v_origin, i,
+//                       point1.normalCount, point2.normalCount, point3.normalCount);
+                       1, 1, 1);
+//                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
+
+#endif
             triangleList.push_back(t);
 
             face_children_table_[i].push_front(triangleList.size() - 1);

@@ -900,7 +900,7 @@ void View::paintGL()                                        // 完成opengl绘�
 
                     glBindBuffer(GL_ARRAY_BUFFER, isStrangeVBO);
                     const GLuint index_isStrange = glGetAttribLocation(prog, "isStrange");
-                    glVertexAttribPointer(index_isStrange, 1, GL_INT, GL_FALSE, 0, 0);
+                    glVertexAttribPointer(index_isStrange, 1, GL_FLOAT, GL_FALSE, 0, 0);
                     glEnableVertexAttribArray(index_isStrange);
 
                     glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
