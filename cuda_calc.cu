@@ -2471,7 +2471,8 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
 
         float3 n1 = triangleListD[adj_face_idx[i / 2]].n_adj[adj_corner_ctrlpoint_idx[adj_edge_idx[i / 2]][i % 2]];
         normalize(n1);
-        if (n_count[i / 2] < 2 || (n1.x == n_ctrlpoint_corner.x && n1.y == n_ctrlpoint_corner.y && n1.z == n_ctrlpoint_corner.z))        // 该条边只有一个法向
+        if (n_count[i / 2] < 2 || (n1.x == n_ctrlpoint_corner.x && n1.y == n_ctrlpoint_corner.y &&
+                                   n1.z == n_ctrlpoint_corner.z))        // 该条边只有一个法向
         {
             //if (adj_face_idx[i / 2] >= 0)		// 只有当这条边的另一侧有面片时才会处理
             //{
@@ -2914,30 +2915,34 @@ __global__ void copy(float *RD,
     float l0 = sqrt(t0.x * t0.x + t0.y * t0.y + t0.z * t0.z);
     float l1 = sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z);
     float l2 = sqrt(t2.x * t2.x + t2.y * t2.y + t2.z * t2.z);
-    float short_edge = 0;
-    float long_edge1 = 0;
-    float long_edge2 = 0;
-    if (l0 < l1) {
-        short_edge = l0;
-        long_edge1 = l1;
-    } else {
-        short_edge = l1;
-        long_edge1 = l0;
-    }
+    float perimeter = l0 + l1 + l2;
+    float double_area = sqrt(perimeter * (-l0 + l1 + l2) * (l0 - l1 + l2) * (l0 + l1 - l2)) / 2;
+    float radius = double_area / perimeter;
+    isStrangePtrVBO[globalIdx] = 1 - radius / max(l0, max(l1, l2)) / 0.2886f;
 
-    if (short_edge < l2) {
-        long_edge2 = l2;
-    } else {
-        long_edge2 = short_edge;
-        short_edge = l2;
-    }
+//    float short_edge = 0;
+//    float long_edge1 = 0;
+//    float long_edge2 = 0;
+//    if (l0 < l1) {
+//        short_edge = l0;
+//        long_edge1 = l1;
+//    } else {
+//        short_edge = l1;
+//        long_edge1 = l0;
+//    }
+//
+//    if (short_edge < l2) {
+//        long_edge2 = l2;
+//    } else {
+//        long_edge2 = short_edge;
+//        short_edge = l2;
+//    }
+//
+//    float sin_min = acosf((long_edge1 * long_edge1 + long_edge2 * long_edge2 - short_edge * short_edge)
+//                          / (2 * long_edge1 * long_edge2));
 
-    float sin_min = acosf((long_edge1 * long_edge1 + long_edge2 * long_edge2 - short_edge * short_edge)
-                          / (2 * long_edge1 * long_edge2));
 
-
-    isStrangePtrVBO[globalIdx] = sin_min / (3.1415926f / 3);
-//    printf("%f\n", isStrangePtrVBO[globalIdx]);
+//    isStrangePtrVBO[globalIdx] = sin_min / (3.1415926f / 3);
 
     float *ND = RD + 3 * f * q;
     normalPtrVBO[globalIdx * 3 + 0] = ND[triangleIdx * +q + localIdx];
