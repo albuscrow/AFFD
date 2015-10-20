@@ -46,10 +46,15 @@ void calcSampleValue(AlgorithmType algo_type);
 void tessellateD(bool firstLoad, float maxX, float maxY, float maxZ, AlgorithmType algo_type);
 
 #ifdef TRUTH
+
 void generateUVW_truth(int samplePointPerEdge);
+
 void calcSampleValue_truth();
+
 void matrixMul1_truth();
+
 void tessellateD_truth(bool firstLoad);
+
 #endif
 
 void freeTessMemD();
@@ -163,7 +168,7 @@ Triangle::Triangle(const VertexCoord &v0, const VertexCoord &v1, const VertexCoo
                    const NormalCoord &n0, const NormalCoord &n1, const NormalCoord &n2,
                    const NormalCoord &n_adj0, const NormalCoord &n_adj1, const NormalCoord &n_adj2,
 #ifdef LINE
-                   const VertexCoord &bary_ori0, const VertexCoord &bary_ori1, const VertexCoord &bary_ori2,
+        const VertexCoord &bary_ori0, const VertexCoord &bary_ori1, const VertexCoord &bary_ori2,
 #endif
                    const VertexCoord *vo, int origin_face_idx,
                    int nc0, int nc1, int nc2,
@@ -1331,7 +1336,7 @@ void CommonData::triangulatePolygon_PN_NO_CUTTING() {
             const TextureCoord &t2 = objData->textureCoordList[id2];
             Triangle t(v[0], v[1], v[2], n0, n1, n2, n0, n1, n2,
 #ifdef LINE
-                       VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
+                    VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
 #endif
                        v, f,
                        nc0, nc1, nc2,
@@ -1341,7 +1346,7 @@ void CommonData::triangulatePolygon_PN_NO_CUTTING() {
         else {
             Triangle t(v[0], v[1], v[2], n0, n1, n2, n0, n1, n2,
 #ifdef LINE
-                       VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
+                    VertexCoord(1, 0, 0), VertexCoord(0, 1, 0), VertexCoord(0, 0, 1),
 #endif
                        v, f,
                        nc0, nc1, nc2);
@@ -1492,8 +1497,8 @@ void CommonData::triangulatePolygon() {
                                        n_adj0, trimmedPolygon.getNormalAdj(q),
                                        trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
-                                       bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
-                                       trimmedPolygonList[i][j][k][p].getBary(q + 1),
+                            bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
+                            trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
                                        v_origin, origin_face_idx,
                                        nc0, nc1, nc2,
@@ -1506,13 +1511,13 @@ void CommonData::triangulatePolygon() {
                         }
                         else {
                             Triangle t(v0, trimmedPolygon[q], trimmedPolygon[q + 1],
-                                       n0, trimmedPolygon.getNormal(q),
-                                       trimmedPolygon.getNormal(q + 1),
-                                       n_adj0, trimmedPolygon.getNormalAdj(q),
-                                       trimmedPolygon.getNormalAdj(q + 1),
+
+                                       n0, trimmedPolygon.getNormal(q), trimmedPolygon.getNormal(q + 1),
+
+                                       n_adj0, trimmedPolygon.getNormalAdj(q), trimmedPolygon.getNormalAdj(q + 1),
 #ifdef LINE
-                                       bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
-                                       trimmedPolygonList[i][j][k][p].getBary(q + 1),
+                            bary_origin0, trimmedPolygonList[i][j][k][p].getBary(q),
+                            trimmedPolygonList[i][j][k][p].getBary(q + 1),
 #endif
                                        v_origin, origin_face_idx,
                                        nc0, nc1, nc2
@@ -2848,28 +2853,28 @@ void CommonData::splitUseNewMethod(VertexCoord pCoord[], int normalCount[],
         splitResultPoint.bary.y(abc(1, 0));
         splitResultPoint.bary.z(abc(2, 0));
         VertexCoord bary = splitResultPoint.bary;
-        if (fabs(1 - bary.x()) < ZERO
-            || fabs(1 - bary.y()) < ZERO
-            || fabs(1 - bary.z()) < ZERO) {
+        if (fabs(1 - bary.x()) < 0.0000001f
+            || fabs(1 - bary.y()) < 0.0000001f
+            || fabs(1 - bary.z()) < 0.0000001f) {
             splitResultPoint.isOriginal = true;
             splitResultPoint.isBorder = false;
             splitResultPoint.isInter = false;
-            if (fabs(1 - bary.x()) < ZERO) {
+            if (fabs(1 - bary.x()) < 0.0000001f) {
                 splitResultPoint.normalCount = normalCount[0];
-            } else if (fabs(1 - bary.y()) < ZERO) {
+            } else if (fabs(1 - bary.y()) < 0.0000001f) {
                 splitResultPoint.normalCount = normalCount[1];
             } else {
                 splitResultPoint.normalCount = normalCount[2];
             }
-        } else if (fabs(bary.z()) < ZERO
-                   || fabs(bary.y()) < ZERO
-                   || fabs(bary.z()) < ZERO) {
+        } else if (fabs(bary.z()) < 0.0000001f
+                   || fabs(bary.y()) < 0.0000001f
+                   || fabs(bary.z()) < 0.0000001f) {
             splitResultPoint.isOriginal = false;
             splitResultPoint.isBorder = true;
             splitResultPoint.isInter = false;
-            if (fabs(bary.x()) < ZERO) {
+            if (fabs(bary.x()) < 0.0000001f) {
                 splitResultPoint.normalCount = normalCount[1] > normalCount[2] ? normalCount[1] : normalCount[2];
-            } else if (fabs(bary.y()) < ZERO) {
+            } else if (fabs(bary.y()) < 0.0000001f) {
                 splitResultPoint.normalCount = normalCount[0] > normalCount[2] ? normalCount[0] : normalCount[2];
             } else {
                 splitResultPoint.normalCount = normalCount[0] > normalCount[1] ? normalCount[0] : normalCount[1];
@@ -3084,7 +3089,6 @@ void CommonData::acSplit() {
                     point.vertex = cubicBezierTriangleList[i].calcValue(point.bary);
                     point.normalAdjusted = quadraticBezierTriangleList[i].calcValue(point.bary);
                     point.normalAdjusted.normalize();
-                    point.normal = point.normalAdjusted;
                 } else {
                     point.normalAdjusted = point.normal;
                 }
@@ -3115,8 +3119,8 @@ void CommonData::acSplit() {
                        point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
                        point1.bary, point2.bary, point3.bary,
                        v_origin, i,
-//                       point1.normalCount, point2.normalCount, point3.normalCount);
-                       1, 1, 1);
+                       point1.normalCount, point2.normalCount, point3.normalCount);
+//                       1, 1, 1);
 //                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
 #else
 
@@ -3125,8 +3129,8 @@ void CommonData::acSplit() {
                        point1.normalAdjusted, point2.normalAdjusted, point3.normalAdjusted,
 //                       point1.bary, point2.bary, point3.bary,
                        v_origin, i,
-//                       point1.normalCount, point2.normalCount, point3.normalCount);
-                       1, 1, 1);
+                       point1.normalCount, point2.normalCount, point3.normalCount);
+//                       2,2,2);
 //                       point1.textureCoord, point2.textureCoord, point3.textureCoord);
 
 #endif

@@ -549,7 +549,7 @@ void Widget::loadObj() {
 	m_pView->update();
 #else
     QString qCurrentFileName = QFileDialog::getOpenFileName(this, tr("打开obj文件"),
-                                                            QString(tr("/home/ac/code/c++/dashi/")),
+                                                            QString(tr("/home/ac/code/c++/dashi/OBJ")),
                                                             tr("obj文件 (*.obj)"));
 
 

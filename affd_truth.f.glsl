@@ -102,12 +102,12 @@ vec4 color_map_normal(vec3 norm0, vec3 norm1, float range)
 void main()
 {
 	if (ErrorDisplayMode == 1)			// 1表示显示顶点误差
-		FragColor = color_map_vertex(ecPosition, ecPosition_truth, 0.02);
+		FragColor = color_map_vertex(ecPosition, ecPosition_truth, 0.00000001);
 		//FragColor = color_map_vertex(ecPosition, ecPosition_truth, 0.0007);
 	else if (ErrorDisplayMode == 2)		// 2表示显示法向误差
 		//FragColor = vec4(tnorm - tnorm_truth, 1.0);
 		//FragColor = vec4(norm - norm_truth, 1.0);
-		FragColor = color_map_normal(tnorm, tnorm_truth, 3.14159265358979 / 70);
+		FragColor = color_map_normal(tnorm, tnorm_truth, 3.14159265358979 / 5);
 		//FragColor = color_map_normal(tnorm, tnorm_truth, 3.14159265358979 / 5);
 		//FragColor = color_map_normal(tnorm, tnorm_truth, 3.14159265358979 / 4);
 	else

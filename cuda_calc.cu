@@ -2428,6 +2428,9 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
     n_count[0] = triangleListD[triangleIdx].nc[0];
     n_count[1] = triangleListD[triangleIdx].nc[1];
     n_count[2] = triangleListD[triangleIdx].nc[2];
+//    n_count[0] = 1;
+//    n_count[2] = 1;
+//    n_count[1] = 1;
     //printf("ncount = (%d, %d, %d): triangleIdx = %d\n", n_count[0], n_count[1], n_count[2], triangleIdx);
 
     float *p_x = &triangleCtrlPointD[m_ * triangleIdx];
@@ -2465,7 +2468,10 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
         // p 是要处理的边控制顶点
         float3 p = make_float3(*(p_x + edge_ctrlpoint_idx[i]), *(p_y + edge_ctrlpoint_idx[i]),
                                *(p_z + edge_ctrlpoint_idx[i]));
-        if (n_count[i / 2] < 2)        // 该条边只有一个法向
+
+        float3 n1 = triangleListD[adj_face_idx[i / 2]].n_adj[adj_corner_ctrlpoint_idx[adj_edge_idx[i / 2]][i % 2]];
+        normalize(n1);
+        if (n_count[i / 2] < 2 || (n1.x == n_ctrlpoint_corner.x && n1.y == n_ctrlpoint_corner.y && n1.z == n_ctrlpoint_corner.z))        // 该条边只有一个法向
         {
             //if (adj_face_idx[i / 2] >= 0)		// 只有当这条边的另一侧有面片时才会处理
             //{
@@ -2502,6 +2508,10 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
             //{
             float3 n_ave = cross(n_ctrlpoint_corner, n1);
             normalize(n_ave);
+//            printf("%f %f %f\n%f %f %f\n%f %f %f\n\n", n1.x, n1.y, n1.z, n_ctrlpoint_corner.x, n_ctrlpoint_corner.y, n_ctrlpoint_corner.z, n_ave.x, n_ave.y, n_ave.z);
+//            if (n1.x == n_ctrlpoint_corner.x && n1.y == n_ctrlpoint_corner.y && n1.z == n_ctrlpoint_corner.z) {
+//                printf("no\n");
+//            }
             //printf("t = %d, n_cross = %f, %f, %f\n", triangleIdx, n_ave.x, n_ave.y, n_ave.z);
             //float3 result = v_ctrlpoint_corner + v01 * n_ave * 0.333333 * n_ave;				// 原始的pn尖锐边算法，将1/3点往法向上投影，效果不佳
             float3 result =
