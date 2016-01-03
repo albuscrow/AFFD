@@ -5,6 +5,7 @@
 #include "common_data_structure.h"
 
 std::vector<pointSharePtr> point::pointPool = std::vector<pointSharePtr>();
+unsigned long point::max_id = 0;
 
 std::shared_ptr<point> point::findPoint(double x, double y, double z) {
     for (std::shared_ptr<point> ptr : pointPool) {
@@ -15,10 +16,19 @@ std::shared_ptr<point> point::findPoint(double x, double y, double z) {
     return std::shared_ptr<point>();
 }
 
+#ifdef TEST
+void point::printAllPoint() {
+    for (std::shared_ptr<point> ptr : pointPool) {
+        std::cout << *ptr;
+    }
+}
+#endif
+
 std::shared_ptr<point> point::getPoint(double x, double y, double z) {
     std::shared_ptr<point> result = findPoint(x, y, z);
     if (!result) {
         result = std::shared_ptr<point>(new point(x, y, z));
+        result->setId();
         pointPool.push_back(result);
     }
     return result;
@@ -114,3 +124,4 @@ vector3d triangle::getNormal() {
     return v1.crossProduct(v2);
 
 }
+

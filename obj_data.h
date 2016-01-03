@@ -165,6 +165,10 @@ namespace objdata {
      * 解析mtl文件时记录所有mtl的信息
      */
     struct MtlTex {
+        MtlTex();
+
+        MtlTex(int i);
+
         std::string m_sMtlTexName;                // mtl的名字
         double m_fKa[3], m_fKd[3], m_fKs[3];    // 材质属性
         std::string m_sTexFileName;                // 纹理文件名

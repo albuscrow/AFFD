@@ -2642,6 +2642,7 @@ __global__ void move(TriangleD *triangleListD, float *triangleCtrlPointD, int *t
         //float3 result = sum + (sum - p) * 0.5;
 
         /******** 平均delta *********/
+        printf("%d", center_factor);
         delta *= center_factor / 6;
         //delta *= 1.5 / 6;
         float3 result = p + delta;

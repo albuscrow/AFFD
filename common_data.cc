@@ -2329,7 +2329,7 @@ void CommonData::setAlgorithm(const Algorithm algo) {
 
 MtlTex CommonData::getMtl(int i) const {
     if (i >= (int) objData->mtlTexList.size())
-        return MtlTex("");
+        return MtlTex();
     return objData->mtlTexList[i];
 }
 

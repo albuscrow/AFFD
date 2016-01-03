@@ -48,9 +48,9 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
     //调整前一条边的走向，另两条边都是从公共顶点出发
     firstEdge = -firstEdge;
 #ifdef TEST
-    if (firstEdge.getP1() == secondEdge.getP1()) {
-        cout << "test adjust direct of edge ok" << endl;
-    }
+//    if (firstEdge.getP1() == secondEdge.getP1()) {
+//        cout << "test adjust direct of edge ok" << endl;
+//    }
 #endif
 
     vector<pointSharePtr> firstEdgePoints = splitEdge(firstEdge, l);
@@ -106,7 +106,7 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 
 void cvt(const triangle &t) {
 #ifdef TEST
-    cout << pointTriangleMap.size() << endl;
+//    cout << pointTriangleMap.size() << endl;
 #endif
     std::map<point *, point> temp;
     for (auto iter = pointTriangleMap.begin(); iter != pointTriangleMap.end(); ++iter) {
@@ -394,12 +394,12 @@ std::vector<pointSharePtr> splitEdge(const edge &e, const double &l) {
         pointVector.push_back(point::getPoint(pointTmp.getX(), pointTmp.getY(), pointTmp.getZ()));
     }
 #ifdef TEST
-    cout << "check split edge" << endl;
-    cout << e << endl;
-
-    for (pointSharePtr p : pointVector) {
-        cout << *p;
-    }
+//    cout << "check split edge" << endl;
+//    cout << e << endl;
+//
+//    for (pointSharePtr p : pointVector) {
+//        cout << *p;
+//    }
 #endif
     return pointVector;
 }

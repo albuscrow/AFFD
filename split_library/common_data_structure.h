@@ -25,6 +25,11 @@ public:
 
     static std::shared_ptr<point> findPoint(double x, double y, double z);
 
+
+#ifdef TEST
+    static void printAllPoint();
+#endif
+
     static std::shared_ptr<point> getPoint(double x, double y, double z);
 
     double getX() const {
@@ -77,7 +82,7 @@ public:
     }
 
     friend std::ostream &operator<<(std::ostream &os, const point &p) {
-        os << "point x:" << p.x << " y:" << p.y << " z:" << p.z << std::endl;
+        os << "point id:"<< p.id << " x:" << p.x << " y:" << p.y << " z:" << p.z << std::endl;
         return os;
     }
 
@@ -107,13 +112,14 @@ public:
 
     static void clearPointPool() {
         pointPool.clear();
+        max_id = 0;
         return;
     }
 
     point() { }
 
     point(double x, double y, double z)
-            : x(x), y(y), z(z), l(sqrt(x * x + y * y + z * z)) { }
+            : x(x), y(y), z(z), l(sqrt(x * x + y * y + z * z)){ }
 
     void setX(double x) {
         point::x = x;
@@ -163,12 +169,20 @@ public:
         return *this;
     }
 
+    unsigned long getId() const {
+        return id;
+    }
+
+    void setId() {
+        point::id = max_id++;
+    }
 
 private:
+    unsigned long id;
     double x = 0, y = 0, z = 0;
     double l = 0.0;
     static std::vector<std::shared_ptr<point>> pointPool;
-
+    static unsigned long max_id;
 };
 
 using vector3d = point;
@@ -190,7 +204,7 @@ public:
     }
 
     friend std::ostream &operator<<(std::ostream &os, const edge &e) {
-        os << "edge\npoint1:" << e.p1 << "point2:" << e.p2;
+        os << "edge\npoint1:" << *e.p1 << "point2:" << *e.p2;
         return os;
     }
 
@@ -314,6 +328,10 @@ public:
         return auxMatrixForContain;
     }
 
+    friend std::ostream &operator<<(std::ostream &os, const triangle &e) {
+        os << "triangle\n" << e.p1->getId() << " " << e.p2->getId()<< " " << e.p3->getId();
+        return os;
+    }
 
 private:
     pointSharePtr p1, p2, p3;

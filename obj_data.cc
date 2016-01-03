@@ -84,6 +84,19 @@ namespace objdata
 		}
 	}
 
+	MtlTex::MtlTex()
+	{
+		m_sMtlTexName = "";
+		m_sTexFileName = string("");
+		m_nTexBindingIdx = 2048;
+		for (int i = 0; i < 3; ++i)
+		{
+			m_fKa[i] = 0.2;
+			m_fKd[i] = 1.0;
+			m_fKs[i] = 0.8;
+		}
+	}
+
 	MtlTex::MtlTex(const MtlTex &mtlTex)
 	{
 		m_sMtlTexName = mtlTex.m_sMtlTexName;
@@ -385,4 +398,5 @@ namespace objdata
 
 		fclose(fptr);*/
 	}
+
 }
