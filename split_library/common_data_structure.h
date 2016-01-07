@@ -17,7 +17,7 @@
 #include <lapackpp/blas3pp.h>
 
 #ifndef ZERO
-#define ZERO 0.0000001
+#define ZERO 0.00001
 #endif
 
 class point {

@@ -18,9 +18,11 @@ using std::fabs;
 using param = struct parameter {
     double u, v, w;
 };
-#define ZERO 0.0000001
+#define ZERO 0.00001
 
 void outputParam(param parameter);
+
+void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<param> points, size_t table[20][20][20]);
 
 size_t getIndex(vector<param> &points, param point) {
     for (size_t i = 0; i < points.size(); ++i) {
@@ -57,6 +59,14 @@ param toParam(const triangle &t, point &p) {
 }
 
 triangle genTriangle(float a, float b, float c) {
+    if (a + b <= c) {
+        a += 0.4;
+        b += 0.4;
+        if (a + b < c) {
+            c -= 0.4;
+        }
+    }
+
     pointSharePtr p1 = point::getPoint(0, 0, 0);
     pointSharePtr p2 = point::getPoint(a, 0, 0);
     double t = (a + b + c) / 2;
@@ -64,14 +74,14 @@ triangle genTriangle(float a, float b, float c) {
     double y = 2 * s / a;
     double x = (float) sqrt(c * c - y * y);
     double d = (x + a) * (x + a) + y * y;
-    if (fabs(d - b * b) < ZERO) {
+    double d1 = fabs(d - b * b);
+    if (d1 < ZERO) {
         x = -x;
     }
     pointSharePtr p3 = point::getPoint(x, y, 0);
     triangle tt(p1, p2, p3);
     tt.rotate();
     return tt;
-
 }
 
 int main() {
@@ -80,16 +90,18 @@ int main() {
     std::string s1 = "./showme result";
     std::string s2 = ".poly";
 
+    size_t factor = 20;
     vector<param> points;
     vector<size_t> indexes;
     vector<size_t> triangleOffset;
-    size_t table[20][20][20];
-    for (int i = 1; i < 10; ++i) {
-        for (int j = i; j < 10; ++j) {
-            for (int k = j; k < 10; ++k) {
-                if (i + j > k && abs(i - j) < k) {
+    size_t table[factor][factor][factor];
+    for (int i = 1; i < factor; ++i) {
+        for (int j = i; j < factor; ++j) {
+            for (int k = j; k < factor; ++k) {
+                if (i + j >= k) {
+                    cout << i << " " << j << " " << k << endl;
                     const triangle &t = genTriangle(i, j, k);
-                    auto triangles = split1(t, 1);
+                    auto triangles = split1(t, 1, true);
 //                    cout << "handle triangle #"<< index << endl;
                     auto currentPoints = point::getPointPool();
                     table[i][j][k] = triangleOffset.size();
@@ -106,17 +118,81 @@ int main() {
             }
         }
     }
-    cout << "poing size: " << points.size() << " index size: " << indexes.size() << " triangle size: " <<
-    triangleOffset.size() / 2;
+    std::ofstream of("20.txt");
+
+    of << factor << endl;
+    for (int i = 0; i < triangleOffset.size(); ++i) {
+        of << triangleOffset[i] << " ";
+    }
+    of << endl;
+    int counter = 0;
+    for (int i = 0; i < indexes.size(); ++i) {
+        of << indexes[i] << " ";
+        if (2 == counter) {
+            of << "-1 ";
+            counter = 0;
+        } else {
+            counter++;
+        }
+    }
+    of << endl;
+    for (int i = 0; i < points.size(); ++i) {
+        of << points[i].u << " " << points[i].v << " " << points[i].w << " " << "0 ";
+    }
+
+    of.close();
+
+
+//    testCode(triangleOffset, indexes, points, table);
+    //    for (size_t i = 0; i < triangleOffset.size(); i += 2) {
+//        size_t offset = triangleOffset[i * 2];
+//        size_t number = triangleOffset[i * 2 + 1];
+//        size_t end = offset + number;
+//        std::ofstream of("debug.poly");
+//        of << number * 3 << " 2 0 0" << endl;
+//        for (size_t j = offset; j < end; ++j) {
+//            auto p1 = points[indexes[offset * 3]];
+//            auto p2 = points[indexes[offset * 3 + 1]];
+//            auto p3 = points[indexes[offset * 3 + 2]];
+//
+//            for (int i = 0; i < number; ++i) {
+//                of << i * 3 + 1 << " " << triangles[i]->getP1()->getX() << " " << triangles[i]->getP1()->getY() << endl;
+//                of << i * 3 + 2 << " " << triangles[i]->getP2()->getX() << " " << triangles[i]->getP2()->getY() << endl;
+//                of << i * 3 + 3 << " " << triangles[i]->getP3()->getX() << " " << triangles[i]->getP3()->getY() << endl;
+//            }
+//
+//
+//            of << number * 3 << " 0" << endl;
+//            for (int i = 0; i < number; ++i) {
+//                of << i * 3 + 1 << " " << i * 3 + 1 << " " << i * 3 + 2 << endl;
+//                of << i * 3 + 2 << " " << i * 3 + 2 << " " << i * 3 + 3 << endl;
+//                of << i * 3 + 3 << " " << i * 3 + 3 << " " << i * 3 + 1 << endl;
+//            }
+//
+//            of << "0" << endl;
+//            of.close();
+//
+//        }
+//    }
+}
+
+
+//vector<param> points;
+//vector<size_t> indexes;
+//vector<size_t> triangleOffset;
+//size_t table[20][20][20];
+void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<param> points, size_t table[20][20][20]) {
+//    cout << "poing size: " << points.size() << " index size: " << indexes.size() << " triangle size: " <<
+//    triangleOffset.size() / 2;
     srand(10);
     for (size_t ii = 0; ii < 100; ++ii) {
 //        cout << "test" << ii << endl;
-//        int i = rand() % 10;
-//        int j = rand() % 10;
-//        int k = rand() % 10;
-        int i = 5;
-        int j = 9;
-        int k = 6;
+        int i = rand() % 10;
+        int j = rand() % 10;
+        int k = rand() % 10;
+//        int i = 3;
+//        int j = 8;
+//        int k = 6;
 
         if (i + j > k && abs(i - j) < k) {
             triangle t = genTriangle(i, j, k);
@@ -195,36 +271,6 @@ int main() {
 
         }
     }
-//    for (size_t i = 0; i < triangleOffset.size(); i += 2) {
-//        size_t offset = triangleOffset[i * 2];
-//        size_t number = triangleOffset[i * 2 + 1];
-//        size_t end = offset + number;
-//        std::ofstream of("debug.poly");
-//        of << number * 3 << " 2 0 0" << endl;
-//        for (size_t j = offset; j < end; ++j) {
-//            auto p1 = points[indexes[offset * 3]];
-//            auto p2 = points[indexes[offset * 3 + 1]];
-//            auto p3 = points[indexes[offset * 3 + 2]];
-//
-//            for (int i = 0; i < number; ++i) {
-//                of << i * 3 + 1 << " " << triangles[i]->getP1()->getX() << " " << triangles[i]->getP1()->getY() << endl;
-//                of << i * 3 + 2 << " " << triangles[i]->getP2()->getX() << " " << triangles[i]->getP2()->getY() << endl;
-//                of << i * 3 + 3 << " " << triangles[i]->getP3()->getX() << " " << triangles[i]->getP3()->getY() << endl;
-//            }
-//
-//
-//            of << number * 3 << " 0" << endl;
-//            for (int i = 0; i < number; ++i) {
-//                of << i * 3 + 1 << " " << i * 3 + 1 << " " << i * 3 + 2 << endl;
-//                of << i * 3 + 2 << " " << i * 3 + 2 << " " << i * 3 + 3 << endl;
-//                of << i * 3 + 3 << " " << i * 3 + 3 << " " << i * 3 + 1 << endl;
-//            }
-//
-//            of << "0" << endl;
-//            of.close();
-//
-//        }
-//    }
 }
 
 void outputParam(param parameter) {

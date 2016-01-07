@@ -8,21 +8,36 @@
 #include <map>
 #include <sstream>
 
-void outputAsFile(std::vector<TriangleSharePtr> &triangles);
-
-void cvt(const triangle &t);
-
 using std::vector;
 using std::cout;
 using std::cin;
 using std::endl;
 
+void outputAsFile(std::vector<TriangleSharePtr> &triangles);
+
+void cvt(const triangle &t);
+
+void handle22(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t);
+
+void handle23(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t);
+
+void handle24(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t);
+
+void handle25(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t);
+
 std::map<point *, std::vector<TriangleSharePtr>> pointTriangleMap =
         std::map<point *, std::vector<TriangleSharePtr>>();
 
-std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
-    pointTriangleMap.clear();
-    point::clearPointPool();
+std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool needClear) {
+    if (needClear) {
+        pointTriangleMap.clear();
+        point::clearPointPool();
+    }
+
 
     //取得三角形中两个较长的边
     vector<edge> edgeVector{t.getE12(), t.getE23(), t.getE31()};
@@ -55,6 +70,8 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l) {
 
     vector<pointSharePtr> firstEdgePoints = splitEdge(firstEdge, l);
     vector<pointSharePtr> secondEdgePoints = splitEdge(secondEdge, l);
+    size_t a = firstEdgePoints.size();
+    size_t b = secondEdgePoints.size();
     vector<TriangleSharePtr> result;
 
     //先把最顶上的三角形分割出来
@@ -131,140 +148,79 @@ void cvt(const triangle &t) {
 
 }
 
+void split1Iter(const triangle &new_t, const double &l, vector<TriangleSharePtr> result, triangle t) {
+    //取得三角形中两个较长的边
+    vector<edge> edgeVector{new_t.getE12(), new_t.getE23(), new_t.getE31()};
+
+    std::sort(edgeVector.begin(), edgeVector.end(), [](const edge edge1, const edge edge2) {
+        return edge1.getLength() > edge2.getLength();
+    });
+
+    edge &e1 = edgeVector[0];
+    edge &e2 = edgeVector[1];
+
+
+    edge firstEdge, secondEdge;
+    //按照三角形的走向，区分前后边
+    if (e1.getP1() == e2.getP2()) {
+        firstEdge = e2;
+        secondEdge = e1;
+    } else {
+        firstEdge = e1;
+        secondEdge = e2;
+    }
+
+    //调整前一条边的走向，另两条边都是从公共顶点出发
+    firstEdge = -firstEdge;
+
+    vector<pointSharePtr> firstEdgePoints = splitEdge(firstEdge, l);
+    vector<pointSharePtr> secondEdgePoints = splitEdge(secondEdge, l);
+    size_t a = firstEdgePoints.size();
+    size_t b = secondEdgePoints.size();
+
+    //先把最顶上的三角形分割出来
+    addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[1], result, t);
+    if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 2) {
+        return;
+    } else if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 3) {
+        addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], result, t);
+        return;
+    } else if (firstEdgePoints.size() == 3 && secondEdgePoints.size() == 2) {
+        addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], result, t);
+        return;
+    } else if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 4) {
+        addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], result, t);
+        addTriangle(firstEdgePoints[1], secondEdgePoints[2], secondEdgePoints[3], result, t);
+        return;
+    } else if (firstEdgePoints.size() == 4 && secondEdgePoints.size() == 2) {
+        addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], result, t);
+        addTriangle(firstEdgePoints[3], firstEdgePoints[2], secondEdgePoints[1], result, t);
+        return;
+    }
+    firstEdgePoints.erase(firstEdgePoints.begin());
+    secondEdgePoints.erase(secondEdgePoints.begin());
+
+    split1Iter(firstEdgePoints, secondEdgePoints, l, result, t);
+}
+
 
 void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> secondEdgePoints, const double &l,
                 vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+//    size_t a = firstEdgePoints.size();
+//    size_t b = secondEdgePoints.size();
     if (firstEdgePoints.size() == 2 || secondEdgePoints.size() == 2) {
         if (firstEdgePoints.size() + secondEdgePoints.size() == 4) {
-            splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
-                          edge(firstEdgePoints[1], secondEdgePoints[1]),
-                          l, triangleVector, t);
-
+            handle22(firstEdgePoints, secondEdgePoints, l, triangleVector, t);
         } else if (firstEdgePoints.size() + secondEdgePoints.size() == 5) {
-            splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
-                          edge(firstEdgePoints[1], secondEdgePoints[1]),
-                          l, triangleVector, t);
-            if (firstEdgePoints.size() == 3) {
-                vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[2], secondEdgePoints[1]), l);
-                if (edgeVector.size() == 3) {
-                    addTriangle(firstEdgePoints[2], firstEdgePoints[1], edgeVector[1], triangleVector, t);
-
-                    vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
-                    if (temp.size() == 2) {
-                        addTriangle(firstEdgePoints[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
-                    } else {
-                        addTriangle(firstEdgePoints[1], temp[1], edgeVector[1], triangleVector, t);
-                        addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
-                    }
-                } else if (edgeVector.size() == 2) {
-                    addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], triangleVector, t);
-                } else if (edgeVector.size() == 4) {
-                    vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
-                    if (temp.size() == 2) {
-                        cout << "unhandle case !!!!!!!!" << endl;
-                        cout << edgeVector.size() << endl;
-                        exit(1);
-                    } else {
-                        addTriangle(firstEdgePoints[2], firstEdgePoints[1], edgeVector[1], triangleVector, t);
-                        addTriangle(edgeVector[1], firstEdgePoints[1], temp[1], triangleVector, t);
-                        addTriangle(edgeVector[1], temp[1], edgeVector[2], triangleVector, t);
-                        addTriangle(edgeVector[2], temp[1], edgeVector[3], triangleVector, t);
-                    }
-                } else {
-                    cout << "unhandle case !!!!!!!!" << endl;
-                    cout << edgeVector.size() << endl;
-                    exit(1);
-
-                }
-            } else {
-                vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[2]), l);
-                if (edgeVector.size() == 3) {
-                    addTriangle(edgeVector[1], secondEdgePoints[1], secondEdgePoints[2], triangleVector, t);
-
-                    vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
-                    if (temp.size() == 2) {
-                        addTriangle(firstEdgePoints[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
-                    } else {
-                        addTriangle(firstEdgePoints[1], temp[1], edgeVector[1], triangleVector, t);
-                        addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
-                    }
-
-                } else if (edgeVector.size() == 2) {
-                    addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], triangleVector, t);
-                } else if (edgeVector.size() == 4) {
-                    vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
-                    if (temp.size() == 2) {
-                        cout << "unhandle case !!!!!!!!" << endl;
-                        cout << edgeVector.size() << endl;
-                        exit(1);
-                    } else {
-                        addTriangle(edgeVector[0], temp[1], edgeVector[1], triangleVector, t);
-                        addTriangle(edgeVector[1], temp[1], temp[2], triangleVector, t);
-                        addTriangle(edgeVector[1], temp[2], edgeVector[2], triangleVector, t);
-                        addTriangle(temp[2], edgeVector[3], edgeVector[2], triangleVector, t);
-                    }
-                } else {
-                    cout << "unhandle case !!!!!!!!" << endl;
-                    cout << edgeVector.size() << endl;
-                    exit(1);
-                }
-            }
+            handle23(firstEdgePoints, secondEdgePoints, l, triangleVector, t);
+        } else if (firstEdgePoints.size() + secondEdgePoints.size() == 6) {
+            handle24(firstEdgePoints, secondEdgePoints, l, triangleVector, t);
         } else {
-            if (firstEdgePoints.size() == 2) {
-                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[0]), l);
-                if (temp.size() == 2) {
-                    addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[0], triangleVector, t);
-                } else if (temp.size() == 3) {
-                    addTriangle(firstEdgePoints[1], firstEdgePoints[0], temp[1], triangleVector, t);
-                    addTriangle(firstEdgePoints[0], secondEdgePoints[0], temp[1], triangleVector, t);
-                } else {
-                    cout << "unhandle case !!!!!!!!\n temp" << endl;
-                    cout << temp.size() << endl;
-                    exit(1);
-                }
-
-//                addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[0], triangleVector, t);
-                vector<pointSharePtr> edgeVector = splitEdge(edge(secondEdgePoints[secondEdgePoints.size() - 1],
-                                                                  firstEdgePoints[firstEdgePoints.size() - 1]), l);
-                addTriangle(secondEdgePoints[secondEdgePoints.size() - 2],
-                            secondEdgePoints[secondEdgePoints.size() - 1], edgeVector[1], triangleVector, t);
-
-                vector<pointSharePtr> newFirstPointVector;
-                for (int i = (int) (secondEdgePoints.size() - 2); i >= 0; --i) {
-                    newFirstPointVector.push_back(secondEdgePoints[i]);
-                }
-                edgeVector.erase(edgeVector.begin());
-                split1Iter(newFirstPointVector, edgeVector, l, triangleVector, t);
-
-            } else {
-
-                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[0], secondEdgePoints[1]), l);
-                if (temp.size() == 2) {
-                    addTriangle(firstEdgePoints[0], secondEdgePoints[0], secondEdgePoints[1], triangleVector, t);
-                } else if (temp.size() == 3) {
-                    addTriangle(firstEdgePoints[0], secondEdgePoints[0], temp[1], triangleVector, t);
-                    addTriangle(secondEdgePoints[0], secondEdgePoints[1], temp[1], triangleVector, t);
-                } else {
-                    cout << "unhandle case !!!!!!!!\n temp" << endl;
-                    cout << temp.size() << endl;
-                    exit(1);
-                }
-
-                vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[firstEdgePoints.size() - 1],
-                                                                  secondEdgePoints[secondEdgePoints.size() - 1]), l);
-                addTriangle(firstEdgePoints[firstEdgePoints.size() - 1],
-                            firstEdgePoints[firstEdgePoints.size() - 2], edgeVector[1], triangleVector, t);
-
-                vector<pointSharePtr> newSecondPointVector;
-                for (int i = (int) (firstEdgePoints.size() - 2); i >= 0; --i) {
-                    newSecondPointVector.push_back(firstEdgePoints[i]);
-                }
-                edgeVector.erase(edgeVector.begin());
-                split1Iter(edgeVector, newSecondPointVector, l, triangleVector, t);
-            }
-
+            handle25(firstEdgePoints, secondEdgePoints, l, triangleVector, t);
+//            cout << "unimplement for 2 5" << endl;
+//            exit(1);
         }
-
+        return;
 //        if (firstEdgePoints.size() == 2 && secondEdgePoints.size() == 3) {
 //            splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
 //                          edge(firstEdgePoints[1], secondEdgePoints[1]),
@@ -277,7 +233,6 @@ void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> sec
 //
 //        }
 
-        return;
     }
 
     int i;
@@ -293,15 +248,233 @@ void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> sec
                       l, triangleVector, t);
     } else {
         if (firstEdgePoints.size() > secondEdgePoints.size()) {
-            split1Iter(splitEdge(edge(secondEdgePoints[i], firstEdgePoints[i]), l),
-                       splitEdge(edge(secondEdgePoints[secondEdgePoints.size() - 1],
-                                      firstEdgePoints[firstEdgePoints.size() - 1]), l), l, triangleVector, t);
+            vector<pointSharePtr> lastMiddle = splitEdge(edge(firstEdgePoints[i], secondEdgePoints[i]), l);
+            if (lastMiddle.size() == 2) {
+                addTriangle(firstEdgePoints[i], secondEdgePoints[i + 1], secondEdgePoints[i], triangleVector, t);
+                split1Iter(triangle(firstEdgePoints[firstEdgePoints.size() - 1], firstEdgePoints[i],
+                                    secondEdgePoints[i + 1]), l, triangleVector, t);
+            } else {
+                split1Iter(splitEdge(edge(secondEdgePoints[i], firstEdgePoints[i]), l),
+                           splitEdge(edge(secondEdgePoints[secondEdgePoints.size() - 1],
+                                          firstEdgePoints[firstEdgePoints.size() - 1]), l), l, triangleVector, t);
+            }
         } else {
-            split1Iter(splitEdge(edge(firstEdgePoints[firstEdgePoints.size() - 1],
-                                      secondEdgePoints[secondEdgePoints.size() - 1]), l),
-                       splitEdge(edge(firstEdgePoints[i], secondEdgePoints[i]), l), l, triangleVector, t);
+            vector<pointSharePtr> lastMiddle = splitEdge(edge(firstEdgePoints[i], secondEdgePoints[i]), l);
+            if (lastMiddle.size() == 2) {
+                addTriangle(firstEdgePoints[i], firstEdgePoints[i + 1], secondEdgePoints[i], triangleVector, t);
+                split1Iter(triangle(secondEdgePoints[firstEdgePoints.size() - 1], secondEdgePoints[i],
+                                    firstEdgePoints[i + 1]), l, triangleVector, t);
+            } else {
+                split1Iter(splitEdge(edge(firstEdgePoints[firstEdgePoints.size() - 1],
+                                          secondEdgePoints[secondEdgePoints.size() - 1]), l),
+                           splitEdge(edge(firstEdgePoints[i], secondEdgePoints[i]), l), l, triangleVector, t);
+            }
         }
     }
+}
+
+void handle25(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+    splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
+                  edge(firstEdgePoints[1], secondEdgePoints[1]),
+                  l, triangleVector, t);
+    if (firstEdgePoints.size() == 5) {
+        vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[2], secondEdgePoints[1]), l);
+        addTriangle(firstEdgePoints[4], firstEdgePoints[3], edgeVector[1], triangleVector, t);
+        addTriangle(edgeVector[1], firstEdgePoints[3], firstEdgePoints[2], triangleVector, t);
+        addTriangle(edgeVector[1], firstEdgePoints[2], secondEdgePoints[1], triangleVector, t);
+        addTriangle(secondEdgePoints[1], firstEdgePoints[2], firstEdgePoints[2], triangleVector, t);
+    } else {
+        vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[2]), l);
+        addTriangle(secondEdgePoints[4], edgeVector[1], secondEdgePoints[3], triangleVector, t);
+        addTriangle(secondEdgePoints[3], edgeVector[1], secondEdgePoints[2], triangleVector, t);
+        addTriangle(secondEdgePoints[2], edgeVector[1], firstEdgePoints[1], triangleVector, t);
+        addTriangle(secondEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], triangleVector, t);
+    }
+}
+
+void handle24(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+    if (firstEdgePoints.size() == 2) { // 2, 4
+        vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[0]), l);
+        if (temp.size() == 2) {
+            addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[0], triangleVector, t);
+        } else if (temp.size() == 3) {
+            addTriangle(firstEdgePoints[1], firstEdgePoints[0], temp[1], triangleVector, t);
+            addTriangle(firstEdgePoints[0], secondEdgePoints[0], temp[1], triangleVector, t);
+        } else {
+            cout << "unhandle case !!!!!!!!\n temp" << endl;
+            cout << temp.size() << endl;
+            exit(1);
+        }
+
+        vector<pointSharePtr> edgeVector = splitEdge(edge(secondEdgePoints[secondEdgePoints.size() - 1],
+                                                          firstEdgePoints[firstEdgePoints.size() - 1]), l);
+        addTriangle(secondEdgePoints[secondEdgePoints.size() - 2],
+                    secondEdgePoints[secondEdgePoints.size() - 1], edgeVector[1], triangleVector, t);
+
+        if (edgeVector.size() == 2) {
+
+            addTriangle(secondEdgePoints[secondEdgePoints.size() - 3],
+                        secondEdgePoints[secondEdgePoints.size() - 2], edgeVector[1], triangleVector, t);
+
+            addTriangle(secondEdgePoints[secondEdgePoints.size() - 4],
+                        secondEdgePoints[secondEdgePoints.size() - 3], edgeVector[1], triangleVector, t);
+        } else {
+            vector<pointSharePtr> newFirstPointVector;
+            for (int i = (int) (secondEdgePoints.size() - 2); i >= 0; --i) {
+                newFirstPointVector.push_back(secondEdgePoints[i]);
+            }
+            edgeVector.erase(edgeVector.begin());
+            split1Iter(newFirstPointVector, edgeVector, l, triangleVector, t);
+        }
+    } else { // 4, 2
+
+        vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[0], secondEdgePoints[1]), l);
+        if (temp.size() == 2) {
+            addTriangle(firstEdgePoints[0], secondEdgePoints[0], secondEdgePoints[1], triangleVector, t);
+        } else if (temp.size() == 3) {
+            addTriangle(firstEdgePoints[0], secondEdgePoints[0], temp[1], triangleVector, t);
+            addTriangle(secondEdgePoints[0], secondEdgePoints[1], temp[1], triangleVector, t);
+        } else {
+            cout << "unhandle case !!!!!!!!\n temp" << endl;
+            cout << temp.size() << endl;
+            exit(1);
+        }
+
+        vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[firstEdgePoints.size() - 1],
+                                                          secondEdgePoints[secondEdgePoints.size() - 1]), l);
+        addTriangle(firstEdgePoints[firstEdgePoints.size() - 1],
+                    firstEdgePoints[firstEdgePoints.size() - 2], edgeVector[1], triangleVector, t);
+
+        if (edgeVector.size() == 2) {
+            addTriangle(secondEdgePoints[firstEdgePoints.size() - 2],
+                        secondEdgePoints[firstEdgePoints.size() - 3], edgeVector[1], triangleVector, t);
+
+            addTriangle(secondEdgePoints[firstEdgePoints.size() - 3],
+                        secondEdgePoints[firstEdgePoints.size() - 4], edgeVector[1], triangleVector, t);
+        } else {
+            vector<pointSharePtr> newSecondPointVector;
+            for (int i = (int) (firstEdgePoints.size() - 2); i >= 0; --i) {
+                newSecondPointVector.push_back(firstEdgePoints[i]);
+            }
+            edgeVector.erase(edgeVector.begin());
+            split1Iter(edgeVector, newSecondPointVector, l, triangleVector, t);
+        }
+    }
+}
+
+void handle23(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+    vector<pointSharePtr> edgeVector;
+    if (firstEdgePoints.size() == 3) {
+        edgeVector = splitEdge(edge(firstEdgePoints[2], secondEdgePoints[1]), l);
+    } else {
+        edgeVector = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[2]), l);
+    }
+    if (edgeVector.size() == 5) {
+        if (firstEdgePoints.size() == 3) {
+            addTriangle(firstEdgePoints[2], firstEdgePoints[1], edgeVector[1], triangleVector, t);
+            addTriangle(firstEdgePoints[1], firstEdgePoints[0], edgeVector[1], triangleVector, t);
+            addTriangle(edgeVector[1], firstEdgePoints[0], edgeVector[2], triangleVector, t);
+            addTriangle(edgeVector[2], firstEdgePoints[0], edgeVector[3], triangleVector, t);
+            addTriangle(firstEdgePoints[0], secondEdgePoints[0], edgeVector[3], triangleVector, t);
+            addTriangle(edgeVector[3], secondEdgePoints[0], edgeVector[4], triangleVector, t);
+        } else {
+            addTriangle(edgeVector[0], firstEdgePoints[1], edgeVector[1], triangleVector, t);
+            addTriangle(firstEdgePoints[0], secondEdgePoints[0], edgeVector[1], triangleVector, t);
+            addTriangle(edgeVector[1], secondEdgePoints[0], edgeVector[2], triangleVector, t);
+            addTriangle(edgeVector[2], secondEdgePoints[0], edgeVector[3], triangleVector, t);
+            addTriangle(edgeVector[3], secondEdgePoints[0], secondEdgePoints[1], triangleVector, t);
+            addTriangle(edgeVector[3], secondEdgePoints[1], edgeVector[4], triangleVector, t);
+        }
+    } else {
+        splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
+                      edge(firstEdgePoints[1], secondEdgePoints[1]),
+                      l, triangleVector, t);
+        if (firstEdgePoints.size() == 3) {
+            if (edgeVector.size() == 3) {
+                addTriangle(firstEdgePoints[2], firstEdgePoints[1], edgeVector[1], triangleVector, t);
+
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                if (temp.size() == 2) {
+                    addTriangle(firstEdgePoints[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
+                } else {
+                    addTriangle(firstEdgePoints[1], temp[1], edgeVector[1], triangleVector, t);
+                    addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
+                }
+            } else if (edgeVector.size() == 2) {
+                addTriangle(firstEdgePoints[2], firstEdgePoints[1], secondEdgePoints[1], triangleVector, t);
+            } else if (edgeVector.size() == 4) {
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                if (temp.size() == 3) {
+                    addTriangle(firstEdgePoints[2], firstEdgePoints[1], edgeVector[1], triangleVector, t);
+                    addTriangle(edgeVector[1], firstEdgePoints[1], temp[1], triangleVector, t);
+                    addTriangle(edgeVector[1], temp[1], edgeVector[2], triangleVector, t);
+                    addTriangle(edgeVector[2], temp[1], edgeVector[3], triangleVector, t);
+                } else {
+                    cout << "unhandle case !!!!!!!!" << endl;
+                    cout << edgeVector.size() << endl;
+                    exit(1);
+                }
+            } else if (edgeVector.size() == 5) {
+                //todo
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                cout << "unhandle case !!!!!!!! implement" << endl;
+                cout << "edge" << edgeVector.size() << "temp" << temp.size() << endl;
+                exit(1);
+            } else {
+                cout << "unhandle case !!!!!!!!" << endl;
+                cout << edgeVector.size() << endl;
+                exit(1);
+            }
+        } else {
+//            vector<pointSharePtr> edgeVector = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[2]), l);
+            if (edgeVector.size() == 3) {
+                addTriangle(edgeVector[1], secondEdgePoints[1], secondEdgePoints[2], triangleVector, t);
+
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                if (temp.size() == 2) {
+                    addTriangle(firstEdgePoints[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
+                } else {
+                    addTriangle(firstEdgePoints[1], temp[1], edgeVector[1], triangleVector, t);
+                    addTriangle(temp[1], secondEdgePoints[1], edgeVector[1], triangleVector, t);
+                }
+
+            } else if (edgeVector.size() == 2) {
+                addTriangle(firstEdgePoints[1], secondEdgePoints[1], secondEdgePoints[2], triangleVector, t);
+            } else if (edgeVector.size() == 4) {
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                if (temp.size() == 3) {
+                    addTriangle(edgeVector[0], temp[1], edgeVector[1], triangleVector, t);
+                    addTriangle(edgeVector[1], temp[1], temp[2], triangleVector, t);
+                    addTriangle(edgeVector[1], temp[2], edgeVector[2], triangleVector, t);
+                    addTriangle(temp[2], edgeVector[3], edgeVector[2], triangleVector, t);
+                } else {
+                    cout << "unhandle case !!!!!!!!" << endl;
+                    cout << edgeVector.size() << endl;
+                    exit(1);
+                }
+            } else if (edgeVector.size() == 5) {
+                //todo
+                vector<pointSharePtr> temp = splitEdge(edge(firstEdgePoints[1], secondEdgePoints[1]), l);
+                cout << "unhandle case !!!!!!!! implement" << endl;
+                cout << "edge" << edgeVector.size() << "temp" << temp.size() << endl;
+                exit(1);
+            } else {
+                cout << "unhandle case !!!!!!!!" << endl;
+                cout << edgeVector.size() << endl;
+                exit(1);
+            }
+        }
+    }
+}
+
+void handle22(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
+              const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+    splitOneLevel(edge(firstEdgePoints[0], secondEdgePoints[0]),
+                  edge(firstEdgePoints[1], secondEdgePoints[1]),
+                  l, triangleVector, t);
 }
 
 void splitOneLevel(edge edge1, edge edge2, double l, vector<TriangleSharePtr> &result, const triangle &t) {
@@ -405,8 +578,9 @@ std::vector<pointSharePtr> splitEdge(const edge &e, const double &l) {
 }
 
 
-std::vector<TriangleSharePtr> split1(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, const double &l) {
-    split1(triangle(p1, p2, p3), l);
+std::vector<TriangleSharePtr> split1(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, const double &l,
+                                     bool needClear) {
+    split1(triangle(p1, p2, p3), l, needClear);
 }
 
 std::vector<triangle> split2(const triangle &t, const double &l) {
