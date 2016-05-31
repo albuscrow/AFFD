@@ -59,12 +59,9 @@ param toParam(const triangle &t, point &p) {
 }
 
 triangle genTriangle(float a, float b, float c) {
-    if (a + b <= c) {
-        a += 0.4;
-        b += 0.4;
-        if (a + b < c) {
-            c -= 0.4;
-        }
+    if (a + b == c) {
+        a += 0.05;
+        b += 0.05;
     }
 
     pointSharePtr p1 = point::getPoint(0, 0, 0);
@@ -90,14 +87,14 @@ int main() {
     std::string s1 = "./showme result";
     std::string s2 = ".poly";
 
-    size_t factor = 20;
+    size_t factor = 19;
     vector<param> points;
     vector<size_t> indexes;
     vector<size_t> triangleOffset;
     size_t table[factor][factor][factor];
-    for (int i = 1; i < factor; ++i) {
-        for (int j = i; j < factor; ++j) {
-            for (int k = j; k < factor; ++k) {
+    for (int i = 1; i <= factor; ++i) {
+        for (int j = i; j <= factor; ++j) {
+            for (int k = j; k <= factor; ++k) {
                 if (i + j >= k) {
                     cout << i << " " << j << " " << k << endl;
                     const triangle &t = genTriangle(i, j, k);
@@ -118,9 +115,9 @@ int main() {
             }
         }
     }
-    std::ofstream of("20.txt");
+    std::ofstream of(std::to_string(factor + 1) + ".txt");
 
-    of << factor << endl;
+    of << (factor + 1) << endl;
     for (int i = 0; i < triangleOffset.size(); ++i) {
         of << triangleOffset[i] << " ";
     }
