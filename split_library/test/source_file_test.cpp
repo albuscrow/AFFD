@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <cmath>
+#include <stdlib.h>
 
 
 using std::cout;
@@ -23,6 +24,8 @@ using param = struct parameter {
 void outputParam(param parameter);
 
 void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<param> points, size_t table[20][20][20]);
+
+void genSplitFile();
 
 size_t getIndex(vector<param> &points, param point) {
     for (size_t i = 0; i < points.size(); ++i) {
@@ -81,22 +84,56 @@ triangle genTriangle(float a, float b, float c) {
     return tt;
 }
 
-int main() {
-
+void genSplitSchemeForOneTriangle() {
     int index = 0;
-    std::string s1 = "./showme result";
-    std::string s2 = ".poly";
+    std::__cxx11::string s1 = "./showme result";
+    std::__cxx11::string s2 = ".poly";
 
-    size_t factor = 19;
+    size_t factor = 30;
+    vector<param> points;
+    vector<size_t> indexes;
+    vector<size_t> triangleOffset;
+    size_t table[factor][factor][factor];
+    int i = 7;
+    int j = 8;
+    int k = 10;
+    const triangle &t = genTriangle(i, j, k);
+    auto triangles = split1(t, 1, true);
+    auto currentPoints = point::getPointPool();
+    table[i][j][k] = triangleOffset.size();
+    triangleOffset.push_back(indexes.size() / 3);
+    triangleOffset.push_back(triangles.size());
+    for (auto smallTriangle : triangles) {
+        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP1())));
+        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP2())));
+        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
+    }
+    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
+}
+
+
+
+
+int main() {
+//    genSplitFile();
+    genSplitSchemeForOneTriangle();
+}
+
+void genSplitFile() {
+    int index = 0;
+    std::__cxx11::string s1 = "./showme result";
+    std::__cxx11::string s2 = ".poly";
+
+    size_t factor = 30;
     vector<param> points;
     vector<size_t> indexes;
     vector<size_t> triangleOffset;
     size_t table[factor][factor][factor];
     for (int i = 1; i <= factor; ++i) {
+        cout << i << endl;
         for (int j = i; j <= factor; ++j) {
             for (int k = j; k <= factor; ++k) {
                 if (i + j >= k) {
-                    cout << i << " " << j << " " << k << endl;
                     const triangle &t = genTriangle(i, j, k);
                     auto triangles = split1(t, 1, true);
 //                    cout << "handle triangle #"<< index << endl;
@@ -110,12 +147,12 @@ int main() {
                         indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
                     }
 //                    cout << s1 + std::to_string(index ++) + s2;
-//                    system((s1 + std::to_string(index ++) + s2).c_str());
+                    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
                 }
             }
         }
     }
-    std::ofstream of(std::to_string(factor + 1) + ".txt");
+    std::ofstream of(std::__cxx11::to_string(factor + 1) + ".txt");
 
     of << (factor + 1) << endl;
     for (int i = 0; i < triangleOffset.size(); ++i) {
