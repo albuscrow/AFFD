@@ -94,9 +94,13 @@ void genSplitSchemeForOneTriangle() {
     vector<size_t> indexes;
     vector<size_t> triangleOffset;
     size_t table[factor][factor][factor];
-    int i = 7;
-    int j = 8;
-    int k = 10;
+    int i = 5;
+    int j = 6;
+    int k = 7;
+
+//    int i = 6;
+//    int j = 7;
+//    int k = 8;
     const triangle &t = genTriangle(i, j, k);
     auto triangles = split1(t, 1, true);
     auto currentPoints = point::getPointPool();
