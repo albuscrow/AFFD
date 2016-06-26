@@ -8,7 +8,7 @@
 #include "common_data_structure.h"
 
 
-void addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3,
+TriangleSharePtr addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3,
                  std::vector<TriangleSharePtr> &result, const triangle &t);
 
 std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool needClear);

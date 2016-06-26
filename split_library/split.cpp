@@ -12,6 +12,7 @@ using std::vector;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::ofstream;
 
 void outputAsFile(std::vector<TriangleSharePtr> &triangles);
 
@@ -32,12 +33,91 @@ void handle25(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSh
 std::map<point *, std::vector<TriangleSharePtr>> pointTriangleMap =
         std::map<point *, std::vector<TriangleSharePtr>>();
 
+ofstream &getFigureofstream() {
+    static ofstream ofs("/home/ac/code/python/affd/figure.txt");
+    return ofs;
+}
+
+void addPoints(vector<pointSharePtr> points) {
+    ofstream &ofs = getFigureofstream();
+    ofs << "ps" << " ";
+    for (auto psp : points) {
+        ofs << psp->getX() << " " << psp->getY() << " ";
+    }
+    ofs << endl;
+}
+
+void addPoints(vector<pointSharePtr> points1, vector<pointSharePtr> points2) {
+    vector<pointSharePtr> temp;
+    temp.reserve(points1.size() + points2.size());
+    temp.insert(temp.end(), points1.begin(), points1.end());
+    temp.insert(temp.end(), points2.begin(), points2.end());
+    addPoints(temp);
+}
+
+void addLines(vector<edge> edges) {
+    ofstream &ofs = getFigureofstream();
+    ofs << "ls" << " ";
+    for (auto e : edges) {
+        ofs << e.getP1()->getX() << " " << e.getP1()->getY() << " ";
+        ofs << e.getP2()->getX() << " " << e.getP2()->getY() << " ";
+    }
+    ofs << endl;
+}
+
+void addLines(edge e1, edge e2) {
+    addLines({e1, e2});
+}
+
+void addPoly(vector<pointSharePtr> ps) {
+    ofstream &ofs = getFigureofstream();
+    ofs << "poly" << " ";
+    for (auto psp : ps) {
+        ofs << psp->getX() << " " << psp->getY() << " ";
+    }
+    ofs << endl;
+}
+
+void addPoly(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, pointSharePtr p4) {
+    addPoly({p1, p2, p4, p3});
+}
+
+void addTriangles(vector<pointSharePtr > ps) {
+    ofstream &ofs = getFigureofstream();
+    ofs << "ts" << " ";
+    for (auto psp : ps) {
+        ofs << psp->getX() << " " << psp->getY() << " ";
+    }
+    ofs << endl;
+}
+
+void addTriangles(vector<TriangleSharePtr> ts) {
+    vector<pointSharePtr> temp;
+    for (auto t : ts) {
+        temp.push_back(t->getP1());
+        temp.push_back(t->getP2());
+        temp.push_back(t->getP3());
+    }
+    addTriangles(temp);
+}
+
+void addTriangles(TriangleSharePtr t) {
+    vector<pointSharePtr> temp{t->getP1(), t->getP2(), t->getP3()};
+    addTriangles(temp);
+}
+
+void addTriangles(triangle t) {
+    vector<pointSharePtr> temp{t.getP1(), t.getP2(), t.getP3()};
+    addTriangles(temp);
+}
+
 std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool needClear) {
     if (needClear) {
         pointTriangleMap.clear();
         point::clearPointPool();
     }
 
+    addTriangles(t);
 
     //取得三角形中两个较长的边
     vector<edge> edgeVector{t.getE12(), t.getE23(), t.getE31()};
@@ -77,6 +157,8 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
         secondEdge = e2;
     }
 
+    addLines(firstEdge, secondEdge);
+
     //调整前一条边的走向，另两条边都是从公共顶点出发
     firstEdge = -firstEdge;
 #ifdef TEST
@@ -88,6 +170,7 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
     vector<pointSharePtr> firstEdgePoints = splitEdge(firstEdge, l);
     vector<pointSharePtr> secondEdgePoints = splitEdge(secondEdge, l);
 
+    addPoints(firstEdgePoints, secondEdgePoints);
 
     //先把最顶上的三角形分割出来
     addTriangle(firstEdgePoints[1], firstEdgePoints[0], secondEdgePoints[1], result, t);
@@ -224,6 +307,7 @@ void split1Iter(const triangle &new_t, const double &l, vector<TriangleSharePtr>
 
 void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> secondEdgePoints, const double &l,
                 vector<TriangleSharePtr> &triangleVector, const triangle &t) {
+    addPoly(firstEdgePoints[0], secondEdgePoints[0], firstEdgePoints.back(), secondEdgePoints.back());
 //    size_t a = firstEdgePoints.size();
 //    size_t b = secondEdgePoints.size();
     if (firstEdgePoints.size() == 2 || secondEdgePoints.size() == 2) {
@@ -255,12 +339,14 @@ void split1Iter(vector<pointSharePtr> firstEdgePoints, vector<pointSharePtr> sec
 
     int i;
     for (i = 0; i < firstEdgePoints.size() - 2 && i < secondEdgePoints.size() - 2; ++i) {
+        addPoly(firstEdgePoints[i], secondEdgePoints[i], firstEdgePoints[i + 1], secondEdgePoints[i + 1]);
         splitOneLevel(edge(firstEdgePoints[i], secondEdgePoints[i]),
                       edge(firstEdgePoints[i + 1], secondEdgePoints[i + 1]),
                       l, triangleVector, t);
     }
 
     if (firstEdgePoints.size() == secondEdgePoints.size()) {
+        addPoly(firstEdgePoints[i], secondEdgePoints[i], firstEdgePoints[i + 1], secondEdgePoints[i + 1]);
         splitOneLevel(edge(firstEdgePoints[i], secondEdgePoints[i]),
                       edge(firstEdgePoints[i + 1], secondEdgePoints[i + 1]),
                       l, triangleVector, t);
@@ -526,41 +612,42 @@ void handle22(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSh
 void splitOneLevel(edge edge1, edge edge2, double l, vector<TriangleSharePtr> &result, const triangle &t) {
     vector<pointSharePtr> upPoints = splitEdge(edge1, l);
     vector<pointSharePtr> downPoints = splitEdge(edge2, l);
-
+    addPoints(upPoints, downPoints);
+    vector<TriangleSharePtr> ts;
     if (upPoints.size() + 1 == downPoints.size()) {
         for (int i = 0; i < downPoints.size() - 1; ++i) {
-            addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t);
+            ts.push_back(addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t));
         }
 
         for (int i = 0; i < upPoints.size() - 1; ++i) {
-            addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t);
+            ts.push_back(addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t));
         }
 
     } else if (upPoints.size() == downPoints.size()) {
         for (int i = 0; i < upPoints.size() - 1; ++i) {
             if (edge(upPoints[i], downPoints[i + 1]).getLength()
                 > edge(downPoints[i], upPoints[i + 1]).getLength()) {
-                addTriangle(downPoints[i], upPoints[i + 1], downPoints[i + 1], result, t);
-                addTriangle(downPoints[i], upPoints[i], upPoints[i + 1], result, t);
+                ts.push_back(addTriangle(downPoints[i], upPoints[i + 1], downPoints[i + 1], result, t));
+                ts.push_back(addTriangle(downPoints[i], upPoints[i], upPoints[i + 1], result, t));
             } else {
-                addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t);
-                addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t);
+                ts.push_back(addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t));
+                ts.push_back(addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t));
             }
         }
     } else if (upPoints.size() + 2 == downPoints.size()) {
-        addTriangle(downPoints[0], upPoints[0], downPoints[1], result, t);
-        addTriangle(downPoints[downPoints.size() - 2],
+        ts.push_back(addTriangle(downPoints[0], upPoints[0], downPoints[1], result, t));
+        ts.push_back(addTriangle(downPoints[downPoints.size() - 2],
                     upPoints[upPoints.size() - 1],
-                    downPoints[downPoints.size() - 1], result, t);
+                    downPoints[downPoints.size() - 1], result, t));
         downPoints.erase(downPoints.begin());
         for (int i = 0; i < upPoints.size() - 1; ++i) {
             if (edge(upPoints[i], downPoints[i + 1]).getLength()
                 > edge(downPoints[i], upPoints[i + 1]).getLength()) {
-                addTriangle(downPoints[i], upPoints[i + 1], downPoints[i + 1], result, t);
-                addTriangle(downPoints[i], upPoints[i], upPoints[i + 1], result, t);
+                ts.push_back(addTriangle(downPoints[i], upPoints[i + 1], downPoints[i + 1], result, t));
+                ts.push_back(addTriangle(downPoints[i], upPoints[i], upPoints[i + 1], result, t));
             } else {
-                addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t);
-                addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t);
+                ts.push_back(addTriangle(upPoints[i], upPoints[i + 1], downPoints[i + 1], result, t));
+                ts.push_back(addTriangle(downPoints[i], upPoints[i], downPoints[i + 1], result, t));
             }
         }
     } else {
@@ -569,6 +656,7 @@ void splitOneLevel(edge edge1, edge edge2, double l, vector<TriangleSharePtr> &r
         outputAsFile(result);
         exit(EXIT_FAILURE);
     }
+    addTriangles(ts);
 }
 
 int index = 0;
@@ -637,7 +725,7 @@ std::vector<triangle> split2(pointSharePtr p1, pointSharePtr p2, pointSharePtr p
     split2(triangle(p1, p2, p3), l);
 }
 
-void addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, std::vector<TriangleSharePtr> &result,
+TriangleSharePtr addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, std::vector<TriangleSharePtr> &result,
                  const triangle &t) {
     TriangleSharePtr triangleSharePtr = std::make_shared<triangle>(p1, p2, p3);
     result.push_back(triangleSharePtr);
@@ -653,4 +741,5 @@ void addTriangle(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, std::vect
     if (t.containPoint(p3.get())) {
         pointTriangleMap[p3.get()].push_back(triangleSharePtr);
     }
+    return triangleSharePtr;
 }
