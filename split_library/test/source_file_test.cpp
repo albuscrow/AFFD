@@ -120,6 +120,7 @@ void genSplitSchemeForOneTriangle() {
 
 int main() {
 //    genSplitFile();
+    cout << "begin split test " << endl;
     genSplitSchemeForOneTriangle();
 }
 

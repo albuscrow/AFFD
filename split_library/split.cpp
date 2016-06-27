@@ -202,8 +202,11 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
     split1Iter(firstEdgePoints, secondEdgePoints, l, result, t);
 
 //    result.push_back(std::shared_ptr<triangle>(new triangle(t)));
+    addTriangles(result);
     for (int i = 0; i < CVT_TIMES; ++i) {
+        cout << "cvt " << i << endl;
         cvt(t);
+        addTriangles(result);
     }
 
 //    addTriangle(t.getP1(), t.getP2(), t.getP3(), result, t);
