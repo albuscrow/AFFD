@@ -3,9 +3,7 @@
 // #include <iostream>
 #include "common_data_structure.h"
 #include "split.h"
-#include <vector>
 #include <fstream>
-#include <cmath>
 #include <stdlib.h>
 
 
@@ -15,10 +13,8 @@ using std::vector;
 using std::min;
 using std::max;
 using std::fabs;
+using std::string;
 
-using param = struct parameter {
-    double u, v, w;
-};
 #define ZERO 0.00001
 
 void outputParam(param parameter);
@@ -84,6 +80,15 @@ triangle genTriangle(float a, float b, float c) {
     return tt;
 }
 
+void outputPoint(pointSharePtr psp) {
+    cout << psp->getX() << " " << psp->getY() << " ";
+}
+
+void genSplitSchemeForOneTriangle(float i, float j, float k) {
+    const triangle &patternTriangle = genTriangle(i, j, k);
+    split1(patternTriangle, 1, true);
+}
+
 void genSplitSchemeForOneTriangle() {
     int index = 0;
     std::__cxx11::string s1 = "./showme result";
@@ -92,36 +97,55 @@ void genSplitSchemeForOneTriangle() {
     size_t factor = 30;
     vector<param> points;
     vector<size_t> indexes;
-    vector<size_t> triangleOffset;
-    size_t table[factor][factor][factor];
-    int i = 5;
-    int j = 6;
-    int k = 7;
+    const triangle &patternTriangle = genTriangle(5, 6, 7);
+    const triangle &splitTriangle = genTriangle(4.5f, 5.5f, 7.4f);
 
-//    int i = 6;
-//    int j = 7;
-//    int k = 8;
-    const triangle &t = genTriangle(i, j, k);
-    auto triangles = split1(t, 1, true);
+    auto triangles = split1(patternTriangle, 1, true);
     auto currentPoints = point::getPointPool();
-    table[i][j][k] = triangleOffset.size();
-    triangleOffset.push_back(indexes.size() / 3);
-    triangleOffset.push_back(triangles.size());
-    for (auto smallTriangle : triangles) {
-        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP1())));
-        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP2())));
-        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
+
+
+    for (auto &p : point::getPointPool()) {
+        param param = toParam(patternTriangle, *p);
+        const pointSharePtr &x = splitTriangle.getPointFromBarycentricCoordinate(param);
+        p->setX(x->getX());
+        p->setY(x->getY());
+        p->setZ(x->getZ());
     }
-    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
+
+    for (int i = 0; i < 10; ++i) {
+        cvt();
+    }
+
+    for (auto smallTriangle : triangles) {
+        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP1())));
+        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP2())));
+        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP3())));
+    }
+    system((s1 + std::__cxx11::to_string(index++) + s2).c_str());
+
+
+    auto positions = vector<pointSharePtr>();
+    for (auto &p : points) {
+        positions.push_back(splitTriangle.getPointFromBarycentricCoordinate(p));
+    }
+    auto subTriangles = vector<triangle>();
+    for (int i = 0; i < indexes.size() / 3; ++i) {
+        subTriangles.emplace_back(positions[indexes[i * 3]], positions[indexes[i * 3 + 1]],
+                                  positions[indexes[i * 3 + 2]]);
+    }
+
+    cout << "ts" << " ";
+    for (auto t : subTriangles) {
+        outputPoint(t.getP1());
+        outputPoint(t.getP2());
+        outputPoint(t.getP3());
+    }
 }
-
-
 
 
 int main() {
 //    genSplitFile();
-    cout << "begin split test " << endl;
-    genSplitSchemeForOneTriangle();
+    genSplitSchemeForOneTriangle(5, 6, 7);
 }
 
 void genSplitFile() {
@@ -152,7 +176,7 @@ void genSplitFile() {
                         indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
                     }
 //                    cout << s1 + std::to_string(index ++) + s2;
-                    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
+                    system((s1 + std::__cxx11::to_string(index++) + s2).c_str());
                 }
             }
         }

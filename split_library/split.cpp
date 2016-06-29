@@ -16,7 +16,7 @@ using std::ofstream;
 
 void outputAsFile(std::vector<TriangleSharePtr> &triangles);
 
-void cvt(const triangle &t);
+void cvt();
 
 void handle22(const vector<pointSharePtr> &firstEdgePoints, const vector<pointSharePtr> &secondEdgePoints,
               const double &l, vector<TriangleSharePtr> &triangleVector, const triangle &t);
@@ -34,8 +34,13 @@ std::map<point *, std::vector<TriangleSharePtr>> pointTriangleMap =
         std::map<point *, std::vector<TriangleSharePtr>>();
 
 ofstream &getFigureofstream() {
-    static ofstream ofs("/home/ac/code/python/affd/figure.txt");
+    static ofstream ofs("/home/ac/code/python/affd/figure2.txt");
     return ofs;
+}
+
+void beginCVT() {
+    ofstream &ofs = getFigureofstream();
+    ofs << "cvt" << endl;
 }
 
 void addPoints(vector<pointSharePtr> points) {
@@ -203,9 +208,9 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
 
 //    result.push_back(std::shared_ptr<triangle>(new triangle(t)));
     addTriangles(result);
+    beginCVT();
     for (int i = 0; i < CVT_TIMES; ++i) {
-        cout << "cvt " << i << endl;
-        cvt(t);
+        cvt();
         addTriangles(result);
     }
 
@@ -223,7 +228,7 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
     return result;
 }
 
-void cvt(const triangle &t) {
+void cvt() {
 #ifdef TEST
 //    cout << pointTriangleMap.size() << endl;
 #endif

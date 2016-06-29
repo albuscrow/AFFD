@@ -26,4 +26,6 @@ std::vector<triangle> split2(const triangle &t, const double &l);
 
 std::vector<triangle> split2(pointSharePtr p1, pointSharePtr p2, pointSharePtr p3, const double &l);
 
+void cvt();
+
 #endif //PROJECT_SPLIT_H

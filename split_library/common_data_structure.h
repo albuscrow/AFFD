@@ -235,6 +235,10 @@ private:
     double length = 0.0;
 };
 
+struct param {
+    double u, v, w;
+};
+
 using edge_ptr = std::unique_ptr<edge>;
 using edge_share_ptr = std::shared_ptr<edge>;
 
@@ -320,6 +324,11 @@ public:
 
     const edge &getE31() const {
         return e31;
+    }
+
+    pointSharePtr getPointFromBarycentricCoordinate(const param &p) const {
+        point temp = *p1 * p.u + *p2 * p.v + *p3 * p.w;
+        return std::make_shared<point>(temp.getX(), temp.getY(), temp.getZ());
     }
 
     point getExcentre() const;
