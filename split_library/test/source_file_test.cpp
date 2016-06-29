@@ -5,6 +5,7 @@
 #include "split.h"
 #include <fstream>
 #include <stdlib.h>
+#include <fstream>
 
 
 using std::cout;
@@ -14,6 +15,7 @@ using std::min;
 using std::max;
 using std::fabs;
 using std::string;
+using std::ofstream;
 
 #define ZERO 0.00001
 
@@ -80,8 +82,8 @@ triangle genTriangle(float a, float b, float c) {
     return tt;
 }
 
-void outputPoint(pointSharePtr psp) {
-    cout << psp->getX() << " " << psp->getY() << " ";
+void outputPoint(pointSharePtr psp, ofstream &ofs) {
+    ofs << psp->getX() << " " << psp->getY() << " ";
 }
 
 void genSplitSchemeForOneTriangle(float i, float j, float k) {
@@ -89,21 +91,23 @@ void genSplitSchemeForOneTriangle(float i, float j, float k) {
     split1(patternTriangle, 1, true);
 }
 
-void genSplitSchemeForOneTriangle() {
-    int index = 0;
-    std::__cxx11::string s1 = "./showme result";
-    std::__cxx11::string s2 = ".poly";
-
-    size_t factor = 30;
-    vector<param> points;
-    vector<size_t> indexes;
-    const triangle &patternTriangle = genTriangle(5, 6, 7);
-    const triangle &splitTriangle = genTriangle(4.5f, 5.5f, 7.4f);
+void genCVTDiff(float i, float j, float k, float i2, float j2, float k2) {
+    const triangle &patternTriangle = genTriangle(i, j, k);
+    const triangle &splitTriangle = genTriangle(i2, j2, k2);
 
     auto triangles = split1(patternTriangle, 1, true);
-    auto currentPoints = point::getPointPool();
 
+    vector<param> points1;
+    vector<param> points2;
+    vector<size_t> indexes;
+    // get the param cvt in pattern
+    for (auto smallTriangle : triangles) {
+        indexes.push_back(getIndex(points1, toParam(patternTriangle, *smallTriangle->getP1())));
+        indexes.push_back(getIndex(points1, toParam(patternTriangle, *smallTriangle->getP2())));
+        indexes.push_back(getIndex(points1, toParam(patternTriangle, *smallTriangle->getP3())));
+    }
 
+    //get the param cvt in split
     for (auto &p : point::getPointPool()) {
         param param = toParam(patternTriangle, *p);
         const pointSharePtr &x = splitTriangle.getPointFromBarycentricCoordinate(param);
@@ -117,35 +121,60 @@ void genSplitSchemeForOneTriangle() {
     }
 
     for (auto smallTriangle : triangles) {
-        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP1())));
-        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP2())));
-        indexes.push_back(getIndex(points, toParam(splitTriangle, *smallTriangle->getP3())));
+        getIndex(points2, toParam(splitTriangle, *smallTriangle->getP1()));
+        getIndex(points2, toParam(splitTriangle, *smallTriangle->getP2()));
+        getIndex(points2, toParam(splitTriangle, *smallTriangle->getP3()));
     }
-    system((s1 + std::__cxx11::to_string(index++) + s2).c_str());
-
 
     auto positions = vector<pointSharePtr>();
-    for (auto &p : points) {
+    for (auto &p : points1) {
         positions.push_back(splitTriangle.getPointFromBarycentricCoordinate(p));
     }
+
     auto subTriangles = vector<triangle>();
     for (int i = 0; i < indexes.size() / 3; ++i) {
         subTriangles.emplace_back(positions[indexes[i * 3]], positions[indexes[i * 3 + 1]],
                                   positions[indexes[i * 3 + 2]]);
     }
 
-    cout << "ts" << " ";
+    ofstream ofs("/home/ac/code/python/affd/cvt.txt", std::ios::app);
+
+    ofs << "ts" << " ";
     for (auto t : subTriangles) {
-        outputPoint(t.getP1());
-        outputPoint(t.getP2());
-        outputPoint(t.getP3());
+        outputPoint(t.getP1(), ofs);
+        outputPoint(t.getP2(), ofs);
+        outputPoint(t.getP3(), ofs);
     }
+    ofs << endl;
+
+    positions = vector<pointSharePtr>();
+    for (auto &p : points2) {
+        positions.push_back(splitTriangle.getPointFromBarycentricCoordinate(p));
+    }
+
+    subTriangles = vector<triangle>();
+    for (int i = 0; i < indexes.size() / 3; ++i) {
+        subTriangles.emplace_back(positions[indexes[i * 3]], positions[indexes[i * 3 + 1]],
+                                  positions[indexes[i * 3 + 2]]);
+    }
+
+    ofs << "ts" << " ";
+    for (auto t : subTriangles) {
+        outputPoint(t.getP1(), ofs);
+        outputPoint(t.getP2(), ofs);
+        outputPoint(t.getP3(), ofs);
+    }
+    ofs << endl;
 }
 
 
 int main() {
 //    genSplitFile();
-    genSplitSchemeForOneTriangle(5, 6, 7);
+//    genSplitSchemeForOneTriangle(5, 6, 7);
+    genCVTDiff(3, 4, 5, 2.5, 3.5, 5.4);
+    genCVTDiff(4, 5, 6, 3.5, 4.5, 6.4);
+    genCVTDiff(5, 6, 7, 4.5, 5.5, 7.4);
+    genCVTDiff(6, 7, 8, 5.5, 6.5, 8.4);
 }
 
 void genSplitFile() {
