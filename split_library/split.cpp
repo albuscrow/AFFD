@@ -34,7 +34,7 @@ std::map<point *, std::vector<TriangleSharePtr>> pointTriangleMap =
         std::map<point *, std::vector<TriangleSharePtr>>();
 
 ofstream &getFigureofstream() {
-    static ofstream ofs("/home/ac/code/python/affd/figure2.txt");
+    static ofstream ofs("/home/ac/code/python/affd/figure1.txt", std::ios::out);
     return ofs;
 }
 

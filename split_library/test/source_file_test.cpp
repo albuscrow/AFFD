@@ -170,11 +170,11 @@ void genCVTDiff(float i, float j, float k, float i2, float j2, float k2) {
 
 int main() {
 //    genSplitFile();
-//    genSplitSchemeForOneTriangle(5, 6, 7);
-    genCVTDiff(3, 4, 5, 2.5, 3.5, 5.4);
-    genCVTDiff(4, 5, 6, 3.5, 4.5, 6.4);
-    genCVTDiff(5, 6, 7, 4.5, 5.5, 7.4);
-    genCVTDiff(6, 7, 8, 5.5, 6.5, 8.4);
+    genSplitSchemeForOneTriangle(5, 6, 7);
+//    genCVTDiff(3, 4, 5, 2.5, 3.5, 5.4);
+//    genCVTDiff(4, 5, 6, 3.5, 4.5, 6.4);
+//    genCVTDiff(5, 6, 7, 4.5, 5.5, 7.4);
+//    genCVTDiff(6, 7, 8, 5.5, 6.5, 8.4);
 }
 
 void genSplitFile() {
