@@ -124,7 +124,7 @@ std::vector<TriangleSharePtr> split1(const triangle &t, const double &l, bool ne
     }
 
 //    addTriangle(t.getP1(), t.getP2(), t.getP3(), result, t);
-    outputAsFile(result);
+//    outputAsFile(result);
 //    result.pop_back();
 #ifdef TEST
     //    cout << point::getPointPool().size() << endl;

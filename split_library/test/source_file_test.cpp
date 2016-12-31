@@ -7,6 +7,9 @@
 #include <fstream>
 #include <cmath>
 #include <stdlib.h>
+#include <string>
+#include <map>
+#include <set>
 
 
 using std::cout;
@@ -17,7 +20,7 @@ using std::max;
 using std::fabs;
 
 using param = struct parameter {
-    double u, v, w;
+    double u, v;
 };
 #define ZERO 0.00001
 
@@ -27,12 +30,42 @@ void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<para
 
 void genSplitFile();
 
-size_t getIndex(vector<param> &points, param point) {
-    for (size_t i = 0; i < points.size(); ++i) {
-        param p = points[i];
-        if (fabs(p.u - point.u) < ZERO && fabs(p.v - point.v) < ZERO && fabs(p.w - point.w) < ZERO) {
+class own_param_less : public std::binary_function<param, param, bool> {
+public:
+
+    bool equal(const double &left, const double &right) const {
+        // you can choose other way to make decision
+        // (The original version is: return left < right;)
+        return (fabs(left - right) < ZERO);
+    }
+
+    bool operator()(const param &left, const param &right) const {
+        // you can choose other way to make decision
+        // (The original version is: return left < right;)
+        if (equal(left.u, right.u)) {
+            return (fabs(left.v - right.v) >= ZERO) && left.v < right.v;
+        } else {
+            return left.u < right.u;
+        }
+    }
+
+};
+void getIndex(std::set<param, own_param_less> &mem, const param &point) {
+    auto iter = mem.find(point);
+    if (iter == mem.end()) {
+        mem.insert(point);
+    }
+}
+
+size_t getIndex(vector<param> &points, const param &point) {
+    param *p = &points[0];
+    double u = point.u, v = point.v;
+    size_t len = points.size();
+    for (size_t i = 0; i < len; ++i) {
+        if (fabs(p->u - u) < ZERO && fabs(p->v - v) < ZERO) {
             return i;
         }
+        ++p;
     }
     points.push_back(point);
     return points.size() - 1;
@@ -51,7 +84,6 @@ param toParam(const triangle &t, point &p) {
     param r;
     r.u = abc(0, 0);
     r.v = abc(1, 0);
-    r.w = abc(2, 0);
     return r;
 
 //    SplitResultPoint splitResultPoint;
@@ -89,7 +121,7 @@ void genSplitSchemeForOneTriangle() {
     std::__cxx11::string s1 = "./showme result";
     std::__cxx11::string s2 = ".poly";
 
-    size_t factor = 30;
+    size_t factor = 40;
     vector<param> points;
     vector<size_t> indexes;
     vector<size_t> triangleOffset;
@@ -112,73 +144,90 @@ void genSplitSchemeForOneTriangle() {
         indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP2())));
         indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
     }
-    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
+    system((s1 + std::__cxx11::to_string(index++) + s2).c_str());
 }
-
-
 
 
 int main() {
-//    genSplitFile();
-    genSplitSchemeForOneTriangle();
+    genSplitFile();
+//    genSplitSchemeForOneTriangle();
+    return 0;
 }
+
 
 void genSplitFile() {
     int index = 0;
-    std::__cxx11::string s1 = "./showme result";
-    std::__cxx11::string s2 = ".poly";
+    std::string s1 = "./showme result";
+    std::string s2 = ".poly";
 
-    size_t factor = 30;
-    vector<param> points;
-    vector<size_t> indexes;
-    vector<size_t> triangleOffset;
-    size_t table[factor][factor][factor];
+    size_t factor = 50;
+//    vector<param> points;
+//    points.reserve(1000000);
+//    vector<size_t> indexes;
+//    vector<size_t> triangleOffset;
+//    size_t table[factor][factor][factor];
+
+// your map:
+    int triangleOffsetSize = 0;
+    int indexNumber = 0;
+    std::set<param, own_param_less> pointsMap;
     for (int i = 1; i <= factor; ++i) {
-        cout << i << endl;
         for (int j = i; j <= factor; ++j) {
             for (int k = j; k <= factor; ++k) {
                 if (i + j >= k) {
                     const triangle &t = genTriangle(i, j, k);
                     auto triangles = split1(t, 1, true);
 //                    cout << "handle triangle #"<< index << endl;
-                    auto currentPoints = point::getPointPool();
-                    table[i][j][k] = triangleOffset.size();
-                    triangleOffset.push_back(indexes.size() / 3);
-                    triangleOffset.push_back(triangles.size());
+//                    auto currentPoints = point::getPointPool();
+//                    table[i][j][k] = triangleOffset.size();
+                    triangleOffsetSize += 2;
+//                    triangleOffset.push_back(indexes.size() / 3);
+//                    triangleOffset.push_back(triangles.size());
+                    indexNumber += triangles.size() * 3;
                     for (auto smallTriangle : triangles) {
-                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP1())));
-                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP2())));
-                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
+//                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP1())));
+//                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP2())));
+//                        indexes.push_back(getIndex(points, toParam(t, *smallTriangle->getP3())));
+
+                        getIndex(pointsMap, toParam(t, *smallTriangle->getP1()));
+                        getIndex(pointsMap, toParam(t, *smallTriangle->getP2()));
+                        getIndex(pointsMap, toParam(t, *smallTriangle->getP3()));
                     }
 //                    cout << s1 + std::to_string(index ++) + s2;
-                    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
+//                    system((s1 + std::__cxx11::to_string(index ++) + s2).c_str());
                 }
             }
         }
-    }
-    std::ofstream of(std::__cxx11::to_string(factor + 1) + ".txt");
-
-    of << (factor + 1) << endl;
-    for (int i = 0; i < triangleOffset.size(); ++i) {
-        of << triangleOffset[i] << " ";
-    }
-    of << endl;
-    int counter = 0;
-    for (int i = 0; i < indexes.size(); ++i) {
-        of << indexes[i] << " ";
-        if (2 == counter) {
-            of << "-1 ";
-            counter = 0;
-        } else {
-            counter++;
-        }
-    }
-    of << endl;
-    for (int i = 0; i < points.size(); ++i) {
-        of << points[i].u << " " << points[i].v << " " << points[i].w << " " << "0 ";
+            cout << i << endl;
+        cout << "total size: " << (triangleOffsetSize * 4  + indexNumber / 3 * 4 * 4 + pointsMap.size() * 3 / 3 * 4 * 4) / 1024.0 / 1024<< endl;
     }
 
-    of.close();
+
+    cout << "total size: " << (triangleOffsetSize * 4  + indexNumber / 3 * 4 * 4 + pointsMap.size() * 3 / 3 * 4 * 4) / 1024.0 / 1024<< endl;
+//    cout << "index size" << indexes.size() / 3 * 4 * 4 << endl;
+//    cout << "point size" << points.size() / 3 * 4 * 4 << endl;
+//    std::ofstream of(std::to_string(factor + 1) + ".txt");
+//    of << (factor + 1) << endl;
+//    for (int i = 0; i < triangleOffset.size(); ++i) {
+//        of << triangleOffset[i] << " ";
+//    }
+//    of << endl;
+//    int counter = 0;
+//
+//    for (int i = 0; i < indexes.size(); ++i) {
+//        of << indexes[i] << " ";
+//        if (2 == counter) {
+//            of << "-1 ";
+//            counter = 0;
+//        } else {
+//            counter++;
+//        }
+//    }
+//    of << endl;
+//    for (int i = 0; i < points.size(); ++i) {
+//        of << points[i].u << " " << points[i].v << " " << points[i].w << " " << "0 ";
+//    }
+//    of.close();
 
 
 //    testCode(triangleOffset, indexes, points, table);
@@ -289,9 +338,9 @@ void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<para
                 outputParam(pp0);
                 outputParam(pp1);
                 outputParam(pp2);
-                point sp0 = *p1 * pp0.u + *p2 * pp0.v + *p3 * pp0.w;
-                point sp1 = *p1 * pp1.u + *p2 * pp1.v + *p3 * pp1.w;
-                point sp2 = *p1 * pp2.u + *p2 * pp2.v + *p3 * pp2.w;
+                point sp0 = *p1 * pp0.u + *p2 * pp0.v + *p3 * (1 - pp0.u - pp0.v);
+                point sp1 = *p1 * pp1.u + *p2 * pp1.v + *p3 * (1 - pp1.u - pp1.v);
+                point sp2 = *p1 * pp2.u + *p2 * pp2.v + *p3 * (1 - pp2.u - pp2.v);
                 of << iii * 3 + 1 << " " << sp0.getX() << " " << sp0.getY() << endl;
                 of << iii * 3 + 2 << " " << sp1.getX() << " " << sp1.getY() << endl;
                 of << iii * 3 + 3 << " " << sp2.getX() << " " << sp2.getY() << endl;
@@ -312,7 +361,7 @@ void testCode(vector<size_t> triangleOffset, vector<size_t> indexes, vector<para
 }
 
 void outputParam(param parameter) {
-    cout << parameter.u << " " << parameter.v << " " << parameter.w << endl;
+    cout << parameter.u << " " << parameter.v << " " << 1 - parameter.u - parameter.v << endl;
 
 }
 
